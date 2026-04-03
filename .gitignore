@@ -1,0 +1,37 @@
+# Environment
+.env
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+data/*.json
+data/*.csv
+*.db
+
+# Models (large files)
+models/
+*.pt
+*.bin
+*.onnx
+
+# Logs
+*.log
+logs/
