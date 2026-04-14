@@ -35,5 +35,3 @@ models/
 # Logs
 *.log
 logs/
-.railwayignore
-.dockerignore
