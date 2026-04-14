@@ -9,7 +9,7 @@ import hashlib
 import logging
 import time
 from urllib.parse import urlparse
-
+import re
 import httpx
 from readability import Document as ReadabilityDocument
 from app.config import get_settings
@@ -213,7 +213,9 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
 
     # Step 5: Run all engines in parallel
     prism_task = route_and_analyze(extracted_text, mode, heuristics)
-    trace_task = run_trace(extracted_text)
+    # Use first sentence for Trace search (more specific than full text)
+    trace_query = re.split(r'[.!?\n]', extracted_text)[0].strip()[:150]
+    trace_task = run_trace(trace_query if len(trace_query) > 20 else extracted_text[:200])
     signal_task = asyncio.to_thread(run_signal, extracted_text, source_url)
 
     prism_raw, trace_raw, signal_raw = await asyncio.gather(
@@ -256,7 +258,7 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
         id=content_hash[:16],
         input_type=input_type,
         input_content=content[:500],
-        extracted_text=extracted_text[:2000],
+        extracted_text=extracted_text[:3000],
         prism=prism_result,
         trace=trace_result,
         signal=signal_result,
