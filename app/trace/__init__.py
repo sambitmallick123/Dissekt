@@ -10,6 +10,8 @@ Searches fact-check databases and traces claim origins:
 import logging
 import httpx
 from app.config import get_settings
+import re
+from datetime import datetime
 
 logger = logging.getLogger("dissekt.trace")
 
@@ -195,9 +197,38 @@ async def run_trace(text: str) -> dict:
     # Find earliest source
     earliest = web_results[0] if web_results else None
 
+    web_results = _enrich_with_platform_dates(web_results)
+
     return {
         "fact_checks": fact_checks,
         "spread_timeline": web_results,
         "earliest_source": earliest,
         "check_worthiness": 0.0,  # TODO: ClaimBuster integration
     }
+
+
+
+def _enrich_with_platform_dates(results: list[dict]) -> list[dict]:
+    """Extract dates from social media URLs where possible."""
+    for item in results:
+        if item.get("date"):
+            continue
+        url = item.get("url", "")
+        
+        # Twitter/X: Snowflake ID encodes timestamp
+        if "x.com" in url or "twitter.com" in url:
+            match = re.search(r'/status/(\d+)', url)
+            if match:
+                tweet_id = int(match.group(1))
+                try:
+                    timestamp_ms = (tweet_id >> 22) + 1288834974657
+                    dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                    item["date"] = dt.strftime("%b %d, %Y %H:%M")
+                except Exception:
+                    pass
+        
+        # Threads
+        if "threads.com" in url:
+            item["platform"] = "Threads"
+    
+    return results
