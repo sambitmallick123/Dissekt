@@ -6,7 +6,8 @@ All models run locally — zero API cost:
 3. VADER (sentiment analysis)
 4. Emotional word scoring (NRC-based, in heuristics module)
 """
-
+import json
+import os
 import logging
 from app.prism.heuristics import lookup_source_credibility, analyze_sentiment
 
@@ -15,41 +16,38 @@ logger = logging.getLogger("dissekt.signal")
 # Lazy-load Detoxify to avoid slow startup
 _detoxify_model = None
 
-
 def _get_detoxify():
-    """Lazy-load Detoxify model on first use."""
     global _detoxify_model
     if _detoxify_model is None:
         try:
             from detoxify import Detoxify
-            _detoxify_model = Detoxify("original")
-            logger.info("Detoxify model loaded successfully")
+            _detoxify_model = Detoxify('original')
+            logger.info("Detoxify model loaded successfully (440MB)")
+        except ImportError:
+            logger.warning("Detoxify not installed — toxicity scores will be 0.0")
+            return None
         except Exception as e:
-            logger.error(f"Failed to load Detoxify: {e}")
-            _detoxify_model = "failed"
-    return _detoxify_model if _detoxify_model != "failed" else None
-
+            logger.error(f"Detoxify failed to load: {e}")
+            return None
+    return _detoxify_model
 
 def analyze_toxicity(text: str) -> dict:
-    """Run Detoxify toxicity classification.
-
-    Returns scores for: toxicity, severe_toxicity, obscene,
-    threat, insult, identity_attack (all 0.0-1.0).
-    """
     model = _get_detoxify()
     if model is None:
-        return {"toxicity": 0.0, "labels": {}}
-
+        return {
+            "toxicity": 0.0, "severe_toxicity": 0.0, "obscene": 0.0,
+            "threat": 0.0, "insult": 0.0, "identity_attack": 0.0
+        }
     try:
-        results = model.predict(text[:2000])  # Limit input length
-        # Results come as {label: [score]} — flatten
-        labels = {k: round(float(v[0]) if isinstance(v, list) else float(v), 4)
-                  for k, v in results.items()}
-        toxicity = labels.get("toxicity", 0.0)
-        return {"toxicity": toxicity, "labels": labels}
+        scores = model.predict(text[:1000])  # Limit input length for speed
+        return {k: round(float(v), 4) for k, v in scores.items()}
     except Exception as e:
-        logger.error(f"Detoxify error: {e}")
-        return {"toxicity": 0.0, "labels": {}}
+        logger.error(f"Detoxify prediction failed: {e}")
+        return {
+            "toxicity": 0.0, "severe_toxicity": 0.0, "obscene": 0.0,
+            "threat": 0.0, "insult": 0.0, "identity_attack": 0.0
+        }
+    
 
 
 def run_signal(text: str, source_url: str = "") -> dict:
@@ -57,6 +55,7 @@ def run_signal(text: str, source_url: str = "") -> dict:
 
     Returns: toxicity, source bias, sentiment, emotion.
     """
+    
     # Toxicity (Detoxify)
     tox = analyze_toxicity(text)
 
@@ -73,12 +72,24 @@ def run_signal(text: str, source_url: str = "") -> dict:
     sentiment = analyze_sentiment(text)
 
     return {
-        "toxicity_score": tox["toxicity"],
-        "toxicity_labels": tox["labels"],
+        "toxicity_score": tox.get("toxicity", 0.0),
+        "toxicity_labels": {k: v for k, v in tox.items()},  # ← all scores as labels
         "source_bias": source_bias,
         "source_factuality": source_factuality,
         "sentiment": sentiment["label"],
         "sentiment_score": sentiment["compound"],
-        "primary_emotion": "neutral",  # TODO: XLM-RoBERTa in Stage 2
+        "primary_emotion": "neutral",
         "emotion_scores": {},
     }
+
+_MBFC_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'mbfc_database.json')
+
+def _load_mbfc():
+    try:
+        with open(_MBFC_PATH) as f:
+            return json.load(f)
+    except Exception as e:
+        logger.warning(f"Failed to load MBFC database: {e}")
+        return {}
+
+MBFC_DATABASE = _load_mbfc()

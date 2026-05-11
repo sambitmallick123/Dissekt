@@ -203,59 +203,12 @@ def estimate_claim_density(text: str) -> tuple[float, int]:
 # Media Bias/Fact Check database — subset for MVP
 # In production, load full database from file (~6000+ entries)
 # Data source: https://mediabiasfactcheck.com/
-MBFC_DATABASE = {
-    # India
-    "thewire.in": {"bias": "left-center", "factuality": "high"},
-    "scroll.in": {"bias": "left-center", "factuality": "high"},
-    "thehindu.com": {"bias": "left-center", "factuality": "high"},
-    "ndtv.com": {"bias": "left-center", "factuality": "high"},
-    "opindia.com": {"bias": "right", "factuality": "mixed"},
-    "swarajyamag.com": {"bias": "right", "factuality": "mixed"},
-    "theprint.in": {"bias": "center", "factuality": "high"},
-    "livemint.com": {"bias": "center", "factuality": "high"},
-    "hindustantimes.com": {"bias": "center", "factuality": "high"},
-    "indiatoday.in": {"bias": "center", "factuality": "mixed"},
-    "timesofindia.indiatimes.com": {"bias": "center", "factuality": "mixed"},
-    "republic.in": {"bias": "right", "factuality": "mixed"},
-    "newslaundry.com": {"bias": "left-center", "factuality": "high"},
 
-    # Germany
-    "tagesschau.de": {"bias": "center", "factuality": "very-high"},
-    "spiegel.de": {"bias": "left-center", "factuality": "high"},
-    "bild.de": {"bias": "right-center", "factuality": "mixed"},
-    "faz.net": {"bias": "right-center", "factuality": "high"},
-    "sueddeutsche.de": {"bias": "left-center", "factuality": "high"},
-    "zeit.de": {"bias": "left-center", "factuality": "high"},
-    "welt.de": {"bias": "right-center", "factuality": "high"},
-    "correctiv.org": {"bias": "center", "factuality": "very-high"},
-    "taz.de": {"bias": "left", "factuality": "high"},
+import json, os
+MBFC_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'mbfc_database.json')
+with open(MBFC_PATH) as f:
+    MBFC_DATABASE = json.load(f)
 
-    # US
-    "nytimes.com": {"bias": "left-center", "factuality": "high"},
-    "washingtonpost.com": {"bias": "left-center", "factuality": "high"},
-    "foxnews.com": {"bias": "right", "factuality": "mixed"},
-    "cnn.com": {"bias": "left", "factuality": "mixed"},
-    "bbc.com": {"bias": "center", "factuality": "very-high"},
-    "reuters.com": {"bias": "center", "factuality": "very-high"},
-    "apnews.com": {"bias": "center", "factuality": "very-high"},
-    "breitbart.com": {"bias": "far-right", "factuality": "low"},
-    "infowars.com": {"bias": "far-right", "factuality": "very-low"},
-    "dailywire.com": {"bias": "right", "factuality": "mixed"},
-    "huffpost.com": {"bias": "left", "factuality": "mixed"},
-    "politico.com": {"bias": "center", "factuality": "high"},
-    "theintercept.com": {"bias": "left", "factuality": "high"},
-
-    # UK
-    "bbc.co.uk": {"bias": "center", "factuality": "high"},
-    "theguardian.com": {"bias": "left-center", "factuality": "high"},
-    "dailymail.co.uk": {"bias": "right", "factuality": "low"},
-    "telegraph.co.uk": {"bias": "right-center", "factuality": "high"},
-    "independent.co.uk": {"bias": "left-center", "factuality": "high"},
-    "mirror.co.uk": {"bias": "left-center", "factuality": "mixed"},
-    "thesun.co.uk": {"bias": "right", "factuality": "low"},
-    "fullfact.org": {"bias": "center", "factuality": "very-high"},
-    "channel4.com": {"bias": "center", "factuality": "high"},
-}
 
 
 def lookup_source_credibility(url: str) -> dict | None:

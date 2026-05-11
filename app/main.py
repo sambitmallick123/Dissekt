@@ -55,7 +55,11 @@ app = FastAPI(
 # CORS — allow all origins in development, restrict in production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Restrict to dissekt.co in production
+    allow_origins=[
+        "http://localhost:3000",
+        "https://dissekt.co",
+        "https://www.dissekt.co",
+    ],  # TODO: Restrict to dissekt.co in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
