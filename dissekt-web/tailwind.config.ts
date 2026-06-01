@@ -9,22 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['Charter', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
-        mono: ['SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
       },
       colors: {
-        ink: {
-          900: '#0a0a0a',
-          800: '#1a1a1a',
-          700: '#404040',
-          600: '#525252',
-          500: '#737373',
-          400: '#a3a3a3',
-          300: '#d4d4d4',
-          200: '#e5e5e5',
-          100: '#f5f5f5',
-          50:  '#fafaf9',
+        panel: {
+          bg: '#f8f8f7',
+          surface: '#ffffff',
+          border: '#e8e6e3',
+          muted: '#f3f2f0',
+        },
+        accent: {
+          purple: '#7c3aed',
+          blue: '#2563eb',
+          amber: '#d97706',
+          red: '#dc2626',
+          green: '#059669',
+          teal: '#0d9488',
         },
       },
     },

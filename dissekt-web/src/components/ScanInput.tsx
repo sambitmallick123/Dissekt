@@ -1,93 +1,39 @@
 'use client';
 import { useState } from 'react';
 
-interface Props {
-  onScan: (content: string, mode: string) => void;
-  loading: boolean;
-}
-
-export default function ScanInput({ onScan, loading }: Props) {
+export default function ScanInput({ onScan, loading }: { onScan: (c: string, m: string) => void; loading: boolean }) {
   const [content, setContent] = useState('');
-  const [mode, setMode] = useState<'brief' | 'detailed'>('brief');
-
-  const handleSubmit = () => {
-    if (content.trim().length < 10) return;
-    onScan(content.trim(), mode);
-  };
-
+  const [mode, setMode] = useState<'brief'|'detailed'>('brief');
   const isUrl = content.trim().startsWith('http');
-  const canSubmit = content.trim().length >= 10 && !loading;
+  const ok = content.trim().length >= 10 && !loading;
 
   return (
-    <div className="bg-white border border-ink-200 rounded-xl shadow-sm overflow-hidden">
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Paste a URL, article text, or social media post…"
-        className="w-full h-36 p-5 text-[15px] leading-relaxed text-ink-900 placeholder-ink-400 focus:outline-none resize-none font-sans"
-        onKeyDown={(e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            handleSubmit();
-          }
-        }}
-      />
-
-      <div className="border-t border-ink-100 px-4 py-3 flex items-center justify-between gap-3 bg-ink-50/50">
-        <div className="flex items-center gap-2">
-          {/* Mode selector */}
-          <div className="inline-flex bg-white border border-ink-200 rounded-md p-0.5">
-            {(['brief', 'detailed'] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`px-3 py-1 rounded text-xs font-medium capitalize transition-all ${
-                  mode === m
-                    ? 'bg-ink-900 text-white shadow-sm'
-                    : 'text-ink-500 hover:text-ink-800'
-                }`}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-          {/* Status indicator */}
-          <span className="text-xs text-ink-500 hidden sm:inline">
-            {isUrl ? (
-              <span className="inline-flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
-                URL detected
-              </span>
-            ) : content.length > 0 ? (
-              `${content.trim().split(/\s+/).length} words`
-            ) : (
-              ''
-            )}
-          </span>
-        </div>
-
-        <button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="inline-flex items-center gap-2 px-4 py-1.5 bg-ink-900 text-white rounded-md text-sm font-medium hover:bg-ink-800 disabled:bg-ink-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? (
-            <>
-              <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-              </svg>
-              Analyzing
-            </>
-          ) : (
-            <>
-              Analyze
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </>
-          )}
-        </button>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, background: '#f5f5f4', borderRadius: 10, padding: '10px 14px', border: '1px solid #e5e5e5' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input
+          type="text" value={content} onChange={e => setContent(e.target.value)}
+          placeholder="Paste a URL, article text, or claim to analyze..."
+          onKeyDown={e => { if (e.key === 'Enter' && ok) onScan(content.trim(), mode); }}
+          style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#1a1a1a' }}
+        />
+        {isUrl && (
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#7c3aed', background: '#f3e8ff', padding: '3px 10px', borderRadius: 20, whiteSpace: 'nowrap' }}>URL</span>
+        )}
       </div>
+      <div style={{ display: 'flex', background: '#f0f0ee', borderRadius: 8, padding: 3 }}>
+        {(['brief','detailed'] as const).map(m => (
+          <button key={m} onClick={() => setMode(m)} style={{ padding: '6px 12px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: mode===m ? '#fff' : 'transparent', color: mode===m ? '#1a1a1a' : '#888', boxShadow: mode===m ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', textTransform: 'capitalize' }}>{m}</button>
+        ))}
+      </div>
+      <button onClick={() => ok && onScan(content.trim(), mode)} disabled={!ok}
+        style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 20px', background: ok ? '#7c3aed' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: ok ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap' }}>
+        {loading ? (
+          <><svg style={{ animation: 'spin 0.8s linear infinite' }} width="14" height="14" viewBox="0 0 24 24"><circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/><path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Scanning</>
+        ) : (
+          <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Scan</>
+        )}
+      </button>
     </div>
   );
 }

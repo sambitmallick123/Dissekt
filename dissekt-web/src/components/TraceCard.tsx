@@ -1,151 +1,102 @@
 'use client';
 import { useState } from 'react';
 
-const platformInfo = (platform: string) => {
-  const p = (platform || '').toLowerCase();
-  if (p.includes('twitter') || p === 'x/twitter')
-    return { icon: '𝕏', name: 'X / Twitter', color: 'text-ink-900 bg-ink-100' };
-  if (p.includes('reddit')) return { icon: 'R', name: 'Reddit', color: 'text-orange-700 bg-orange-50' };
-  if (p.includes('facebook')) return { icon: 'f', name: 'Facebook', color: 'text-blue-700 bg-blue-50' };
-  if (p.includes('youtube')) return { icon: '▶', name: 'YouTube', color: 'text-red-700 bg-red-50' };
-  if (p.includes('instagram')) return { icon: '◉', name: 'Instagram', color: 'text-pink-700 bg-pink-50' };
-  if (p.includes('telegram')) return { icon: '✈', name: 'Telegram', color: 'text-sky-700 bg-sky-50' };
-  if (p.includes('whatsapp')) return { icon: '✓', name: 'WhatsApp', color: 'text-green-700 bg-green-50' };
-  return { icon: '○', name: 'Web', color: 'text-ink-600 bg-ink-100' };
+const card: React.CSSProperties = { background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' };
+const header: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', borderBottom: '1px solid #e5e5e5' };
+
+const ratingStyle = (r: string) => {
+  const s = (r||'').toLowerCase();
+  if (s.includes('false') || s.includes('pinocchio') || s.includes('wrong')) return { bg: '#fef2f2', color: '#b91c1c', border: '#fecaca' };
+  if (s.includes('true')) return { bg: '#f0fdf4', color: '#166534', border: '#bbf7d0' };
+  if (s.includes('context') || s.includes('mixed') || s.includes('misleading')) return { bg: '#fffbeb', color: '#92400e', border: '#fde68a' };
+  return { bg: '#f5f5f4', color: '#555', border: '#e5e5e5' };
 };
 
-const ratingColor = (rating: string) => {
-  const r = (rating || '').toLowerCase();
-  if (r.includes('false') || r.includes('pinocchio') || r.includes('wrong')) return 'text-red-700 bg-red-50 border-red-200';
-  if (r.includes('true')) return 'text-green-700 bg-green-50 border-green-200';
-  if (r.includes('misleading') || r.includes('mixed') || r.includes('context'))
-    return 'text-amber-700 bg-amber-50 border-amber-200';
-  return 'text-ink-700 bg-ink-100 border-ink-200';
+const dotColor = (p: string) => {
+  const s = (p||'').toLowerCase();
+  if (s.includes('reddit')) return '#ef4444'; if (s.includes('facebook')) return '#3b82f6';
+  if (s.includes('youtube')) return '#dc2626'; if (s.includes('twitter')) return '#1a1a1a';
+  if (s.includes('whatsapp')) return '#22c55e'; if (s.includes('instagram')) return '#e879f9';
+  return '#aaa';
 };
 
 export default function TraceCard({ trace }: { trace: any }) {
-  const [showAll, setShowAll] = useState(false);
-  const timeline = showAll ? trace.spread_timeline : trace.spread_timeline?.slice(0, 5);
-  const hasFactChecks = trace.fact_checks && trace.fact_checks.length > 0;
-  const hasTimeline = trace.spread_timeline && trace.spread_timeline.length > 0;
+  const [showAllFC, setShowAllFC] = useState(false);
+  const [showAllTL, setShowAllTL] = useState(false);
+  const hasFC = trace.fact_checks?.length > 0;
+  const hasTL = trace.spread_timeline?.length > 0;
+  const visibleFC = showAllFC ? trace.fact_checks : trace.fact_checks?.slice(0, 4);
+  const visibleTL = showAllTL ? trace.spread_timeline : trace.spread_timeline?.slice(0, 4);
 
   return (
-    <section className="bg-white border border-ink-200 rounded-xl overflow-hidden">
-      <div className="px-5 pt-5 pb-3 border-b border-ink-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-blue-700 font-semibold mb-0.5">
-              Trace
-            </div>
-            <h2 className="font-serif text-xl font-semibold text-ink-900">
-              Source origins
-            </h2>
-          </div>
-          {(hasFactChecks || hasTimeline) && (
-            <div className="text-xs text-ink-500">
-              {hasFactChecks && <span>{trace.fact_checks.length} fact-checks</span>}
-              {hasFactChecks && hasTimeline && <span className="mx-1">·</span>}
-              {hasTimeline && <span>{trace.spread_timeline.length} sources</span>}
-            </div>
-          )}
+    <div style={card}>
+      <div style={header}>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Trace — fact-checks</span>
+        <span style={{ fontSize: 12, color: '#aaa' }}>
+          {hasFC && `${trace.fact_checks.length} checks`}{hasFC && hasTL && ' · '}{hasTL && `${trace.spread_timeline.length} sources`}
+        </span>
       </div>
 
-      <div className="px-5 py-4">
-        {/* Fact checks */}
-        {hasFactChecks && (
-          <div className="mb-5">
-            <div className="text-[10px] uppercase tracking-widest text-ink-500 font-semibold mb-3">
-              Existing fact-checks
-            </div>
-            <div className="space-y-2">
-              {trace.fact_checks.slice(0, 5).map((fc: any, i: number) => (
-                <a
-                  key={i}
-                  href={fc.url}
-                  target="_blank"
-                  rel="noopener"
-                  className="block p-3 border border-ink-100 rounded-lg hover:border-ink-300 hover:bg-ink-50/50 transition-all group"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-1">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-ink-900">{fc.publisher}</span>
-                        {fc.date && (
-                          <span className="text-xs text-ink-500">· {fc.date.slice(0, 10)}</span>
-                        )}
-                      </div>
+      <div style={{ padding: 18, flex: 1 }}>
+        {hasFC && (
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#aaa', marginBottom: 10 }}>Existing fact-checks</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {visibleFC.map((fc: any, i: number) => {
+                const rs = ratingStyle(fc.rating);
+                return (
+                  <a key={i} href={fc.url} target="_blank" rel="noopener"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: '1px solid #e5e5e5', borderRadius: 10, textDecoration: 'none', color: 'inherit', gap: 10 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#404040' }}>{fc.publisher}</div>
+                      <div style={{ fontSize: 11, color: '#aaa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fc.title}</div>
                     </div>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded border shrink-0 ${ratingColor(fc.rating)}`}>
+                    <span style={{ fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: rs.bg, color: rs.color, border: `1px solid ${rs.border}`, whiteSpace: 'nowrap' }}>
                       {fc.rating}
                     </span>
-                  </div>
-                  <div className="text-sm text-ink-700 line-clamp-2 group-hover:text-ink-900 transition-colors">
-                    {fc.title}
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Spread timeline */}
-        {hasTimeline && (
-          <div>
-            <div className="text-[10px] uppercase tracking-widest text-ink-500 font-semibold mb-3">
-              Spread timeline
-            </div>
-            <div className="relative space-y-1">
-              {/* Vertical line */}
-              <div className="absolute left-[9px] top-2 bottom-2 w-px bg-ink-200" aria-hidden="true" />
-              {timeline.map((s: any, i: number) => {
-                const p = platformInfo(s.platform);
-                return (
-                  <a
-                    key={i}
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener"
-                    className="relative flex items-start gap-3 p-2 pl-0 hover:bg-ink-50/70 rounded transition-colors group"
-                  >
-                    <div className={`relative z-[1] w-[19px] h-[19px] rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${p.color} border border-white`}>
-                      {p.icon}
-                    </div>
-                    <div className="flex-1 min-w-0 pt-0">
-                      <div className="text-sm text-ink-800 truncate group-hover:text-ink-900">
-                        {s.title || '(untitled)'}
-                      </div>
-                      <div className="text-xs text-ink-500 flex items-center gap-2 mt-0.5">
-                        <span>{p.name}</span>
-                        {s.date && (
-                          <>
-                            <span>·</span>
-                            <span>{s.date}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
                   </a>
                 );
               })}
             </div>
-            {trace.spread_timeline.length > 5 && (
-              <button
-                onClick={() => setShowAll(!showAll)}
-                className="mt-3 text-sm text-blue-700 hover:text-blue-900 font-medium"
-              >
-                {showAll ? '− Show less' : `+ Show all ${trace.spread_timeline.length} sources`}
+            {trace.fact_checks.length > 4 && (
+              <button onClick={() => setShowAllFC(!showAllFC)}
+                style={{ display: 'block', margin: '8px auto 0', fontSize: 12, fontWeight: 500, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}>
+                {showAllFC ? `− Show fewer` : `+ ${trace.fact_checks.length - 4} more fact-checks`}
               </button>
             )}
           </div>
         )}
 
-        {!hasFactChecks && !hasTimeline && (
-          <div className="py-6 text-center">
-            <p className="text-ink-500 text-sm">No existing sources found for this claim.</p>
+        {hasTL && (
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#aaa', marginBottom: 10 }}>Spread timeline</div>
+            <div style={{ position: 'relative', paddingLeft: 18 }}>
+              <div style={{ position: 'absolute', left: 5, top: 6, bottom: 6, width: 1, background: '#e5e5e5' }}/>
+              {visibleTL.map((s: any, i: number) => (
+                <a key={i} href={s.url} target="_blank" rel="noopener"
+                  style={{ display: 'flex', alignItems: 'start', gap: 10, padding: '6px 0', textDecoration: 'none', color: 'inherit', position: 'relative' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 5, background: dotColor(s.platform), border: '2px solid #fff', position: 'absolute', left: -17, top: 9, zIndex: 1 }}/>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, color: '#404040', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title || '(untitled)'}</div>
+                    <div style={{ fontSize: 10, color: '#aaa' }}>{s.platform}{s.date ? ` · ${s.date}` : ''}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+            {trace.spread_timeline.length > 4 && (
+              <button onClick={() => setShowAllTL(!showAllTL)}
+                style={{ fontSize: 12, fontWeight: 500, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', marginTop: 8, padding: 0 }}>
+                {showAllTL ? '− Show fewer' : `+ ${trace.spread_timeline.length - 4} more sources`}
+              </button>
+            )}
           </div>
         )}
+
+        {!hasFC && !hasTL && <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#aaa' }}>No sources found</div>}
       </div>
-    </section>
+    </div>
   );
 }

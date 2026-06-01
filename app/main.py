@@ -10,11 +10,15 @@ Endpoints:
 import logging
 import time
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.models import ScanRequest, FullAnalysis, AnalysisMode
 from app.beacon import scan
+from app.radar import get_radar_feed
+from fastapi.responses import JSONResponse
+from collections import defaultdict
+import time as _time
 
 # Logging
 logging.basicConfig(
@@ -65,6 +69,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Rate limiting (in-memory, replace with Redis in production)
+_rate_limits = defaultdict(list)
+FREE_LIMIT = 50  # generous for testing, lower to 3 for production
+WINDOW = 86400
+
+@app.middleware("http")
+async def rate_limit(request: Request, call_next):
+    if request.url.path == "/api/scan" and request.method == "POST":
+        ip = request.client.host
+        now = _time.time()
+        _rate_limits[ip] = [t for t in _rate_limits[ip] if now - t < WINDOW]
+        if len(_rate_limits[ip]) >= FREE_LIMIT:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": f"Rate limit exceeded ({FREE_LIMIT}/day)."}
+            )
+        _rate_limits[ip].append(now)
+    return await call_next(request)
 
 # ============================================
 # Endpoints
@@ -118,6 +140,11 @@ async def list_techniques():
         "count": len(TECHNIQUES),
         "techniques": TECHNIQUES,
     }
+
+@app.get("/api/radar")
+async def radar_feed(market: str = "all", limit: int = 20):
+    items = await get_radar_feed(market, limit)
+    return {"items": items, "count": len(items), "market": market}
 
 
 # ============================================

@@ -1,83 +1,63 @@
 'use client';
 import { useState } from 'react';
 
-const categoryColors: Record<string, string> = {
-  framing: 'bg-purple-50 text-purple-800 border-purple-200',
-  logical_fallacy: 'bg-blue-50 text-blue-800 border-blue-200',
-  credibility: 'bg-amber-50 text-amber-800 border-amber-200',
-  deflection: 'bg-rose-50 text-rose-800 border-rose-200',
-};
+const card: React.CSSProperties = { background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' };
+const header: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', borderBottom: '1px solid #e5e5e5' };
+const iconBox = (bg: string): React.CSSProperties => ({ width: 30, height: 30, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 });
 
-const confidenceColor = (c: number) => {
-  if (c >= 0.85) return { bar: 'bg-red-500', text: 'text-red-700' };
-  if (c >= 0.7) return { bar: 'bg-orange-500', text: 'text-orange-700' };
-  return { bar: 'bg-yellow-500', text: 'text-yellow-700' };
+const catColors: Record<string, { bg: string; text: string }> = {
+  framing: { bg: '#f3e8ff', text: '#7c3aed' },
+  logical_fallacy: { bg: '#dbeafe', text: '#2563eb' },
+  credibility: { bg: '#fef3c7', text: '#b45309' },
+  deflection: { bg: '#ffe4e6', text: '#be123c' },
 };
+const confColor = (c: number) => c >= 0.85 ? '#dc2626' : c >= 0.7 ? '#d97706' : '#eab308';
 
 export default function PrismCard({ prism }: { prism: any }) {
   const [expanded, setExpanded] = useState(false);
+  const cat = (c: string) => catColors[c] || catColors.framing;
 
   return (
-    <section className="bg-white border border-ink-200 rounded-xl overflow-hidden">
-      {/* Header */}
-      <div className="px-5 pt-5 pb-3 border-b border-ink-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-purple-700 font-semibold mb-0.5">
-              Prism
-            </div>
-            <h2 className="font-serif text-xl font-semibold text-ink-900">
-              Manipulation analysis
-            </h2>
-          </div>
-          <div className="text-xs text-ink-500">
-            {prism.techniques?.length || 0} {prism.techniques?.length === 1 ? 'technique' : 'techniques'}
-          </div>
+    <div style={card}>
+      <div style={header}>
+        <div style={iconBox('#f3e8ff')}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </div>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Prism — techniques</span>
+        <span style={{ fontSize: 12, color: '#aaa', fontWeight: 500 }}>{prism.techniques?.length || 0} found</span>
       </div>
 
-      {/* Body */}
-      <div className="px-5 py-4">
+      <div style={{ padding: 18, flex: 1 }}>
         {prism.techniques.length === 0 ? (
-          <div className="py-6 text-center">
-            <div className="text-4xl mb-2">✓</div>
-            <p className="text-ink-600 text-sm">No manipulation techniques detected.</p>
+          <div style={{ textAlign: 'center', padding: '30px 0' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 20, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span style={{ fontSize: 13, color: '#888' }}>No manipulation detected</span>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {prism.techniques.map((t: any, i: number) => {
-              const color = confidenceColor(t.confidence);
-              const catClass = categoryColors[t.category] || categoryColors.framing;
+              const cc = cat(t.category);
               return (
-                <div key={i} className="border border-ink-100 rounded-lg p-4 hover:border-ink-200 transition-colors">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-serif text-[15px] font-semibold text-ink-900 capitalize">
-                          {t.name.replace(/_/g, ' ')}
-                        </span>
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${catClass} capitalize`}>
-                          {t.category?.replace(/_/g, ' ')}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-xs font-semibold ${color.text}`}>
-                        {(t.confidence * 100).toFixed(0)}%
+                <div key={i} style={{ border: '1px solid #e5e5e5', borderRadius: 10, padding: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, textTransform: 'capitalize' }}>{t.name.replace(/_/g, ' ')}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: cc.bg, color: cc.text, textTransform: 'capitalize' }}>
+                        {t.category?.replace(/_/g, ' ')}
                       </span>
                     </div>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: confColor(t.confidence) }}>{(t.confidence * 100).toFixed(0)}%</span>
                   </div>
-                  <div className="h-1 bg-ink-100 rounded-full mb-3 overflow-hidden">
-                    <div
-                      className={`h-full ${color.bar} rounded-full transition-all`}
-                      style={{ width: `${t.confidence * 100}%` }}
-                    />
+                  <div style={{ height: 5, background: '#f0f0ee', borderRadius: 3, overflow: 'hidden', marginBottom: 10 }}>
+                    <div style={{ height: '100%', borderRadius: 3, width: `${t.confidence * 100}%`, background: confColor(t.confidence), transition: 'width 0.7s ease' }}/>
                   </div>
-                  <p className="text-sm text-ink-700 leading-relaxed">{t.explanation}</p>
+                  <p style={{ fontSize: 12, color: '#555', lineHeight: 1.6, margin: 0 }}>{t.explanation}</p>
                   {t.evidence && (
-                    <blockquote className="mt-2 pl-3 border-l-2 border-orange-200 text-sm text-ink-600 italic">
-                      "{t.evidence}"
-                    </blockquote>
+                    <div style={{ marginTop: 8, paddingLeft: 12, borderLeft: '3px solid #fed7aa' }}>
+                      <p style={{ fontSize: 12, color: '#888', fontStyle: 'italic', margin: 0 }}>"{t.evidence}"</p>
+                    </div>
                   )}
                 </div>
               );
@@ -85,48 +65,28 @@ export default function PrismCard({ prism }: { prism: any }) {
           </div>
         )}
 
-        {/* Brief summary */}
         {prism.brief && (
-          <div className="mt-4 p-4 bg-orange-50 border border-orange-100 rounded-lg">
-            <div className="text-[10px] uppercase tracking-widest text-orange-700 font-semibold mb-1.5">
-              Summary
-            </div>
-            <p className="text-sm text-ink-800 leading-relaxed font-serif">{prism.brief}</p>
+          <div style={{ marginTop: 14, padding: 14, background: '#faf5ff', border: '1px solid #ede9fe', borderRadius: 10 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#7c3aed', marginBottom: 6 }}>Summary</div>
+            <p style={{ fontSize: 12, color: '#404040', lineHeight: 1.7, margin: 0 }}>{prism.brief}</p>
           </div>
         )}
 
-        {/* Detailed (collapsible) */}
         {prism.detailed && (
-          <div className="mt-4 pt-4 border-t border-ink-100">
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-2 text-sm text-ink-700 hover:text-ink-900 font-medium"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={`transition-transform ${expanded ? 'rotate-90' : ''}`}
-              >
-                <path d="M9 18l6-6-6-6" />
-              </svg>
+          <div style={{ marginTop: 10 }}>
+            <button onClick={() => setExpanded(!expanded)}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 500, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <span style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>▸</span>
               {expanded ? 'Hide detailed analysis' : 'Show detailed analysis'}
             </button>
             {expanded && (
-              <div className="mt-3 p-4 bg-ink-50 border border-ink-100 rounded-lg">
-                <p className="text-sm text-ink-700 leading-relaxed whitespace-pre-wrap font-serif">
-                  {prism.detailed}
-                </p>
+              <div style={{ marginTop: 8, padding: 14, background: '#f8f8f6', border: '1px solid #e5e5e5', borderRadius: 10 }}>
+                <p style={{ fontSize: 12, color: '#555', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{prism.detailed}</p>
               </div>
             )}
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 }

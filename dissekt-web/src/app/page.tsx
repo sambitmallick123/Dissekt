@@ -4,103 +4,74 @@ import ScanInput from '@/components/ScanInput';
 import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
 
+const S = {
+  page: { minHeight: '100vh', background: '#f5f5f4' } as React.CSSProperties,
+  nav: { background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky' as const, top: 0, zIndex: 20 },
+  navInner: { maxWidth: 1100, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  logoWrap: { display: 'flex', alignItems: 'center', gap: 10 },
+  logoIcon: { width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  logoText: { fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' },
+  tabs: { display: 'flex', gap: 2 },
+  tab: (active: boolean) => ({ padding: '6px 14px', borderRadius: 7, fontSize: 13, fontWeight: 500, background: active ? '#f0f0ee' : 'transparent', color: active ? '#1a1a1a' : '#888', border: 'none', cursor: 'pointer' }),
+  searchBar: { background: '#fff', borderBottom: '1px solid #e5e5e5' },
+  searchInner: { maxWidth: 1100, margin: '0 auto', padding: '16px 24px' },
+  content: { maxWidth: 1100, margin: '0 auto', padding: '20px 24px' },
+  error: { marginBottom: 16, padding: 14, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 },
+  empty: { textAlign: 'center' as const, padding: '60px 0' },
+  emptyIcon: { width: 48, height: 48, margin: '0 auto 12px', background: '#f0f0ee', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  emptyTitle: { fontSize: 15, fontWeight: 500, color: '#404040', marginBottom: 4 },
+  emptySub: { fontSize: 13, color: '#aaa', maxWidth: 360, margin: '0 auto' },
+};
+
 export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleScan = async (content: string, mode: string) => {
-    setLoading(true);
-    setError('');
-    setResult(null);
-
+    setLoading(true); setError(''); setResult(null);
     try {
-      const res = await fetch('/api/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, mode }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        setError(err.detail || 'Analysis failed');
-        return;
-      }
-
-      const data = await res.json();
-      setResult(data);
-    } catch (e) {
-      setError('Could not connect to analysis service. Is the backend running?');
-    } finally {
-      setLoading(false);
-    }
+      const res = await fetch('/api/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, mode }) });
+      if (!res.ok) { const err = await res.json(); setError(err.detail || 'Analysis failed'); return; }
+      setResult(await res.json());
+    } catch (e) { setError('Could not connect to analysis service.'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <main className="min-h-screen bg-[#fafaf9]">
-      {/* Nav */}
-      <nav className="border-b border-ink-200 bg-white/70 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-ink-900 rounded flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 3l18 18M21 3L3 21" />
-              </svg>
+    <div style={S.page}>
+      <nav style={S.nav}>
+        <div style={S.navInner}>
+          <div style={S.logoWrap}>
+            <div style={S.logoIcon}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <span className="font-serif text-lg font-semibold tracking-tight text-ink-900">Dissekt</span>
+            <span style={S.logoText}>Dissekt</span>
           </div>
-          <div className="flex items-center gap-6 text-sm">
-            <a href="/radar" className="text-ink-600 hover:text-ink-900 transition-colors">Radar</a>
-            <a href="#" className="text-ink-600 hover:text-ink-900 transition-colors hidden sm:inline">About</a>
-            <a href="#" className="text-ink-600 hover:text-ink-900 transition-colors hidden sm:inline">API</a>
+          <div style={S.tabs}>
+            {['Scan', 'Radar', 'History'].map((t, i) => (
+              <button key={t} style={S.tab(i === 0)}>{t}</button>
+            ))}
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="border-b border-ink-200 dissekt-grid">
-        <div className="max-w-3xl mx-auto px-6 py-16 md:py-20">
-          <div className="mb-2 text-xs uppercase tracking-widest text-orange-700 font-semibold">
-            An investigation tool
-          </div>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-ink-900 mb-4 leading-tight">
-            Explanation,<br />not verdicts.
-          </h1>
-          <p className="text-lg text-ink-600 leading-relaxed max-w-xl">
-            Paste any URL or text. Dissekt identifies manipulation techniques, traces claims to their source, and exports blockchain-verified evidence.
-          </p>
-        </div>
-      </section>
+      <div style={S.searchBar}><div style={S.searchInner}><ScanInput onScan={handleScan} loading={loading} /></div></div>
 
-      {/* Scan interface */}
-      <section className="max-w-3xl mx-auto px-6 py-10">
-        <ScanInput onScan={handleScan} loading={loading} />
-
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-            <strong className="font-medium">Error: </strong>{error}
-          </div>
-        )}
-
+      <div style={S.content}>
+        {error && <div style={S.error}>{error}</div>}
         {loading && <LoadingState />}
         {result && <AnalysisResult data={result} />}
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-ink-200 mt-20">
-        <div className="max-w-4xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-ink-500">
-          <div>
-            <span className="font-serif text-sm font-semibold text-ink-700">Dissekt</span>
-            <span className="mx-2">·</span>
-            <span>Built for journalists</span>
+        {!result && !loading && !error && (
+          <div style={S.empty}>
+            <div style={S.emptyIcon}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div style={S.emptyTitle}>Paste a URL or text to begin</div>
+            <div style={S.emptySub}>Dissekt detects manipulation techniques, finds existing fact-checks, and assesses source credibility — in seconds.</div>
           </div>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-ink-800">Privacy</a>
-            <a href="#" className="hover:text-ink-800">Terms</a>
-            <a href="#" className="hover:text-ink-800">Contact</a>
-          </div>
-        </div>
-      </footer>
-    </main>
+        )}
+      </div>
+    </div>
   );
 }

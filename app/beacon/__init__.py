@@ -145,6 +145,32 @@ async def extract_from_url(url: str) -> tuple[str, str]:
             return p_text[:MAX_TEXT_LENGTH], title
 
         raise ValueError("Could not extract article content. Try pasting the text directly.")
+    
+    # Method 3: Playwright headless browser (for bot-blocked sites)
+        try:
+            from playwright.async_api import async_playwright
+            
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=True)
+                page = await browser.new_page()
+                await page.goto(url, wait_until="networkidle", timeout=15000)
+                
+                html = await page.content()
+                if not title:
+                    title = await page.title()
+                
+                await browser.close()
+                
+                import trafilatura
+                text = trafilatura.extract(html, include_comments=False, include_tables=False) or ""
+                if text and len(text) > 200:
+                    logger.info(f"Playwright extracted {len(text)} chars from {url}")
+                    return text[:MAX_TEXT_LENGTH], title
+        except ImportError:
+            logger.warning("Playwright not installed — skipping JS rendering")
+        except Exception as e:
+            logger.warning(f"Playwright failed: {e}")
+            
 
     except ValueError:
         raise
