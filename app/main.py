@@ -61,8 +61,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://dissekt.co",
-        "https://www.dissekt.co",
+        "https://dissekt.info",
+        "https://www.dissekt.info",
     ],  # TODO: Restrict to dissekt.co in production
     allow_credentials=True,
     allow_methods=["*"],
