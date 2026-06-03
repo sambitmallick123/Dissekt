@@ -55,4 +55,4 @@ supabase==2.11.0
 
 # Utils
 hashlib-additional==1.0.1
-setuptools
+setuptools<78
