@@ -156,6 +156,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
 
 function ScanPage({ onShowToast, onShowFeedback }: { onShowToast: () => void; onShowFeedback: () => void }) {
   const [result, setResult] = useState<any>(null);
+  const [inputContent, setInputContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [usage, setUsage] = useState(0);
@@ -165,7 +166,7 @@ function ScanPage({ onShowToast, onShowFeedback }: { onShowToast: () => void; on
   const handleScan = async (content: string, mode: string) => {
     const currentUsage = getAnonUsage();
     if (currentUsage >= DAILY_LIMIT) { onShowToast(); return; }
-    setLoading(true); setError(''); setResult(null);
+    setLoading(true); setError(""); setResult(null); setInputContent(content);
     try {
       const res = await fetch('/api/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, mode }) });
       if (!res.ok) { const err = await res.json(); setError(err.detail || 'Analysis failed'); return; }
@@ -211,7 +212,7 @@ function ScanPage({ onShowToast, onShowFeedback }: { onShowToast: () => void; on
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
         {error && <div style={{ marginBottom: 16, padding: 14, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>}
         {loading && <LoadingState />}
-        {result && <AnalysisResult data={result} />}
+        {result && <AnalysisResult data={result} inputContent={inputContent} />}
         {!result && !loading && !error && (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ width: 48, height: 48, margin: '0 auto 12px', background: '#f0f0ee', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
