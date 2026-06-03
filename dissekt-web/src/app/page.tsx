@@ -163,12 +163,12 @@ function ScanPage({ onShowToast, onShowFeedback }: { onShowToast: () => void; on
 
   useEffect(() => { setUsage(getAnonUsage()); }, []);
 
-  const handleScan = async (content: string, mode: string) => {
+  const handleScan = async (content: string, mode: string, image?: string) => {
     const currentUsage = getAnonUsage();
     if (currentUsage >= DAILY_LIMIT) { onShowToast(); return; }
     setLoading(true); setError(""); setResult(null); setInputContent(content);
     try {
-      const res = await fetch('/api/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, mode }) });
+      const res = await fetch('/api/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, mode, image }) });
       if (!res.ok) { const err = await res.json(); setError(err.detail || 'Analysis failed'); return; }
       const data = await res.json();
       setResult(data);
@@ -212,7 +212,7 @@ function ScanPage({ onShowToast, onShowFeedback }: { onShowToast: () => void; on
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
         {error && <div style={{ marginBottom: 16, padding: 14, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>}
         {loading && <LoadingState />}
-        {result && <AnalysisResult data={result} inputContent={inputContent} />}
+        {result && <AnalysisResult data={result} />}
         {!result && !loading && !error && (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ width: 48, height: 48, margin: '0 auto 12px', background: '#f0f0ee', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
