@@ -43,3 +43,4 @@ trafilatura==2.0.0
 transformers==4.47.1
 uvicorn[standard]==0.34.0
 vaderSentiment==3.3.2
+feedparser==6.0.12
