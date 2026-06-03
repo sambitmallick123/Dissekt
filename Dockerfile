@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir setuptools<78 && pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir "setuptools<78" && pip install --no-cache-dir -r requirements.txt
 
 # Download NLTK data (used by textstat)
 RUN python -c "import nltk; nltk.download('punkt_tab', quiet=True)"

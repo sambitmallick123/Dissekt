@@ -1,58 +1,45 @@
-# Dissekt Backend - Requirements
-# Week 1: Prism (heuristics + LLM) + Trace + Signal + Beacon
-
-# Core
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-python-dotenv==1.0.1
-pydantic==2.10.4
-pydantic-settings==2.7.1
-
-# HTTP
-httpx==0.28.1
-aiohttp==3.11.11
-
-# LLM Clients
-anthropic==0.43.0
-openai==1.59.3
-
-# Cache
-redis==5.2.1
-
-# Text extraction
-readability-lxml==0.8.1
-beautifulsoup4==4.12.3
-lxml==5.3.0
-trafilatura==2.0.0
-
-# NLP / Heuristics
-nltk==3.9.1
-textstat==0.7.4
-
-# Signal - Toxicity
-detoxify==0.5.2
-torch==2.5.1
-transformers==4.47.1
-
-# Signal - Sentiment
-vaderSentiment==3.3.2
-
-# Trace
-google-api-python-client==2.159.0
-
-# Embeddings + Vector store
-sentence-transformers==3.3.1
-qdrant-client==1.12.1
 
 # Blockchain evidence
-opentimestamps-client==0.7.1
-
-# Duplicate detection
-datasketch==1.6.5
-
+# Cache
+# Core
 # Database
-supabase==2.11.0
-
+# Dissekt Backend - Requirements
+# Duplicate detection
+# Embeddings + Vector store
+# HTTP
+# LLM Clients
+# NLP / Heuristics
+# Signal - Sentiment
+# Signal - Toxicity
+# Text extraction
+# Trace
 # Utils
+# Week 1: Prism (heuristics + LLM) + Trace + Signal + Beacon
+aiohttp==3.11.11
+anthropic==0.43.0
+beautifulsoup4==4.12.3
+datasketch==1.6.5
+detoxify==0.5.2
+fastapi==0.115.6
+google-api-python-client==2.159.0
 hashlib-additional==1.0.1
+httpx==0.28.1
+lxml==5.3.0
+nltk==3.9.1
+openai==1.59.3
+opentimestamps-client==0.7.1
+pydantic-settings==2.7.1
+pydantic==2.10.4
+python-dotenv==1.0.1
+qdrant-client==1.12.1
+readability-lxml==0.8.1
+redis==5.2.1
+sentence-transformers==3.3.1
 setuptools<78
+supabase==2.11.0
+textstat==0.7.4
+torch==2.5.1
+trafilatura==2.0.0
+transformers==4.47.1
+uvicorn[standard]==0.34.0
+vaderSentiment==3.3.2
