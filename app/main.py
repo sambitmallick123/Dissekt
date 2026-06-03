@@ -63,6 +63,7 @@ app.add_middleware(
         "http://localhost:3000",
         "https://dissekt.info",
         "https://www.dissekt.info",
+        "https://dissekt-web.vercel.app",
     ],  # TODO: Restrict to dissekt.co in production
     allow_credentials=True,
     allow_methods=["*"],
