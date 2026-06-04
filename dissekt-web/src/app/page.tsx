@@ -161,7 +161,14 @@ function ScanPage({ onShowToast, onShowFeedback }: { onShowToast: () => void; on
   const [error, setError] = useState('');
   const [usage, setUsage] = useState(0);
 
-  useEffect(() => { setUsage(getAnonUsage()); }, []);
+  useEffect(() => {
+    setUsage(getAnonUsage());
+    const autoUrl = localStorage.getItem('dissekt_analyze');
+    if (autoUrl) {
+      localStorage.removeItem('dissekt_analyze');
+      handleScan(autoUrl, 'brief');
+    }
+  }, []);
 
   const handleScan = async (content: string, mode: string, image?: string) => {
     const currentUsage = getAnonUsage();

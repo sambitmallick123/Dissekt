@@ -33,3 +33,52 @@ body {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  /* Scan input stacks vertically */
+  .scan-row { flex-direction: column !important; gap: 8px !important; }
+  .scan-row > * { width: 100% !important; }
+  .scan-controls { display: flex !important; gap: 8px !important; }
+  .scan-controls > * { flex: 1 !important; }
+
+  /* Result grid: single column */
+  .result-grid { grid-template-columns: 1fr !important; }
+
+  /* Threat score: stack vertically */
+  .threat-strip { flex-direction: column !important; }
+  .threat-ring { border-right: none !important; border-bottom: 1px solid #e5e5e5 !important; padding: 16px !important; }
+  .threat-metrics { grid-template-columns: repeat(3, 1fr) !important; padding: 12px !important; gap: 8px !important; }
+
+  /* Nav: tighten */
+  .nav-inner { padding: 8px 12px !important; }
+  .nav-links { gap: 6px !important; font-size: 11px !important; }
+
+  /* Landing page */
+  .hero-title { font-size: 24px !important; }
+  .hero-sub { font-size: 13px !important; }
+  .hero-buttons { flex-direction: column !important; gap: 8px !important; }
+  .hero-buttons > * { margin-left: 0 !important; width: 100% !important; text-align: center !important; justify-content: center !important; }
+  .landing-grid-3 { grid-template-columns: 1fr !important; }
+  .landing-grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .demo-grid { grid-template-columns: 1fr !important; }
+  .demo-panel { border-right: none !important; border-bottom: 1px solid #e5e5e5 !important; }
+  .how-steps { padding: 0 !important; }
+  .trust-grid { grid-template-columns: 1fr !important; }
+  .stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .cta-section { margin: 20px 0 !important; padding: 24px 16px !important; border-radius: 10px !important; }
+  .section-title { font-size: 18px !important; }
+  .section { padding: 24px 14px !important; }
+
+  /* Signal grid */
+  .signal-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Meta grid */
+  .meta-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .threat-metrics { grid-template-columns: repeat(2, 1fr) !important; }
+  .landing-grid-4 { grid-template-columns: 1fr !important; }
+  .stats-grid { grid-template-columns: 1fr 1fr !important; }
+}

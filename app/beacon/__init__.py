@@ -38,16 +38,14 @@ async def extract_from_url(url: str) -> tuple[str, str]:
     try:
         import trafilatura
         from asyncio import to_thread
-        
+
         def _trafilatura_extract(url):
-            # Use trafilatura's built-in fetcher with browser-like settings
             config = trafilatura.settings.use_config()
-            config.set("DEFAULT", "USER_AGENTS", 
+            config.set("DEFAULT", "USER_AGENTS",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
-            
+
             downloaded = trafilatura.fetch_url(url, config=config)
             if not downloaded:
-                # Fallback: try with httpx and custom headers
                 import httpx
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
@@ -67,15 +65,15 @@ async def extract_from_url(url: str) -> tuple[str, str]:
                     resp = client.get(url, headers=headers)
                     resp.raise_for_status()
                     downloaded = resp.text
-            
+
             if not downloaded:
                 return None, None
-            
+
             text = trafilatura.extract(downloaded, include_comments=False, include_tables=False) or ""
             metadata = trafilatura.extract_metadata(downloaded)
             title = metadata.title if metadata and metadata.title else ""
             return text, title
-        
+
         text, title = await to_thread(_trafilatura_extract, url)
         if text and len(text) > 200:
             logger.info(f"Trafilatura extracted {len(text)} chars from {url}")
@@ -124,7 +122,6 @@ async def extract_from_url(url: str) -> tuple[str, str]:
 
         # Method 2b: readability
         try:
-            from readability import Document as ReadabilityDocument
             doc = ReadabilityDocument(html)
             if not title:
                 title = doc.title()
@@ -144,39 +141,37 @@ async def extract_from_url(url: str) -> tuple[str, str]:
         if len(p_text) > 200:
             return p_text[:MAX_TEXT_LENGTH], title
 
-        raise ValueError("Could not extract article content. Try pasting the text directly.")
-    
-    # Method 3: Playwright headless browser (for bot-blocked sites)
-        try:
-            from playwright.async_api import async_playwright
-            
-            async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=True)
-                page = await browser.new_page()
-                await page.goto(url, wait_until="networkidle", timeout=15000)
-                
-                html = await page.content()
-                if not title:
-                    title = await page.title()
-                
-                await browser.close()
-                
-                import trafilatura
-                text = trafilatura.extract(html, include_comments=False, include_tables=False) or ""
-                if text and len(text) > 200:
-                    logger.info(f"Playwright extracted {len(text)} chars from {url}")
-                    return text[:MAX_TEXT_LENGTH], title
-        except ImportError:
-            logger.warning("Playwright not installed — skipping JS rendering")
-        except Exception as e:
-            logger.warning(f"Playwright failed: {e}")
-            
-
     except ValueError:
         raise
     except Exception as e:
-        logger.error(f"URL extraction failed for {url}: {e}")
-        raise ValueError(f"Could not extract content from URL: {e}")
+        logger.warning(f"Method 2 (httpx) failed: {e}")
+
+    # Method 3: Playwright headless browser (for bot-blocked sites)
+    try:
+        from playwright.async_api import async_playwright
+
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(url, wait_until="networkidle", timeout=15000)
+
+            html = await page.content()
+            if not title:
+                title = await page.title()
+
+            await browser.close()
+
+            import trafilatura
+            text = trafilatura.extract(html, include_comments=False, include_tables=False) or ""
+            if text and len(text) > 200:
+                logger.info(f"Playwright extracted {len(text)} chars from {url}")
+                return text[:MAX_TEXT_LENGTH], title
+    except ImportError:
+        logger.warning("Playwright not installed — skipping JS rendering")
+    except Exception as e:
+        logger.warning(f"Playwright failed: {e}")
+
+    raise ValueError("Could not extract article content. Try pasting the text directly.")
 
 
 def detect_input_type(content: str) -> InputType:
@@ -206,7 +201,8 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     5. Run Prism + Trace + Signal in parallel
     6. Combine results
     7. Cache result
-    8. Generate blockchain hash
+    8. Store in claim graph
+    9. Generate blockchain proof
     """
     start_time = time.time()
 
@@ -239,7 +235,6 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
 
     # Step 5: Run all engines in parallel
     prism_task = route_and_analyze(extracted_text, mode, heuristics)
-    # Use first sentence for Trace search (more specific than full text)
     trace_query = re.split(r'[.!?\n]', extracted_text)[0].strip()[:150]
     trace_task = run_trace(trace_query if len(trace_query) > 20 else extracted_text[:200])
     signal_task = asyncio.to_thread(run_signal, extracted_text, source_url)
@@ -250,33 +245,37 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     )
 
     # Step 6: Combine results
-    # Prism
     if isinstance(prism_raw, Exception):
         logger.error(f"Prism failed: {prism_raw}")
         prism_raw = {"brief": "Analysis engine temporarily unavailable.", "techniques": [], "_model": "error"}
-
     prism_result = _build_prism_result(prism_raw, mode)
 
-    # Trace
     if isinstance(trace_raw, Exception):
         logger.error(f"Trace failed: {trace_raw}")
         trace_raw = {"fact_checks": [], "spread_timeline": [], "earliest_source": None, "check_worthiness": 0.0}
-
     trace_result = _build_trace_result(trace_raw)
 
-    # Signal
     if isinstance(signal_raw, Exception):
         logger.error(f"Signal failed: {signal_raw}")
         signal_raw = {"toxicity_score": 0.0, "toxicity_labels": {}, "source_bias": None, "source_factuality": None, "sentiment": "neutral", "sentiment_score": 0.0, "primary_emotion": "neutral", "emotion_scores": {}}
-
     signal_result = SignalResult(**signal_raw)
 
-    # Blockchain hash
-    blockchain = BlockchainProof(
-        content_hash=content_hash,
-        timestamp=str(int(time.time())),
-        proof_status="pending",  # OTS anchoring happens async
-    )
+    # Step 9: Blockchain hash + OTS anchoring
+    try:
+        from app.anchor import create_timestamp
+        blockchain_raw = await create_timestamp(content_hash)
+        blockchain = BlockchainProof(
+            content_hash=blockchain_raw["content_hash"],
+            timestamp=blockchain_raw["timestamp"],
+            proof_status=blockchain_raw["proof_status"],
+        )
+    except Exception as e:
+        logger.warning(f"OTS anchoring failed: {e}")
+        blockchain = BlockchainProof(
+            content_hash=content_hash,
+            timestamp=str(int(time.time())),
+            proof_status="pending",
+        )
 
     analysis_time = int((time.time() - start_time) * 1000)
 
@@ -296,6 +295,21 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     # Step 7: Cache result
     await set_cached(content_hash, mode, analysis.model_dump(mode="json"))
 
+    # Step 8: Store in claim graph (non-blocking, don't fail the response)
+    try:
+        from app.claim_graph import store_analysis
+        await store_analysis(
+            extracted_text,
+            content_hash[:16],
+            {
+                "techniques": [t.name for t in prism_result.techniques],
+                "source_bias": signal_result.source_bias,
+                "timestamp": str(int(time.time())),
+            }
+        )
+    except Exception as e:
+        logger.warning(f"Claim graph store failed: {e}")
+
     return analysis
 
 
@@ -310,11 +324,9 @@ def _build_prism_result(raw: dict, mode: str) -> PrismResult:
 
     for t in raw.get("techniques", []):
         conf = float(t.get("confidence", 0.0))
-        # Confidence gating
         if conf < settings.confidence_threshold:
             continue
 
-        # Map category
         from app.prism.techniques import TECHNIQUE_BY_NAME
         tech_info = TECHNIQUE_BY_NAME.get(t.get("name", ""), {})
         category = tech_info.get("category", "framing")
