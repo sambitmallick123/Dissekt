@@ -19,7 +19,7 @@ export default function RadarPage() {
   }, [market]);
 
   const analyzeItem = (url: string) => {
-    window.location.href = `/?analyze=${encodeURIComponent(url)}`;
+    localStorage.setItem("dissekt_analyze", url); window.location.href = "/";
   };
 
   return (

@@ -36,3 +36,4 @@ models/
 # Logs
 *.log
 logs/
+.vercel

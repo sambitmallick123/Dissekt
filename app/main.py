@@ -143,9 +143,52 @@ async def list_techniques():
     }
 
 @app.get("/api/radar")
-async def radar_feed(market: str = "all", limit: int = 20):
-    items = await get_radar_feed(market, limit)
-    return {"items": items, "count": len(items), "market": market}
+async def radar_feed(market: str = "all", limit: int = 20, refresh: bool = False):
+    """Radar feed with 6-hour Redis cache."""
+    import json
+    from datetime import datetime, timezone
+
+    cache_key = f"radar:{market}"
+    RADAR_TTL = 21600  # 6 hours in seconds
+
+    # Check Redis cache (unless force refresh)
+    if not refresh:
+        try:
+            from app.cache import redis_client
+            if redis_client:
+                cached = await redis_client.get(cache_key)
+                if cached:
+                    data = json.loads(cached)
+                    return {
+                        "items": data["items"][:limit],
+                        "count": len(data["items"][:limit]),
+                        "market": market,
+                        "cached": True,
+                        "last_refreshed": data.get("timestamp", None),
+                    }
+        except Exception as e:
+            logger.warning(f"Radar cache read failed: {e}")
+
+    # Fetch fresh RSS feeds
+    items = await get_radar_feed(market, limit=100)  # fetch more, cache all
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Store in Redis with 6-hour TTL
+    try:
+        from app.cache import redis_client
+        if redis_client:
+            cache_data = json.dumps({"items": items, "timestamp": now})
+            await redis_client.set(cache_key, cache_data, ex=RADAR_TTL)
+    except Exception as e:
+        logger.warning(f"Radar cache write failed: {e}")
+
+    return {
+        "items": items[:limit],
+        "count": len(items[:limit]),
+        "market": market,
+        "cached": False,
+        "last_refreshed": now,
+    }
 
 
 # ============================================

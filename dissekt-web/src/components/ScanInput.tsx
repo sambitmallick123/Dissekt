@@ -1,13 +1,15 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 interface Props {
+  initialContent?: string;
   onScan: (content: string, mode: string, image?: string) => void;
   loading: boolean;
 }
 
-export default function ScanInput({ onScan, loading }: Props) {
-  const [content, setContent] = useState('');
+export default function ScanInput({ onScan, loading, initialContent }: Props) {
+  const [content, setContent] = useState(initialContent || '');
+  useEffect(() => { if (initialContent) setContent(initialContent); }, [initialContent]);
   const [mode, setMode] = useState<'brief' | 'detailed'>('brief');
   const [image, setImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState('');
