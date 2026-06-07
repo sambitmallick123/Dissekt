@@ -60,7 +60,7 @@ async def store_analysis(text: str, analysis_id: str, metadata: dict) -> bool:
         embedding = model.encode(text[:512]).tolist()
 
         point = PointStruct(
-            id=hashlib.md5(analysis_id.encode()).hexdigest()[:16],
+            id=int(hashlib.md5(analysis_id.encode()).hexdigest()[:16], 16),
             vector=embedding,
             payload={
                 "analysis_id": analysis_id,
