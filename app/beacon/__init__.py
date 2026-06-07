@@ -25,6 +25,24 @@ from app.cache import get_cached, set_cached
 
 logger = logging.getLogger("dissekt.beacon")
 
+
+def detect_language(text: str) -> str:
+    """Quick language detection based on character ranges and common words."""
+    sample = text[:500].lower()
+
+    # Hindi/Devanagari
+    devanagari = sum(1 for c in sample if '\u0900' <= c <= '\u097F')
+    if devanagari > 20:
+        return "hi"
+
+    # German indicators
+    german_words = ["der", "die", "das", "und", "ist", "ein", "eine", "nicht", "auf", "mit", "für", "auch", "sich", "nach", "bei"]
+    german_count = sum(1 for w in german_words if f" {w} " in f" {sample} ")
+    if german_count >= 3:
+        return "de"
+
+    return "en"
+
 MAX_TEXT_LENGTH = 5000
 # ============================================
 # Content extraction
@@ -188,6 +206,43 @@ def compute_content_hash(text: str) -> str:
 
 
 # ============================================
+# Claim extraction
+# ============================================
+
+async def extract_claims(text: str, mode: str = "brief") -> list[dict]:
+    """Extract individual verifiable claims from text using LLM."""
+    settings = get_settings()
+    import openai
+
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=500,
+            messages=[
+                {
+                    "role": "system",
+                    "content": """Extract verifiable factual claims from this text. Return ONLY a JSON array of objects.
+Each object: {"claim": "the specific factual claim", "type": "statistic|quote|event|prediction|causal"}
+Only include claims that can be fact-checked. Max 7 claims. No explanations, just the JSON array."""
+                },
+                {"role": "user", "content": text[:1500]}
+            ],
+        )
+        import json
+        raw = response.choices[0].message.content.strip()
+        # Clean markdown fences if present
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+            raw = raw.rsplit("```", 1)[0]
+        claims = json.loads(raw)
+        return claims if isinstance(claims, list) else []
+    except Exception as e:
+        logger.warning(f"Claim extraction LLM failed: {e}")
+        return []
+
+
+# ============================================
 # Main scan pipeline
 # ============================================
 
@@ -309,6 +364,26 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
         )
     except Exception as e:
         logger.warning(f"Claim graph store failed: {e}")
+
+    # Step 9: Find similar past claims
+    try:
+        from app.claim_graph import find_similar
+        similar = await find_similar(extracted_text[:300])
+        # Exclude self (same analysis id)
+        analysis.similar_claims = [s for s in similar if s.get("analysis_id") != content_hash[:16]]
+    except Exception as e:
+        logger.warning(f"Similar claims lookup failed: {e}")
+
+    # Step 10: Detect language
+    analysis.detected_language = detect_language(extracted_text)
+
+    # Step 11: Extract individual claims (only if techniques found, to save API cost)
+    if len(prism_result.techniques) > 0:
+        try:
+            claims = await extract_claims(extracted_text, mode)
+            analysis.extracted_claims = claims
+        except Exception as e:
+            logger.warning(f"Claim extraction failed: {e}")
 
     return analysis
 

@@ -128,6 +128,9 @@ class FullAnalysis(BaseModel):
     signal: SignalResult
     blockchain: Optional[BlockchainProof] = None
 
+    similar_claims: list[dict] = Field(default_factory=list, description="Similar past analyses from Qdrant")
+    detected_language: str = Field(default="en", description="Detected input language")
+    extracted_claims: list[dict] = Field(default_factory=list, description="Individual verifiable claims extracted")
     cached: bool = False
     analyzed_at: datetime = Field(default_factory=datetime.utcnow)
     analysis_time_ms: int = 0
