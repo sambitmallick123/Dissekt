@@ -1,3 +1,319 @@
+#!/bin/bash
+# Dissekt — Week 3 Tasks: Reports, History, Radar Badges, Auth
+# Run from inside dissekt-web/
+set -e
+
+# ============================================
+# Task 1: Shareable Report URLs
+# ============================================
+
+# 1a. API route to save + fetch reports
+mkdir -p src/app/api/report
+
+cat > src/app/api/report/route.ts << 'EOF'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
+
+// POST: Save a report
+export async function POST(req: NextRequest) {
+  try {
+    const { id, analysis, input_content, mode } = await req.json();
+    const { error } = await supabase.from('reports').upsert({
+      id,
+      analysis,
+      input_content: (input_content || '').slice(0, 500),
+      mode,
+    });
+    if (error) throw error;
+    return NextResponse.json({ success: true, url: `/report/${id}` });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+
+// GET: Fetch a report
+export async function GET(req: NextRequest) {
+  const id = req.nextUrl.searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+
+  try {
+    const { data, error } = await supabase
+      .from('reports')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error || !data) return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    return NextResponse.json(data);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+EOF
+
+# 1b. Report view page
+mkdir -p "src/app/report/[id]"
+
+cat > "src/app/report/[id]/page.tsx" << 'REPORTEOF'
+'use client';
+import { useState, useEffect, use } from 'react';
+import AnalysisResult from '@/components/AnalysisResult';
+
+export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch(`/api/report?id=${id}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { setError(d.error); }
+        else { setData(d); }
+        setLoading(false);
+      })
+      .catch(() => { setError('Failed to load report'); setLoading(false); });
+  }, [id]);
+
+  return (
+    <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span style={{ fontWeight: 600, fontSize: 15 }}>Dissekt</span>
+          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 12, color: '#888', background: '#f0f0ee', padding: '4px 10px', borderRadius: 6 }}>Shared report</span>
+            <a href="/" style={{ fontSize: 13, color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>Scan your own →</a>
+          </div>
+        </div>
+      </nav>
+
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
+        {data?.input_content && (
+          <div style={{ marginBottom: 14, padding: '10px 14px', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, fontSize: 13, color: '#555' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Analyzed: </span>
+            {data.input_content.length > 150 ? data.input_content.slice(0, 150) + '...' : data.input_content}
+          </div>
+        )}
+
+        {loading && (
+          <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Loading report...</div>
+        )}
+
+        {error && (
+          <div style={{ textAlign: 'center', padding: 60 }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: '#404040', marginBottom: 4 }}>Report not found</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>This report may have expired or the link is invalid.</div>
+            <a href="/" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>Run your own scan →</a>
+          </div>
+        )}
+
+        {data?.analysis && <AnalysisResult data={data.analysis} />}
+
+        {data && (
+          <div style={{ textAlign: 'center', marginTop: 24, padding: '16px 0', borderTop: '1px solid #e5e5e5', fontSize: 12, color: '#aaa' }}>
+            Scanned {new Date(data.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} · {data.mode} mode
+            <span style={{ margin: '0 6px' }}>·</span>
+            <a href="/" style={{ color: '#7c3aed', textDecoration: 'none' }}>dissekt.info</a>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+REPORTEOF
+
+# 1c. Updated AnalysisResult with Share button
+cat > src/components/AnalysisResult.tsx << 'AREOF'
+'use client';
+import { useState } from 'react';
+import ThreatScore from './ThreatScore';
+import PrismCard from './PrismCard';
+import SignalCard from './SignalCard';
+import TraceCard from './TraceCard';
+import MetaCard from './MetaCard';
+
+export default function AnalysisResult({ data, onShare }: { data: any; onShare?: () => void }) {
+  return (
+    <div>
+      {/* Share button */}
+      {onShare && (
+        <div className="anim-fade" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+          <button onClick={onShare} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', color: '#7c3aed' }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            Share report
+          </button>
+        </div>
+      )}
+
+      <div className="anim-fade"><ThreatScore data={data} /></div>
+      <div className="result-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
+        <div className="anim-fade anim-d1"><PrismCard prism={data.prism} /></div>
+        <div className="anim-fade anim-d2"><TraceCard trace={data.trace} /></div>
+        <div className="anim-fade anim-d3"><SignalCard signal={data.signal} /></div>
+        <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
+      </div>
+    </div>
+  );
+}
+AREOF
+
+echo "✅ Task 1: Shareable report URLs — API + page + share button"
+
+# ============================================
+# Task 2: Scan History
+# ============================================
+
+cat > src/components/ScanHistory.tsx << 'HISTEOF'
+'use client';
+import { useState, useEffect } from 'react';
+
+interface HistoryItem {
+  id: string;
+  input: string;
+  score: number;
+  techniques: number;
+  mode: string;
+  time: string;
+}
+
+function getHistory(): HistoryItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    return JSON.parse(localStorage.getItem('dissekt_history') || '[]');
+  } catch { return []; }
+}
+
+export function addToHistory(item: HistoryItem) {
+  if (typeof window === 'undefined') return;
+  const history = getHistory();
+  // Dedupe by id
+  const filtered = history.filter(h => h.id !== item.id);
+  filtered.unshift(item);
+  // Keep last 50
+  localStorage.setItem('dissekt_history', JSON.stringify(filtered.slice(0, 50)));
+}
+
+export default function ScanHistory({ onReanalyze }: { onReanalyze: (input: string) => void }) {
+  const [items, setItems] = useState<HistoryItem[]>([]);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => { setItems(getHistory()); }, []);
+
+  if (items.length === 0) return null;
+
+  const visible = expanded ? items : items.slice(0, 5);
+  const scoreColor = (s: number) => s >= 70 ? '#dc2626' : s >= 40 ? '#d97706' : '#16a34a';
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#404040' }}>🕐 Recent scans</div>
+          <div style={{ fontSize: 11, color: '#888' }}>{items.length} scans saved locally</div>
+        </div>
+        {items.length > 5 && (
+          <button onClick={() => setExpanded(!expanded)} style={{ fontSize: 11, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
+            {expanded ? 'Show less' : `Show all ${items.length}`}
+          </button>
+        )}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {visible.map((item, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#f8f8f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: scoreColor(item.score), flexShrink: 0 }}>
+              {item.score}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.input}</div>
+              <div style={{ fontSize: 10, color: '#aaa' }}>
+                {item.techniques} techniques · {item.mode} · {new Date(item.time).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+              <a href={`/report/${item.id}`} style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', padding: '3px 8px', background: '#eff6ff', borderRadius: 4, fontWeight: 500 }}>View</a>
+              <button onClick={() => onReanalyze(item.input)} style={{ fontSize: 10, color: '#7c3aed', background: '#f3e8ff', border: 'none', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontWeight: 500 }}>Rescan</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+HISTEOF
+
+echo "✅ Task 2: Scan history component"
+
+# ============================================
+# Task 3: Radar Auto-Risk Badges
+# ============================================
+
+# Backend: Add heuristic scoring to radar items
+cd /mnt/d/Startup\ Ideas/Dissekt
+
+python3 << 'PYEOF'
+content = open('app/radar/__init__.py').read()
+
+# Add risk scoring function
+risk_fn = '''
+def _quick_risk_score(title: str, summary: str) -> str:
+    """Quick heuristic risk badge based on title/summary keywords."""
+    text = (title + " " + summary).lower()
+    high_risk = ["breaking", "shocking", "exposed", "conspiracy", "hoax", "fake",
+                 "they don't want you to know", "secret", "banned", "cover-up",
+                 "exposed", "urgent", "you won't believe", "mainstream media"]
+    medium_risk = ["claim", "alleged", "reportedly", "sources say", "unverified",
+                   "controversial", "debunk", "misleading", "false", "rumor",
+                   "fact-check", "disputed"]
+
+    high_count = sum(1 for w in high_risk if w in text)
+    med_count = sum(1 for w in medium_risk if w in text)
+
+    if high_count >= 2:
+        return "high"
+    elif high_count >= 1 or med_count >= 2:
+        return "medium"
+    elif med_count >= 1:
+        return "low"
+    return "none"
+
+'''
+
+# Insert before the get_radar_feed function
+content = content.replace(
+    'async def get_radar_feed',
+    risk_fn + 'async def get_radar_feed'
+)
+
+# Add risk field to each item
+content = content.replace(
+    '"market": feed_market,',
+    '"market": feed_market,\n                        "risk": _quick_risk_score(entry.get("title", ""), (entry.get("summary", "") or "")[:200]),'
+)
+
+open('app/radar/__init__.py', 'w').write(content)
+print('✅ Task 3: Radar risk badges — backend')
+PYEOF
+
+cd /mnt/d/Startup\ Ideas/Dissekt/dissekt-web
+
+echo "✅ Task 3: Radar risk scoring added to backend"
+
+# ============================================
+# Task 4: Update page.tsx with all integrations
+# ============================================
+
+cat > src/app/page.tsx << 'MAINEOF'
 'use client';
 import { useState, useEffect } from 'react';
 import LandingPage from '@/components/LandingPage';
@@ -325,3 +641,15 @@ export default function Home() {
     </>
   );
 }
+MAINEOF
+
+echo "✅ Task 4: page.tsx updated with reports, history, radar badges, share"
+echo ""
+echo "All 4 tasks complete:"
+echo "  1. Shareable reports: /report/[id] page + API + share button"
+echo "  2. Scan history: localStorage, shown above Radar, View + Rescan buttons"
+echo "  3. Radar badges: 🔴🟡🟢 based on headline keywords"
+echo "  4. Auth: kept as toast (ready to enable later)"
+echo ""
+echo "Don't forget to create the 'reports' table in Supabase SQL Editor!"
+echo "Run: npm run dev"
