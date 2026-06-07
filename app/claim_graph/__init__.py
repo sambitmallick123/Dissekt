@@ -21,6 +21,9 @@ VECTOR_SIZE = 384  # all-MiniLM-L6-v2
 
 
 def _get_model():
+    import os
+    if os.getenv("DISABLE_CLAIM_GRAPH", "").lower() in ("true", "1", "yes"):
+        return None
     global _model
     if _model is None:
         _model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -29,6 +32,9 @@ def _get_model():
 
 
 def _get_client():
+    import os
+    if os.getenv("DISABLE_CLAIM_GRAPH", "").lower() in ("true", "1", "yes"):
+        return None
     global _client
     if _client is None:
         settings = get_settings()
