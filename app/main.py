@@ -240,6 +240,21 @@ async def telegram_webhook(request: Request):
     try:
         result = await scan(content=text, mode="brief")
         result_dict = result.model_dump(mode="json")
+        
+        # Save report to Supabase so the link works
+        report_id = result_dict.get("id", "")
+        try:
+            import os
+            from supabase import create_client
+            sb = create_client(os.getenv("SUPABASE_URL", ""), os.getenv("SUPABASE_KEY", ""))
+            sb.table("reports").upsert({
+                "id": report_id,
+                "analysis": result_dict,
+                "input_content": text[:500],
+                "mode": "brief",
+            }).execute()
+        except Exception as e:
+            logger.warning(f"Report save failed: {e}")
         reply = format_result(result_dict)
         await bot.send_message(chat_id=chat_id, text=reply, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
     except ValueError as e:

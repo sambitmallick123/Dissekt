@@ -34,12 +34,12 @@ def format_result(data: dict) -> str:
     if techs:
         lines.append(f"")
         lines.append(f"👁 <b>Techniques ({len(techs)}):</b>")
-        for t in techs[:4]:
+        for t in techs[:6]:
             name = t.get("name", "").replace("_", " ").title()
             conf = round(t.get("confidence", 0) * 100)
             lines.append(f"  • {name} — {conf}%")
-        if len(techs) > 4:
-            lines.append(f"  + {len(techs) - 4} more")
+        if len(techs) > 6:
+            lines.append(f"  + {len(techs) - 6} more — see full report")
 
     if brief:
         lines.append(f"")
@@ -48,12 +48,12 @@ def format_result(data: dict) -> str:
     if fcs:
         lines.append(f"")
         lines.append(f"🌐 <b>Fact-checks ({len(fcs)}):</b>")
-        for fc in fcs[:3]:
+        for fc in fcs[:8]:
             pub = fc.get("publisher", "")
             rating = fc.get("rating", "")
             lines.append(f"  • {pub}: {rating}")
-        if len(fcs) > 3:
-            lines.append(f"  + {len(fcs) - 3} more")
+        if len(fcs) > 8:
+            lines.append(f"  + {len(fcs) - 8} more — see full report")
 
     if claims:
         lines.append(f"")
