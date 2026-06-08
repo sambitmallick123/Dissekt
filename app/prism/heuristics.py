@@ -357,8 +357,8 @@ def run_all_heuristics(text: str, source_url: str = "") -> HeuristicResult:
 
     # 8. Semantic compression (Kolmogorov complexity)
     compression = score_semantic_compression(text)
-    if compression > 0.55:  # Very compressible = formulaic
-        conf = min((compression - 0.5) / 0.2, 1.0)
+    if compression > 0.72:  # Very compressible = formulaic (normal text is ~0.6-0.7)
+        conf = min((compression - 0.7) / 0.2, 1.0)
         result.signals.append(HeuristicSignal(
             model="semantic_compression", technique="loaded_language",
             confidence=round(conf, 2),
@@ -413,11 +413,18 @@ def score_attention_gradient(text: str) -> float:
         return 0.0
 
     third = len(words) // 3
+    if third == 0:
+        return 0.0
+
     first_third = words[:third]
     last_third = words[third * 2:]
 
-    first_emotion = sum(1 for w in first_third if w in EMOTION_WORDS) / max(len(first_third), 1)
-    last_emotion = sum(1 for w in last_third if w in EMOTION_WORDS) / max(len(last_third), 1)
+    first_emotion = sum(1 for w in first_third if w in ALL_EMOTION_WORDS) / len(first_third)
+    last_emotion = sum(1 for w in last_third if w in ALL_EMOTION_WORDS) / max(len(last_third), 1)
+    mean_emotion = (first_emotion + last_emotion) / 2
+    if mean_emotion < 0.001:
+        return 0.0
+    gradient = (first_emotion - last_emotion) / mean_emotion
     mean_emotion = sum(1 for w in words if w in EMOTION_WORDS) / max(len(words), 1)
 
     if mean_emotion < 0.005:

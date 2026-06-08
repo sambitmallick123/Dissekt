@@ -1,40 +1,35 @@
 """Dissekt Claim Graph — Qdrant vector similarity search.
 
-Every analysis gets embedded and stored. Enables:
-- "Has a similar claim been analyzed before?"
-- Narrative clustering over time
-- Building the knowledge graph moat
+Uses OpenAI embeddings (no torch dependency, works on Railway).
+Every analysis gets embedded and stored for similarity search.
 """
 import logging
 import hashlib
+import os
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
-from sentence_transformers import SentenceTransformer
 from app.config import get_settings
 
 logger = logging.getLogger("dissekt.claim_graph")
 
-_model = None
 _client = None
 COLLECTION = "dissekt_claims"
-VECTOR_SIZE = 384  # all-MiniLM-L6-v2
+VECTOR_SIZE = 1536  # OpenAI text-embedding-3-small
 
 
-def _get_model():
-    import os
-    if os.getenv("DISABLE_CLAIM_GRAPH", "").lower() in ("true", "1", "yes"):
-        return None
-    global _model
-    if _model is None:
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
-        logger.info("Sentence transformer loaded")
-    return _model
+async def _get_embedding(text: str) -> list[float]:
+    """Get embedding from OpenAI API (lightweight, no torch)."""
+    import openai
+    settings = get_settings()
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+    response = await client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text[:512],
+    )
+    return response.data[0].embedding
 
 
 def _get_client():
-    import os
-    if os.getenv("DISABLE_CLAIM_GRAPH", "").lower() in ("true", "1", "yes"):
-        return None
     global _client
     if _client is None:
         settings = get_settings()
@@ -62,8 +57,7 @@ async def store_analysis(text: str, analysis_id: str, metadata: dict) -> bool:
         return False
 
     try:
-        model = _get_model()
-        embedding = model.encode(text[:512]).tolist()
+        embedding = await _get_embedding(text)
 
         point = PointStruct(
             id=int(hashlib.md5(analysis_id.encode()).hexdigest()[:16], 16),
@@ -91,8 +85,7 @@ async def find_similar(text: str, limit: int = 5) -> list[dict]:
         return []
 
     try:
-        model = _get_model()
-        embedding = model.encode(text[:512]).tolist()
+        embedding = await _get_embedding(text)
 
         results = client.search(
             collection_name=COLLECTION,
