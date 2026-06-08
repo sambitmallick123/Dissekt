@@ -34,32 +34,28 @@ def format_result(data: dict) -> str:
     if techs:
         lines.append(f"")
         lines.append(f"👁 <b>Techniques ({len(techs)}):</b>")
-        for t in techs[:6]:
+        for t in techs:
             name = t.get("name", "").replace("_", " ").title()
             conf = round(t.get("confidence", 0) * 100)
             lines.append(f"  • {name} — {conf}%")
-        if len(techs) > 6:
-            lines.append(f"  + {len(techs) - 6} more — see full report")
 
     if brief:
         lines.append(f"")
-        lines.append(f"📝 <i>{brief[:250]}</i>")
+        lines.append(f"📝 <i>{brief[:300]}</i>")
 
     if fcs:
         lines.append(f"")
         lines.append(f"🌐 <b>Fact-checks ({len(fcs)}):</b>")
-        for fc in fcs[:8]:
+        for fc in fcs:
             pub = fc.get("publisher", "")
             rating = fc.get("rating", "")
             lines.append(f"  • {pub}: {rating}")
-        if len(fcs) > 8:
-            lines.append(f"  + {len(fcs) - 8} more — see full report")
 
     if claims:
         lines.append(f"")
         lines.append(f"📋 <b>Claims ({len(claims)}):</b>")
-        for c in claims[:3]:
-            lines.append(f"  • {c.get('claim', '')[:80]}")
+        for c in claims:
+            lines.append(f"  • {c.get('claim', '')[:100]}")
 
     lines.append(f"")
     lines.append(f"📊 Toxicity: {tox*100:.1f}% | Sentiment: {data.get('signal', {}).get('sentiment', 'neutral')}")

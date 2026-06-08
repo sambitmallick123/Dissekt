@@ -9,7 +9,7 @@ import ExtractedClaims from './ExtractedClaims';
 
 const LANG_NAMES: Record<string, string> = { en: 'English', hi: 'Hindi', de: 'German', es: 'Spanish', fr: 'French' };
 
-export default function AnalysisResult({ data, onShare }: { data: any; onShare?: () => void }) {
+export default function AnalysisResult({ data, onShare, onAnalyzeClaim }: { data: any; onShare?: () => void; onAnalyzeClaim?: (claim: string) => void }) {
   const lang = data.detected_language;
   const langName = LANG_NAMES[lang] || lang;
 
@@ -42,7 +42,7 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
       </div>
 
       {data.extracted_claims?.length > 0 && (
-        <div className="anim-fade anim-d3"><ExtractedClaims claims={data.extracted_claims} /></div>
+        <div className="anim-fade anim-d3"><ExtractedClaims claims={data.extracted_claims} onAnalyzeClaim={onAnalyzeClaim} /></div>
       )}
 
       {data.similar_claims?.length > 0 && (

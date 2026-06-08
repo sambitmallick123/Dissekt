@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ExtractedClaims({ claims }: { claims: any[] }) {
+export default function ExtractedClaims({ claims, onAnalyzeClaim }: { claims: any[]; onAnalyzeClaim?: (claim: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   if (!claims || claims.length === 0) return null;
 
@@ -32,9 +32,16 @@ export default function ExtractedClaims({ claims }: { claims: any[] }) {
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, color: '#1a1a1a', lineHeight: 1.5 }}>{c.claim}</div>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: tc.bg, color: tc.color, flexShrink: 0, whiteSpace: 'nowrap' }}>
-                {c.type}
-              </span>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: tc.bg, color: tc.color, whiteSpace: 'nowrap' }}>
+                  {c.type}
+                </span>
+                {onAnalyzeClaim && (
+                  <button onClick={() => onAnalyzeClaim(c.claim)} style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 4, background: '#f3e8ff', color: '#7c3aed', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    Analyze →
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
