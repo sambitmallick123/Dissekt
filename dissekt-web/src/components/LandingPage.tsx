@@ -31,7 +31,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
           Paste any URL, text, or screenshot and see the playbook behind the content.
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
-          {['📰 Journalists', '🔍 Researchers', '📱 Social media users', '📰 News readers', '🎓 Students'].map((t, i) => (
+          {['📰 Journalists', '🔍 Researchers', '📱 Social media users', '📰 News readers'].map((t, i) => (
             <span key={i} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 20, background: '#f5f5f4', border: '1px solid #e5e5e5', color: '#555' }}>{t}</span>
           ))}
         </div>
