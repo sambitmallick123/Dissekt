@@ -15,7 +15,6 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
 
   return (
     <div>
-      {/* Top bar: language + share */}
       <div className="anim-fade" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {lang && lang !== 'en' && (
@@ -23,6 +22,7 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
               Detected: {langName}
             </span>
           )}
+          <a href="/help" style={{ fontSize: 11, color: '#888', textDecoration: 'none' }}>What do these mean?</a>
         </div>
         {onShare && (
           <button onClick={onShare} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 12, fontWeight: 500, cursor: 'pointer', color: '#7c3aed' }}>
@@ -41,18 +41,12 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
       </div>
 
-      {/* Extracted claims */}
       {data.extracted_claims?.length > 0 && (
-        <div className="anim-fade anim-d3">
-          <ExtractedClaims claims={data.extracted_claims} />
-        </div>
+        <div className="anim-fade anim-d3"><ExtractedClaims claims={data.extracted_claims} /></div>
       )}
 
-      {/* Similar past claims */}
       {data.similar_claims?.length > 0 && (
-        <div className="anim-fade anim-d4">
-          <SimilarClaims claims={data.similar_claims} />
-        </div>
+        <div className="anim-fade anim-d4"><SimilarClaims claims={data.similar_claims} /></div>
       )}
     </div>
   );

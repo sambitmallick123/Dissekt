@@ -5,6 +5,8 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
+    telegram_bot_token: str = ""
+
     # Core
     app_env: str = "development"
     app_name: str = "Dissekt"

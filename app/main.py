@@ -191,6 +191,66 @@ async def radar_feed(market: str = "all", limit: int = 20, refresh: bool = False
     }
 
 
+
+
+@app.post("/api/telegram")
+async def telegram_webhook(request: Request):
+    """Telegram bot webhook."""
+    import json
+    from telegram import Update, Bot
+    from app.telegram_bot import format_result, WELCOME_MSG, HELP_MSG
+    from telegram.constants import ParseMode
+    
+    settings = get_settings()
+    bot = Bot(token=settings.telegram_bot_token)
+    
+    body = await request.json()
+    update = Update.de_json(body, bot)
+    
+    if not update or not update.message:
+        return {"status": "ok"}
+    
+    chat_id = update.message.chat_id
+    text = update.message.text or ""
+    
+    # Handle commands
+    if text.startswith("/start"):
+        try:
+            await bot.send_message(chat_id=chat_id, text=WELCOME_MSG, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            logger.warning(f"Telegram send failed: {e}")
+        return {"status": "ok"}
+    
+    if text.startswith("/help"):
+        await bot.send_message(chat_id=chat_id, text=HELP_MSG, parse_mode=ParseMode.HTML)
+        return {"status": "ok"}
+    
+    # Handle image
+    if update.message.photo:
+        await bot.send_message(chat_id=chat_id, text="📷 Image analysis coming soon! For now, please paste the text from the image.", parse_mode=ParseMode.HTML)
+        return {"status": "ok"}
+    
+    if not text or len(text) < 10:
+        await bot.send_message(chat_id=chat_id, text="Please send more text (at least 10 characters) or a URL to analyze.", parse_mode=ParseMode.HTML)
+        return {"status": "ok"}
+    
+    # Send "analyzing" message
+    await bot.send_message(chat_id=chat_id, text="🔍 Analyzing... This takes 3-10 seconds.", parse_mode=ParseMode.HTML)
+    
+    try:
+        result = await scan(content=text, mode="brief")
+        result_dict = result.model_dump(mode="json")
+        reply = format_result(result_dict)
+        await bot.send_message(chat_id=chat_id, text=reply, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+    except ValueError as e:
+        err_msg = str(e)
+        await bot.send_message(chat_id=chat_id, text=f"⚠️ {err_msg}", parse_mode=ParseMode.HTML)
+    except Exception as e:
+        logger.error(f"Telegram analysis failed: {e}")
+        await bot.send_message(chat_id=chat_id, text="❌ Analysis failed. Please try again.", parse_mode=ParseMode.HTML)
+    
+    return {"status": "ok"}
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================
