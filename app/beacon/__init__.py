@@ -289,7 +289,8 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     heuristics = run_all_heuristics(extracted_text, source_url)
 
     # Step 5: Run all engines in parallel
-    prism_task = route_and_analyze(extracted_text, mode, heuristics)
+    detected_lang = detect_language(extracted_text)
+    prism_task = route_and_analyze(extracted_text, mode, heuristics, detected_language=detected_lang)
     trace_query = re.split(r'[.!?\n]', extracted_text)[0].strip()[:150]
     trace_task = run_trace(trace_query if len(trace_query) > 20 else extracted_text[:200])
     signal_task = asyncio.to_thread(run_signal, extracted_text, source_url)

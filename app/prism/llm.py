@@ -114,6 +114,13 @@ async def analyze_with_claude(
 ) -> dict:
     """Run analysis via Claude Sonnet 4."""
     settings = get_settings()
+    # Language-aware analysis instruction
+    lang_names = {"en": "English", "hi": "Hindi", "de": "German", "es": "Spanish", "fr": "French"}
+    lang_note = ""
+    if detected_language != "en":
+        lang_name = lang_names.get(detected_language, detected_language)
+        lang_note = f"\nIMPORTANT: The input text is in {lang_name}. Analyze the manipulation techniques in the original language but write your response (technique names, explanations, summary) in English. Quote evidence in the original {lang_name} text."
+
     if not settings.anthropic_api_key:
         raise ValueError("ANTHROPIC_API_KEY not set")
 

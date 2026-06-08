@@ -254,6 +254,7 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, background: remaining <= 3 ? '#fef2f2' : '#f0f0ee', color: remaining <= 3 ? '#b91c1c' : '#888' }}>{remaining} scans left today</span>
+            <a href='/compare' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>Compare</a>
             <a href='/help' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>Help</a>
             <button onClick={onShowFeedback} style={{ fontSize: 12, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>Feedback</button>
             <button onClick={onShowToast} style={{ fontSize: 12, color: '#888', background: 'none', border: '1px solid #e5e5e5', borderRadius: 6, padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}>Sign in</button>

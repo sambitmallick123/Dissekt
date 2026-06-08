@@ -266,6 +266,86 @@ async def telegram_webhook(request: Request):
     
     return {"status": "ok"}
 
+
+
+@app.post("/api/scan/compare")
+async def compare_content(request: Request):
+    """Compare two pieces of content side-by-side."""
+    import openai
+    
+    body = await request.json()
+    content_a = body.get("content_a", "")
+    content_b = body.get("content_b", "")
+    mode = body.get("mode", "brief")
+    
+    if len(content_a) < 10 or len(content_b) < 10:
+        raise HTTPException(status_code=400, detail="Both inputs must be at least 10 characters")
+    
+    try:
+        # Run both scans in parallel
+        import asyncio
+        result_a, result_b = await asyncio.gather(
+            scan(content=content_a, mode=mode),
+            scan(content=content_b, mode=mode),
+        )
+        
+        dict_a = result_a.model_dump(mode="json")
+        dict_b = result_b.model_dump(mode="json")
+        
+        # Generate comparison summary using GPT-4o mini
+        settings = get_settings()
+        client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+        
+        techs_a = [t.get("name", "") for t in dict_a.get("prism", {}).get("techniques", [])]
+        techs_b = [t.get("name", "") for t in dict_b.get("prism", {}).get("techniques", [])]
+        shared = set(techs_a) & set(techs_b)
+        only_a = set(techs_a) - set(techs_b)
+        only_b = set(techs_b) - set(techs_a)
+        
+        brief_a = dict_a.get("prism", {}).get("brief", "")
+        brief_b = dict_b.get("prism", {}).get("brief", "")
+        
+        comparison_prompt = f"""Compare these two content analyses:
+
+Content A summary: {brief_a[:300]}
+Content A techniques: {', '.join(techs_a) or 'none'}
+
+Content B summary: {brief_b[:300]}  
+Content B techniques: {', '.join(techs_b) or 'none'}
+
+Write a 2-3 sentence comparison of how these two pieces of content differ in their use of manipulation techniques, framing, and credibility. Be specific."""
+
+        comp_response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=200,
+            messages=[
+                {"role": "system", "content": "You are a media analysis expert comparing two pieces of content."},
+                {"role": "user", "content": comparison_prompt},
+            ],
+        )
+        
+        comparison_summary = comp_response.choices[0].message.content.strip()
+        
+        return {
+            "result_a": dict_a,
+            "result_b": dict_b,
+            "comparison": {
+                "summary": comparison_summary,
+                "shared_techniques": list(shared),
+                "only_a_techniques": list(only_a),
+                "only_b_techniques": list(only_b),
+                "score_diff": abs(
+                    (dict_a.get("signal", {}).get("toxicity_score", 0) * 100) -
+                    (dict_b.get("signal", {}).get("toxicity_score", 0) * 100)
+                ),
+            }
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Compare failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Comparison failed")
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================
