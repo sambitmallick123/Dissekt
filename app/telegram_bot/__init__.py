@@ -6,7 +6,7 @@ logger = logging.getLogger("dissekt.telegram")
 
 
 def format_result(data: dict) -> str:
-    """Format Dissekt analysis for Telegram (HTML)."""
+    """Format Dissekt analysis for Telegram (HTML). No hyperlinks except report + dissekt.info."""
     techs = data.get("prism", {}).get("techniques", [])
     fcs = data.get("trace", {}).get("fact_checks", [])
     tox = data.get("signal", {}).get("toxicity_score", 0)
@@ -32,7 +32,7 @@ def format_result(data: dict) -> str:
     ]
 
     if techs:
-        lines.append(f"")
+        lines.append("")
         lines.append(f"👁 <b>Techniques ({len(techs)}):</b>")
         for t in techs:
             name = t.get("name", "").replace("_", " ").title()
@@ -40,32 +40,31 @@ def format_result(data: dict) -> str:
             lines.append(f"  • {name} — {conf}%")
 
     if brief:
-        lines.append(f"")
+        lines.append("")
         lines.append(f"📝 <i>{brief[:300]}</i>")
 
     if fcs:
-        lines.append(f"")
+        lines.append("")
         lines.append(f"🌐 <b>Fact-checks ({len(fcs)}):</b>")
         for fc in fcs:
             pub = fc.get("publisher", "")
             rating = fc.get("rating", "")
-            lines.append(f"  • {pub}: {rating}")
+            lines.append(f"  • {pub} — {rating}")
 
     if claims:
-        lines.append(f"")
+        lines.append("")
         lines.append(f"📋 <b>Claims ({len(claims)}):</b>")
         for c in claims:
             lines.append(f"  • {c.get('claim', '')[:100]}")
 
-    lines.append(f"")
+    lines.append("")
     lines.append(f"📊 Toxicity: {tox*100:.1f}% | Sentiment: {data.get('signal', {}).get('sentiment', 'neutral')}")
+    lines.append("")
 
     if report_id:
-        lines.append(f"")
-        lines.append(f'🔗 <a href="https://dissekt.info/report/{report_id}">Full report</a>')
+        lines.append(f'🔗 <a href="https://dissekt.info/report/{report_id}">View full report</a>')
 
-    lines.append(f"")
-    lines.append(f"<i>Powered by dissekt.info</i>")
+    lines.append(f'🛡 <a href="https://dissekt.info">dissekt.info</a>')
 
     return "\n".join(lines)
 
@@ -78,7 +77,7 @@ I detect manipulation in any content. Send me:
 🔗 <b>URL</b> — send a news article link
 📷 <b>Image</b> — send a screenshot of a post
 
-I'll analyze it and show you:
+I'll show you:
 - Manipulation techniques used
 - Existing fact-checks
 - Source credibility scores
@@ -86,7 +85,8 @@ I'll analyze it and show you:
 
 Try it now — paste any suspicious text!
 
-<i>Free | 10 scans/day | dissekt.info</i>"""
+<i>Free | 10 scans/day</i>
+🛡 <a href="https://dissekt.info">dissekt.info</a>"""
 
 
 HELP_MSG = """🛡 <b>How to use Dissekt Bot</b>
@@ -96,10 +96,9 @@ Just send me any of these:
 1. <b>Text</b> — paste a claim like:
    <i>"COVID vaccines contain microchips"</i>
 
-2. <b>URL</b> — send an article link:
-   <i>https://example.com/article</i>
+2. <b>URL</b> — send an article link
 
-3. <b>Image</b> — send a screenshot of a WhatsApp forward or social media post
+3. <b>Image</b> — send a screenshot
 
 I'll reply with the full analysis in seconds.
 
@@ -107,4 +106,4 @@ I'll reply with the full analysis in seconds.
 /start — Welcome message
 /help — This message
 
-<i>dissekt.info | See the playbook behind the content</i>"""
+🛡 <a href="https://dissekt.info">dissekt.info</a>"""
