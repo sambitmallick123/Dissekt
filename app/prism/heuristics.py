@@ -421,14 +421,8 @@ def score_attention_gradient(text: str) -> float:
 
     first_emotion = sum(1 for w in first_third if w in ALL_EMOTION_WORDS) / len(first_third)
     last_emotion = sum(1 for w in last_third if w in ALL_EMOTION_WORDS) / max(len(last_third), 1)
-    mean_emotion = (first_emotion + last_emotion) / 2
-    if mean_emotion < 0.001:
-        return 0.0
-    gradient = (first_emotion - last_emotion) / mean_emotion
-    mean_emotion = sum(1 for w in words if w in EMOTION_WORDS) / max(len(words), 1)
-
+    mean_emotion = sum(1 for w in words if w in ALL_EMOTION_WORDS) / len(words)
     if mean_emotion < 0.005:
         return 0.0
-
     gradient = (first_emotion - last_emotion) / mean_emotion
     return round(gradient, 3)

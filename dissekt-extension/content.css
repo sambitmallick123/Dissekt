@@ -1,0 +1,151 @@
+#dissekt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 2147483647;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#dissekt-panel {
+  width: 380px;
+  max-height: calc(100vh - 32px);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  overflow-y: auto;
+  animation: dissekt-slide 0.2s ease;
+}
+
+@keyframes dissekt-slide {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+#dissekt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #7c3aed;
+  border-radius: 14px 14px 0 0;
+}
+
+#dissekt-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#dissekt-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+#dissekt-close:hover { color: white; }
+
+#dissekt-body { padding: 14px 16px; }
+
+.dissekt-loading-state { text-align: center; padding: 30px 0; }
+.dissekt-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid #f0f0ee;
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  animation: dissekt-spin 0.8s linear infinite;
+}
+@keyframes dissekt-spin { to { transform: rotate(360deg); } }
+.dissekt-loading-text { font-size: 13px; font-weight: 500; color: #404040; }
+.dissekt-loading-preview { font-size: 11px; color: #888; margin-top: 6px; max-height: 40px; overflow: hidden; }
+
+.dissekt-content-preview {
+  font-size: 11px; color: #888; padding: 8px 10px;
+  background: #f5f5f4; border-radius: 8px; margin-bottom: 12px;
+  max-height: 48px; overflow: hidden; line-height: 1.5;
+}
+
+.dissekt-score-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; background: #fff; border: 1px solid #e5e5e5;
+  border-radius: 10px; margin-bottom: 12px;
+}
+
+.dissekt-score-circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 3px solid; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+
+.dissekt-score-num { font-size: 18px; font-weight: 700; }
+.dissekt-score-info { flex: 1; }
+.dissekt-score-label { font-size: 12px; font-weight: 700; }
+.dissekt-score-meta { font-size: 10px; color: #888; margin-top: 2px; }
+.dissekt-score-time { font-size: 10px; color: #aaa; }
+
+.dissekt-section { margin-bottom: 12px; }
+.dissekt-section-title { font-size: 12px; font-weight: 600; color: #404040; margin-bottom: 8px; }
+
+.dissekt-tech {
+  padding: 8px 10px; border: 1px solid #e5e5e5;
+  border-radius: 8px; margin-bottom: 6px;
+}
+.dissekt-tech-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.dissekt-tech-name { font-size: 12px; font-weight: 600; }
+.dissekt-tech-conf { font-size: 12px; font-weight: 700; }
+.dissekt-bar-bg { height: 3px; background: #f0f0ee; border-radius: 2px; margin-bottom: 4px; }
+.dissekt-bar { height: 100%; border-radius: 2px; }
+.dissekt-tech-exp { font-size: 11px; color: #555; line-height: 1.5; }
+
+.dissekt-clean { font-size: 12px; color: #16a34a; padding: 8px; background: #f0fdf4; border-radius: 8px; }
+
+.dissekt-summary {
+  font-size: 11px; color: #404040; line-height: 1.6;
+  padding: 8px 10px; background: #faf5ff; border: 1px solid #ede9fe;
+  border-radius: 8px; margin-bottom: 12px;
+}
+
+.dissekt-fc {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; border: 1px solid #e5e5e5;
+  border-radius: 6px; margin-bottom: 4px; font-size: 11px;
+}
+.dissekt-fc-pub { font-weight: 600; flex-shrink: 0; }
+.dissekt-fc-title { flex: 1; color: #555; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dissekt-fc-badge { font-weight: 600; font-size: 10px; flex-shrink: 0; }
+.dissekt-fc-more { font-size: 11px; color: #2563eb; text-align: center; margin-top: 4px; }
+.dissekt-no-fc { font-size: 11px; color: #888; }
+
+.dissekt-error { text-align: center; padding: 20px 0; }
+.dissekt-error-icon { font-size: 28px; margin-bottom: 8px; }
+.dissekt-error-msg { font-size: 13px; color: #404040; margin-bottom: 12px; }
+
+.dissekt-actions {
+  display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.dissekt-btn-primary {
+  flex: 1; text-align: center; padding: 8px 0;
+  background: #7c3aed; color: white !important; border-radius: 8px;
+  font-size: 12px; font-weight: 600; text-decoration: none;
+}
+
+.dissekt-btn-secondary {
+  flex: 1; text-align: center; padding: 8px 0;
+  background: #fff; color: #7c3aed !important; border: 1px solid #e5e5e5;
+  border-radius: 8px; font-size: 12px; font-weight: 500; text-decoration: none;
+}
+
+.dissekt-btn-primary:hover { background: #6d28d9; }
+.dissekt-btn-secondary:hover { background: #faf5ff; }

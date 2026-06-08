@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 320px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .header { background: #7c3aed; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
+    .header svg { flex-shrink: 0; }
+    .header span { color: white; font-weight: 600; font-size: 14px; }
+    .body { padding: 14px 16px; }
+    .empty { text-align: center; padding: 20px 0; color: #888; font-size: 13px; }
+    .hint { font-size: 11px; color: #aaa; text-align: center; margin-top: 8px; line-height: 1.5; }
+    .last { padding: 10px 12px; background: #f5f5f4; border-radius: 8px; margin-bottom: 10px; }
+    .last-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .last-text { font-size: 12px; color: #404040; line-height: 1.5; max-height: 60px; overflow: hidden; }
+    .last-time { font-size: 10px; color: #aaa; margin-top: 4px; }
+    .btn { display: block; width: 100%; padding: 10px; background: #7c3aed; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; }
+    .btn:hover { background: #6d28d9; }
+    .btn-outline { background: white; color: #7c3aed; border: 1px solid #e5e5e5; margin-top: 8px; }
+    .btn-outline:hover { background: #faf5ff; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span>Dissekt</span>
+  </div>
+  <div class="body" id="content">
+    <div class="empty">
+      <div style="font-size: 24px; margin-bottom: 8px;">👁</div>
+      <div style="font-weight: 500; color: #404040; margin-bottom: 4px;">Select text, then right-click</div>
+      <div class="hint">Highlight any text on a webpage, right-click, and choose "Analyze with Dissekt" to see the manipulation playbook.</div>
+    </div>
+    <a href="https://dissekt.info" target="_blank" class="btn" style="margin-top: 12px;">Open Dissekt</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
