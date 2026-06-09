@@ -92,7 +92,6 @@ const components = [
     ]
   },
   {
-    {
     icon: '🏛',
     name: 'Compass — Political Accountability',
     color: '#d97706',

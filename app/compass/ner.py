@@ -1,4 +1,4 @@
-"""Detect politician names in text using fuzzy matching against database."""
+"""Detect politician names in text using matching against database."""
 import json
 import os
 import re
@@ -17,37 +17,38 @@ def _load_db():
     return _db
 
 def detect_politicians(text: str, country: str = "india") -> list[dict]:
-    """Find politician mentions in text. Returns list of matched profiles."""
+    """Find politician mentions in text."""
     if country != "india":
         return []
     
     db = _load_db()
-    text_lower = text.lower()
     found = []
     seen = set()
     
     for key, profile in db.items():
-        # Match full name or last name
-        name_parts = key.split()
-        full_name = key
-        last_name = name_parts[-1] if len(name_parts) > 1 else key
+        if key in seen:
+            continue
         
-        # Check for full name match
-        if full_name in text_lower and full_name not in seen:
+        name = profile["name"]
+        name_parts = name.split()
+        
+        # Match full name (case insensitive)
+        if re.search(rf'\b{re.escape(name)}\b', text, re.IGNORECASE):
             found.append(profile)
-            seen.add(full_name)
-        # Check for "Mr./Shri/PM + last name" patterns
-        elif last_name in text_lower and len(last_name) > 4:
-            # Avoid false positives on short names
-            patterns = [
-                rf'\b{re.escape(last_name)}\b',
-                rf'\b{re.escape(profile["name"])}\b',
-            ]
-            for p in patterns:
-                if re.search(p, text, re.IGNORECASE):
-                    if full_name not in seen:
-                        found.append(profile)
-                        seen.add(full_name)
-                    break
+            seen.add(key)
+            continue
+        
+        # Match last name alone (e.g. "Modi", "Shah", "Kejriwal")
+        last_name = name_parts[-1]
+        if re.search(rf'\b{re.escape(last_name)}\b', text, re.IGNORECASE):
+            found.append(profile)
+            seen.add(key)
+            continue
+        
+        # Match first name if unique enough (>5 chars)
+        first_name = name_parts[0]
+        if len(first_name) > 5 and re.search(rf'\b{re.escape(first_name)}\b', text, re.IGNORECASE):
+            found.append(profile)
+            seen.add(key)
     
     return found
