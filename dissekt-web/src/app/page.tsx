@@ -294,7 +294,7 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
         {error && <div style={{ marginBottom: 16, padding: 14, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>}
         {loading && <LoadingState />}
-        {result && <AnalysisResult data={result} onShare={handleShare} onAnalyzeClaim={(claim) => { setInputContent(claim); handleScan(claim, "brief"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
+        {result && <AnalysisResult data={result} onShare={handleShare} />}
 
         {!result && !loading && !error && (
           <div>

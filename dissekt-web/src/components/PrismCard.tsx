@@ -1,92 +1,145 @@
 'use client';
 import { useState } from 'react';
 
-const card: React.CSSProperties = { background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' };
-const header: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', borderBottom: '1px solid #e5e5e5' };
-const iconBox = (bg: string): React.CSSProperties => ({ width: 30, height: 30, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 });
-
-const catColors: Record<string, { bg: string; text: string }> = {
-  framing: { bg: '#f3e8ff', text: '#7c3aed' },
-  logical_fallacy: { bg: '#dbeafe', text: '#2563eb' },
-  credibility: { bg: '#fef3c7', text: '#b45309' },
-  deflection: { bg: '#ffe4e6', text: '#be123c' },
+const CATEGORY_COLORS: Record<string, { bg: string; color: string }> = {
+  framing: { bg: '#fff7ed', color: '#c2410c' },
+  logical_fallacy: { bg: '#fef2f2', color: '#b91c1c' },
+  credibility: { bg: '#f0fdf4', color: '#166534' },
+  deflection: { bg: '#eff6ff', color: '#1e40af' },
 };
-const confColor = (c: number) => c >= 0.85 ? '#dc2626' : c >= 0.7 ? '#d97706' : '#eab308';
 
-export default function PrismCard({ prism }: { prism: any }) {
-  const [expanded, setExpanded] = useState(false);
-  const cat = (c: string) => catColors[c] || catColors.framing;
+function TechniqueVote({ analysisId, technique }: { analysisId: string; technique: any }) {
+  const [voted, setVoted] = useState<'agree' | 'disagree' | null>(null);
+  const [showComment, setShowComment] = useState(false);
+  const [comment, setComment] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const handleVote = async (vote: 'agree' | 'disagree') => {
+    setVoted(vote);
+    if (vote === 'disagree') {
+      setShowComment(true);
+      return;
+    }
+    try {
+      await fetch('/api/corrections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysis_id: analysisId, technique_name: technique.name, vote, comment: '' }),
+      });
+      setSent(true);
+    } catch {}
+  };
+
+  const submitDisagree = async () => {
+    try {
+      await fetch('/api/corrections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysis_id: analysisId, technique_name: technique.name, vote: 'disagree', comment }),
+      });
+      setSent(true);
+      setShowComment(false);
+    } catch {}
+  };
+
+  if (sent) {
+    return (
+      <div style={{ fontSize: 10, color: '#16a34a', marginTop: 6 }}>
+        ✓ Thanks for your feedback
+      </div>
+    );
+  }
 
   return (
-    <div style={card}>
-      <div style={header}>
-        <div style={iconBox('#f3e8ff')}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <div style={{ marginTop: 6 }}>
+      {!showComment && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 10, color: '#aaa' }}>Accurate?</span>
+          <button onClick={() => handleVote('agree')}
+            style={{ padding: '2px 8px', fontSize: 10, borderRadius: 4, border: '1px solid #e5e5e5', background: voted === 'agree' ? '#f0fdf4' : '#fff', color: voted === 'agree' ? '#16a34a' : '#888', cursor: 'pointer', fontWeight: 500 }}>
+            👍
+          </button>
+          <button onClick={() => handleVote('disagree')}
+            style={{ padding: '2px 8px', fontSize: 10, borderRadius: 4, border: '1px solid #e5e5e5', background: voted === 'disagree' ? '#fef2f2' : '#fff', color: voted === 'disagree' ? '#b91c1c' : '#888', cursor: 'pointer', fontWeight: 500 }}>
+            👎
+          </button>
         </div>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Prism — techniques</span>
-        <span style={{ fontSize: 12, color: '#aaa', fontWeight: 500 }}>{prism.techniques?.length || 0} found</span>
+      )}
+      {showComment && (
+        <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+          <input
+            type="text"
+            placeholder="What's wrong? (optional)"
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            style={{ flex: 1, fontSize: 10, padding: '4px 8px', border: '1px solid #e5e5e5', borderRadius: 4, outline: 'none' }}
+          />
+          <button onClick={submitDisagree}
+            style={{ fontSize: 10, padding: '4px 10px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600 }}>
+            Send
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function PrismCard({ prism, analysisId }: { prism: any; analysisId?: string }) {
+  if (!prism) return null;
+
+  const techniques = prism.techniques || [];
+  const brief = prism.brief || '';
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 24, height: 24, borderRadius: 6, background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          </div>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#404040' }}>Prism — techniques</span>
+        </div>
+        <span style={{ fontSize: 12, color: '#888' }}>{techniques.length} found</span>
       </div>
 
-      <div style={{ padding: 18, flex: 1 }}>
-        {prism.techniques.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '30px 0' }}>
-            <div style={{ width: 40, height: 40, borderRadius: 20, background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </div>
-            <span style={{ fontSize: 13, color: '#888' }}>No manipulation detected</span>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {prism.techniques.map((t: any, i: number) => {
-              const cc = cat(t.category);
-              return (
-                <div key={i} style={{ border: '1px solid #e5e5e5', borderRadius: 10, padding: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, textTransform: 'capitalize' }}>{t.name.replace(/_/g, ' ')}</span>
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: cc.bg, color: cc.text, textTransform: 'capitalize' }}>
-                        {t.category?.replace(/_/g, ' ')}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: confColor(t.confidence) }}>{(t.confidence * 100).toFixed(0)}%</span>
+      {techniques.length === 0 ? (
+        <div style={{ padding: '12px 0', textAlign: 'center', color: '#16a34a', fontSize: 13 }}>✓ No manipulation techniques detected</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {techniques.map((t: any, i: number) => {
+            const conf = Math.round((t.confidence || 0) * 100);
+            const barColor = conf >= 85 ? '#dc2626' : conf >= 70 ? '#d97706' : '#eab308';
+            const cat = CATEGORY_COLORS[t.category] || { bg: '#f0f0ee', color: '#555' };
+            const name = (t.name || '').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+
+            return (
+              <div key={i} style={{ border: '1px solid #e5e5e5', borderRadius: 10, padding: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600 }}>{name}</span>
+                    <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 4, background: cat.bg, color: cat.color, fontWeight: 600 }}>
+                      {(t.category || 'framing').replace(/_/g, ' ')}
+                    </span>
                   </div>
-                  <div style={{ height: 5, background: '#f0f0ee', borderRadius: 3, overflow: 'hidden', marginBottom: 10 }}>
-                    <div style={{ height: '100%', borderRadius: 3, width: `${t.confidence * 100}%`, background: confColor(t.confidence), transition: 'width 0.7s ease' }}/>
-                  </div>
-                  <p style={{ fontSize: 12, color: '#555', lineHeight: 1.6, margin: 0 }}>{t.explanation}</p>
-                  {t.evidence && (
-                    <div style={{ marginTop: 8, paddingLeft: 12, borderLeft: '3px solid #fed7aa' }}>
-                      <p style={{ fontSize: 12, color: '#888', fontStyle: 'italic', margin: 0 }}>"{t.evidence}"</p>
-                    </div>
-                  )}
+                  <span style={{ fontSize: 13, fontWeight: 700, color: barColor }}>{conf}%</span>
                 </div>
-              );
-            })}
-          </div>
-        )}
-
-        {prism.brief && (
-          <div style={{ marginTop: 14, padding: 14, background: '#faf5ff', border: '1px solid #ede9fe', borderRadius: 10 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#7c3aed', marginBottom: 6 }}>Summary</div>
-            <p style={{ fontSize: 12, color: '#404040', lineHeight: 1.7, margin: 0 }}>{prism.brief}</p>
-          </div>
-        )}
-
-        {prism.detailed && (
-          <div style={{ marginTop: 10 }}>
-            <button onClick={() => setExpanded(!expanded)}
-              style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 500, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              <span style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>▸</span>
-              {expanded ? 'Hide detailed analysis' : 'Show detailed analysis'}
-            </button>
-            {expanded && (
-              <div style={{ marginTop: 8, padding: 14, background: '#f8f8f6', border: '1px solid #e5e5e5', borderRadius: 10 }}>
-                <p style={{ fontSize: 12, color: '#555', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{prism.detailed}</p>
+                <div style={{ height: 3, background: '#f0f0ee', borderRadius: 2, marginBottom: 6 }}>
+                  <div style={{ height: '100%', width: `${conf}%`, background: barColor, borderRadius: 2 }} />
+                </div>
+                {t.explanation && <div style={{ fontSize: 12, color: '#555', lineHeight: 1.5, marginBottom: 2 }}>{t.explanation}</div>}
+                {t.evidence && <div style={{ fontSize: 11, color: '#888', fontStyle: 'italic', borderLeft: '2px solid #e5e5e5', paddingLeft: 8, marginTop: 4 }}>"{t.evidence}"</div>}
+                {analysisId && <TechniqueVote analysisId={analysisId} technique={t} />}
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
+
+      {brief && (
+        <div style={{ marginTop: 12, padding: '10px 12px', background: '#faf5ff', border: '1px solid #ede9fe', borderRadius: 8, fontSize: 12, color: '#404040', lineHeight: 1.6 }}>
+          {brief}
+        </div>
+      )}
     </div>
   );
 }

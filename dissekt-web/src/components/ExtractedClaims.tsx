@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ExtractedClaims({ claims, onAnalyzeClaim }: { claims: any[]; onAnalyzeClaim?: (claim: string) => void }) {
+export default function ExtractedClaims({ claims }: { claims: any[] }) {
   const [expanded, setExpanded] = useState(false);
   if (!claims || claims.length === 0) return null;
 
@@ -13,6 +13,9 @@ export default function ExtractedClaims({ claims, onAnalyzeClaim }: { claims: an
     prediction: { bg: '#fce7f3', color: '#9d174d' },
     causal: { bg: '#f0fdf4', color: '#166534' },
   };
+
+  const searchUrl = (claim: string) =>
+    `https://www.google.com/search?q=${encodeURIComponent(claim + ' fact check')}`;
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18, marginTop: 16 }}>
@@ -27,20 +30,21 @@ export default function ExtractedClaims({ claims, onAnalyzeClaim }: { claims: an
         {visible.map((c, i) => {
           const tc = typeColors[c.type] || { bg: '#f0f0ee', color: '#555' };
           return (
-            <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 8, padding: '8px 12px', border: '1px solid #e5e5e5', borderRadius: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#aaa', flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, color: '#1a1a1a', lineHeight: 1.5 }}>{c.claim}</div>
-              </div>
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: tc.bg, color: tc.color, whiteSpace: 'nowrap' }}>
+            <div key={i} style={{ padding: '8px 12px', border: '1px solid #e5e5e5', borderRadius: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'start', gap: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#aaa', flexShrink: 0, marginTop: 2 }}>{i + 1}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: '#1a1a1a', lineHeight: 1.5 }}>{c.claim}</div>
+                </div>
+                <span style={{ fontSize: 10, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: tc.bg, color: tc.color, flexShrink: 0, whiteSpace: 'nowrap' }}>
                   {c.type}
                 </span>
-                {onAnalyzeClaim && (
-                  <button onClick={() => onAnalyzeClaim(c.claim)} style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 4, background: '#f3e8ff', color: '#7c3aed', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                    Analyze →
-                  </button>
-                )}
+              </div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 6, marginLeft: 20 }}>
+                <a href={searchUrl(c.claim)} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>🔍 Google fact-check</a>
+                <a href={`https://www.snopes.com/?s=${encodeURIComponent(c.claim)}`} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>Snopes</a>
+                <a href={`https://www.politifact.com/search/?q=${encodeURIComponent(c.claim)}`} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>PolitiFact</a>
+                <a href={`https://www.altnews.in/?s=${encodeURIComponent(c.claim)}`} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>Alt News</a>
               </div>
             </div>
           );

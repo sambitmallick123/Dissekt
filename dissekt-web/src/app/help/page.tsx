@@ -154,6 +154,32 @@ export default function HelpPage() {
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>How Dissekt works</h1>
         <p style={{ fontSize: 14, color: '#888', marginBottom: 28 }}>Every component explained — what it does, how it works, and what the numbers mean.</p>
 
+        
+        <div style={{ background: '#7c3aed', borderRadius: 14, padding: '24px 20px', marginBottom: 24, color: '#fff' }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Our approach</h2>
+          <p style={{ fontSize: 13, lineHeight: 1.7, opacity: 0.9, marginBottom: 12 }}>
+            Dissekt never tells you what's true or false. Instead, it shows you <em>how</em> content is constructed to influence you — the techniques, the framing, the missing context.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Heuristics first, AI second</div>
+              <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>9 statistical models run instantly at zero cost. LLMs are only called when heuristics need confirmation — saving money and reducing hallucination risk.</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Transparent scoring</div>
+              <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>Every score is decomposed. You see exactly how much each factor contributes — technique confidence, fact-checks, toxicity. No black boxes.</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>You correct us</div>
+              <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>Every technique has a 👍/👎 button. Your corrections train future models. The more you use Dissekt, the better it gets — for everyone.</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Multiple sources, one view</div>
+              <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>We check 100+ fact-checkers, 231 media sources, and our own growing knowledge base. Cross-referencing beats any single source.</div>
+            </div>
+          </div>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {components.map((c, i) => (
             <div key={i} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, overflow: 'hidden' }}>
