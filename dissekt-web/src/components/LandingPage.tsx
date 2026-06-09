@@ -14,6 +14,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
           </div>
           <div className="nav-links" style={{ display: 'flex', gap: 14, fontSize: 13, color: '#737373', alignItems: 'center' }}>
             <a href="#features" style={{ color: '#737373', textDecoration: 'none' }}>Features</a>
+            <a href="/docs" style={{ color: '#737373', textDecoration: 'none' }}>API</a>
             <a href="#how" style={{ color: '#737373', textDecoration: 'none' }}>How it works</a>
             {onShowFeedback && <button onClick={onShowFeedback} style={{ color: '#737373', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}>Feedback</button>}
             <button onClick={onSignIn} style={{ padding: '5px 14px', background: 'transparent', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Sign in</button>
@@ -24,8 +25,8 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
 
       {/* Hero */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', textAlign: 'center', padding: '48px 20px 40px' }}>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 10, maxWidth: 500, margin: '0 auto 10px' }}>Headlines are engineered. Claims are crafted. Now you can see the playbook.</p>
-        <h1 className="hero-title" style={{ fontSize: 34, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em', maxWidth: 640, margin: '0 auto 14px' }}>Don't get played. Understand how content is designed to influence you.</h1>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 10, maxWidth: 500, margin: '0 auto 10px' }}>Every article frames information differently. Dissekt makes that framing visible.</p>
+        <h1 className="hero-title" style={{ fontSize: 34, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em', maxWidth: 640, margin: '0 auto 14px' }}>See how information is constructed. Understand what content says — and what it leaves out.</h1>
         <p className="hero-sub" style={{ fontSize: 15, color: '#555', lineHeight: 1.6, maxWidth: 540, margin: '0 auto 12px' }}>
           Dissekt shows you exactly how — loaded language, missing context, emotional framing, and 17 more techniques.
           Paste any URL, text, or screenshot and see the playbook behind the content.
@@ -38,7 +39,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
         <div className="hero-buttons" style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
           <button onClick={onTryFree} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            See through the noise
+            Inspect any content
           </button>
           <button onClick={onSignIn} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#fff', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 10, fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>Sign in</button>
         </div>
@@ -184,19 +185,47 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
         </div>
       </div>
 
+
+      {/* For Organizations */}
+      <div className="section" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 20px', borderBottom: '1px solid #e5e5e5' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#888', textAlign: 'center', marginBottom: 4 }}>For organizations</div>
+        <div className="section-title" style={{ fontSize: 20, fontWeight: 600, textAlign: 'center', marginBottom: 6 }}>Interpretation infrastructure for your platform</div>
+        <p style={{ fontSize: 13, color: '#888', textAlign: 'center', maxWidth: 540, margin: '0 auto 20px' }}>Dissekt is not a fact-checker. It is an interpretation layer that makes manipulation visible — for any system that processes information.</p>
+        <div className="landing-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18 }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>📰</div>
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Newsrooms</div>
+            <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>Auto-scan incoming tips and wire stories. Flag manipulation before publication. One API call per article.</div>
+          </div>
+          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18 }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>💬</div>
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Messaging platforms</div>
+            <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>Scan links and forwards before they go viral. Overlay manipulation signals without blocking content.</div>
+          </div>
+          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18 }}>
+            <div style={{ fontSize: 22, marginBottom: 8 }}>🏢</div>
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Enterprise</div>
+            <div style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>Monitor how your brand is framed. Detect coordinated narratives targeting your organization. API + webhooks.</div>
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <a href="/docs" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#fff', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>View API documentation →</a>
+        </div>
+      </div>
+
       {/* CTA */}
       <div style={{ padding: '0 20px' }}>
         <div className="cta-section" style={{ background: '#7c3aed', borderRadius: 14, padding: '36px 20px', textAlign: 'center', margin: '36px auto', maxWidth: 800 }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Stop scrolling blind. Start seeing the playbook.</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Information transparency for everyone.</div>
           <div style={{ fontSize: 13, color: '#d4bfff', marginBottom: 16 }}>Free · No signup · 10 scans per day</div>
-          <button onClick={onTryFree} style={{ padding: '12px 24px', background: '#fff', color: '#7c3aed', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>See through the noise →</button>
+          <button onClick={onTryFree} style={{ padding: '12px 24px', background: '#fff', color: '#7c3aed', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>Inspect any content →</button>
         </div>
       </div>
 
       {/* Footer */}
       <div style={{ borderTop: '1px solid #e5e5e5', padding: '16px 20px', textAlign: 'center', fontSize: 12, color: '#aaa' }}>
         <span style={{ fontWeight: 600, color: '#555' }}>Dissekt</span>
-        <span style={{ margin: '0 6px' }}>·</span>See the playbook behind the content
+        <span style={{ margin: '0 6px' }}>·</span>Information transparency and argument inspection
         <span style={{ margin: '0 6px' }}>·</span><a href="mailto:sambitmallick123@gmail.com" style={{ color: '#7c3aed', textDecoration: 'none' }}>sambitmallick123@gmail.com</a>
         <span style={{ margin: '0 6px' }}>·</span>Munich, Germany · 2026
       </div>

@@ -34,7 +34,7 @@ export default function TraceCard({ trace }: { trace: any }) {
         <div style={{ width: 30, height: 30, borderRadius: 8, background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Trace — fact-checks</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Trace — cross-references</span>
         <span style={{ fontSize: 12, color: '#aaa' }}>
           {hasFC && `${trace.fact_checks.length} checks`}{hasFC && hasTL && ' · '}{hasTL && `${trace.spread_timeline.length} sources`}
         </span>
@@ -43,7 +43,7 @@ export default function TraceCard({ trace }: { trace: any }) {
       <div style={{ padding: 18, flex: 1 }}>
         {hasFC && (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#aaa', marginBottom: 10 }}>Existing fact-checks</div>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#aaa', marginBottom: 10 }}>Existing cross-references</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {visibleFC.map((fc: any, i: number) => {
                 const rs = ratingStyle(fc.rating);
@@ -64,7 +64,7 @@ export default function TraceCard({ trace }: { trace: any }) {
             {trace.fact_checks.length > 4 && (
               <button onClick={() => setShowAllFC(!showAllFC)}
                 style={{ display: 'block', margin: '8px auto 0', fontSize: 12, fontWeight: 500, color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px' }}>
-                {showAllFC ? `− Show fewer` : `+ ${trace.fact_checks.length - 4} more fact-checks`}
+                {showAllFC ? `− Show fewer` : `+ ${trace.fact_checks.length - 4} more cross-references`}
               </button>
             )}
           </div>
@@ -95,7 +95,7 @@ export default function TraceCard({ trace }: { trace: any }) {
           </div>
         )}
 
-        {!hasFC && !hasTL && <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#aaa' }}>No sources found</div>}
+        {!hasFC && !hasTL && <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#aaa' }}>No cross-references found</div>}
       </div>
     </div>
   );

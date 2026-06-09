@@ -15,20 +15,21 @@ def format_result(data: dict) -> str:
     report_id = data.get("id", "")
 
     max_conf = max((t.get("confidence", 0) for t in techs), default=0)
-    score = min(100, (
+    raw = min(100, (
         (round(max_conf * 40) if techs else 0) +
         min(len(fcs) * 4, 30) +
         round(tox * 20) +
         (10 if len(fcs) >= 3 else 0)
     ))
+    score = 100 - raw
 
-    emoji = "🔴" if score >= 70 else "🟡" if score >= 40 else "🟢"
-    label = "HIGH RISK" if score >= 70 else "MEDIUM RISK" if score >= 40 else "LOW RISK"
+    emoji = "🔴" if score <= 30 else "🟡" if score <= 60 else "🟢"
+    label = "LOW TRANSPARENCY" if score <= 30 else "MODERATE" if score <= 60 else "HIGH TRANSPARENCY"
 
     lines = [
-        f"🛡 <b>DISSEKT ANALYSIS</b>",
+        f"🛡 <b>DISSEKT — INFORMATION TRANSPARENCY</b>",
         f"",
-        f"{emoji} <b>Threat Score: {score}/100 — {label}</b>",
+        f"{emoji} <b>Transparency Score: {score}/100 — {label}</b>",
     ]
 
     if techs:
@@ -45,7 +46,7 @@ def format_result(data: dict) -> str:
 
     if fcs:
         lines.append("")
-        lines.append(f"🌐 <b>Fact-checks ({len(fcs)}):</b>")
+        lines.append(f"🌐 <b>Cross-references ({len(fcs)}):</b>")
         for fc in fcs:
             pub = fc.get("publisher", "")
             rating = fc.get("rating", "")
@@ -79,7 +80,7 @@ I detect manipulation in any content. Send me:
 
 I'll show you:
 - Manipulation techniques used
-- Existing fact-checks
+- Existing cross-references
 - Source credibility scores
 - Verifiable claims extracted
 

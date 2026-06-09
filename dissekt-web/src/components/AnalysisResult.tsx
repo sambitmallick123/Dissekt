@@ -6,6 +6,7 @@ import TraceCard from './TraceCard';
 import MetaCard from './MetaCard';
 import SimilarClaims from './SimilarClaims';
 import ExtractedClaims from './ExtractedClaims';
+import CounterfactualCard from './CounterfactualCard';
 import CompassCard from './CompassCard';
 import PulseCard from './PulseCard';
 
@@ -42,6 +43,10 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         <div className="anim-fade anim-d3"><SignalCard signal={data.signal} /></div>
         <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
       </div>
+
+      {data.counterfactuals?.length > 0 && (
+        <div className="anim-fade anim-d2"><CounterfactualCard counterfactuals={data.counterfactuals} /></div>
+      )}
 
       {data.extracted_claims?.length > 0 && (
         <div className="anim-fade anim-d3"><ExtractedClaims claims={data.extracted_claims} /></div>

@@ -78,7 +78,7 @@ function showResult(data, content, reportId) {
       }).join("");
 
   let fcsHtml = fcs.length === 0
-    ? '<div class="dissekt-no-fc">No existing fact-checks found</div>'
+    ? '<div class="dissekt-no-fc">No existing cross-references found</div>'
     : fcs.slice(0, 4).map(fc => {
         const rating = (fc.rating || "").toLowerCase();
         const rColor = rating.includes("false") ? "#dc2626" : rating.includes("true") ? "#16a34a" : "#d97706";
@@ -100,7 +100,7 @@ function showResult(data, content, reportId) {
       </div>
       <div class="dissekt-score-info">
         <div class="dissekt-score-label" style="color:${scoreColor}">${scoreLabel}</div>
-        <div class="dissekt-score-meta">${techs.length} techniques · ${fcs.length} fact-checks · ${(tox * 100).toFixed(1)}% toxicity</div>
+        <div class="dissekt-score-meta">${techs.length} techniques · ${fcs.length} cross-references · ${(tox * 100).toFixed(1)}% toxicity</div>
       </div>
       <div class="dissekt-score-time">${(data.analysis_time_ms / 1000).toFixed(1)}s</div>
     </div>
@@ -113,7 +113,7 @@ function showResult(data, content, reportId) {
     ${data.prism?.brief ? `<div class="dissekt-summary">${escapeHtml(data.prism.brief)}</div>` : ""}
 
     <div class="dissekt-section">
-      <div class="dissekt-section-title">🌐 Fact-checks</div>
+      <div class="dissekt-section-title">🌐 Cross-references</div>
       ${fcsHtml}
     </div>
 

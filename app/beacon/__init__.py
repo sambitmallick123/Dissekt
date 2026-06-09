@@ -243,6 +243,54 @@ Only include claims that can be fact-checked. Max 7 claims. No explanations, jus
 
 
 # ============================================
+# Counterfactual generation
+# ============================================
+
+async def generate_counterfactuals(text: str, mode: str = "brief") -> list[dict]:
+    """Generate alternative framings for claims in the text."""
+    settings = get_settings()
+    import openai
+
+    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+    try:
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=600,
+            messages=[
+                {
+                    "role": "system",
+                    "content": """You are an information transparency tool. For the given text, identify the 2-3 strongest claims and provide alternative framings that add missing context or present a different perspective.
+
+Return ONLY a JSON array. Each object:
+{
+  "original": "the claim as stated in the text",
+  "alternative": "a more complete or differently-framed version with added context",
+  "missing_context": "what the original framing omits or de-emphasizes"
+}
+
+Rules:
+- Do NOT say the original is "wrong" or "false"
+- Show HOW the framing shapes perception, not WHAT to believe
+- The alternative should be equally factual, just more complete
+- Keep each field under 100 words
+- Return only the JSON array, no markdown"""
+                },
+                {"role": "user", "content": text[:2000]}
+            ],
+        )
+        import json
+        raw = response.choices[0].message.content.strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+            raw = raw.rsplit("```", 1)[0]
+        result = json.loads(raw)
+        return result if isinstance(result, list) else []
+    except Exception as e:
+        logger.warning(f"Counterfactual LLM failed: {e}")
+        return []
+
+
+# ============================================
 # Main scan pipeline
 # ============================================
 
@@ -393,6 +441,14 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
 
     # Step 11: Detect language
     analysis.detected_language = detect_language(extracted_text)
+
+    # Step 11a: Generate counterfactual views (alternative framing)
+    if len(prism_result.techniques) > 0:
+        try:
+            counterfactuals = await generate_counterfactuals(extracted_text, mode)
+            analysis.counterfactuals = counterfactuals
+        except Exception as e:
+            logger.warning(f"Counterfactual generation failed: {e}")
 
     # Step 11: Extract individual claims (only if techniques found, to save API cost)
     if len(prism_result.techniques) > 0:

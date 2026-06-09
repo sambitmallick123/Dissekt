@@ -5,11 +5,11 @@ const components = [
     icon: '🎯',
     name: 'Threat Score',
     color: '#dc2626',
-    desc: 'An overall risk score from 0 to 100 based on the combination of manipulation techniques found, existing fact-checks, and toxicity level.',
+    desc: 'An overall risk score from 0 to 100 based on the combination of manipulation techniques found, existing cross-references, and toxicity level.',
     details: [
       'Score 0-39: Low risk — few or no manipulation signals detected',
       'Score 40-69: Medium risk — some manipulation techniques or disputed claims found',
-      'Score 70-100: High risk — strong manipulation signals with multiple fact-checks flagging the content',
+      'Score 70-100: High risk — strong manipulation signals with multiple cross-references flagging the content',
       'The score is calculated from: technique confidence (40%), fact-check count (30%), toxicity (20%), and cross-referencing bonus (10%)',
     ]
   },
@@ -31,7 +31,7 @@ const components = [
     icon: '🌐',
     name: 'Trace — Fact-Checks & Sources',
     color: '#2563eb',
-    desc: 'Searches 100+ fact-checking organizations worldwide for existing fact-checks on the claim, and traces the spread timeline.',
+    desc: 'Searches 100+ fact-checking organizations worldwide for existing cross-references on the claim, and traces the spread timeline.',
     details: [
       'Searches: FactCheck.org, Full Fact, PolitiFact, AP Fact Check, Snopes, Alt News, BOOM Live, Correctiv, and 90+ more',
       'Each fact-check shows: publisher, title, rating (True/False/Misleading/Mixed), and link to original',
@@ -158,7 +158,7 @@ export default function HelpPage() {
         <div style={{ background: '#7c3aed', borderRadius: 14, padding: '24px 20px', marginBottom: 24, color: '#fff' }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Our approach</h2>
           <p style={{ fontSize: 13, lineHeight: 1.7, opacity: 0.9, marginBottom: 12 }}>
-            Dissekt never tells you what's true or false. Instead, it shows you <em>how</em> content is constructed to influence you — the techniques, the framing, the missing context.
+            Dissekt is interpretation infrastructure for the information age. It never tells you what's true or false. Instead, it shows you <em>how</em> content is constructed to influence you — the techniques, the framing, the missing context.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
@@ -167,7 +167,7 @@ export default function HelpPage() {
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Transparent scoring</div>
-              <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>Every score is decomposed. You see exactly how much each factor contributes — technique confidence, fact-checks, toxicity. No black boxes.</div>
+              <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>Every score is decomposed. You see exactly how much each factor contributes — technique confidence, cross-references, toxicity. No black boxes.</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 12 }}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>You correct us</div>

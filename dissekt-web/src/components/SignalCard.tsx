@@ -42,7 +42,7 @@ export default function SignalCard({ signal }: { signal: any }) {
         <div style={{ width: 30, height: 30, borderRadius: 8, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></svg>
         </div>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040' }}>Signal — credibility</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040' }}>Signal — evidence</span>
       </div>
       <div style={{ padding: 18, flex: 1 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

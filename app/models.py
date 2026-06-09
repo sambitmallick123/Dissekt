@@ -132,6 +132,7 @@ class FullAnalysis(BaseModel):
     pulse: dict = Field(default_factory=dict, description="Coordination detection signals")
     similar_claims: list[dict] = Field(default_factory=list, description="Similar past analyses from Qdrant")
     detected_language: str = Field(default="en", description="Detected input language")
+    counterfactuals: list[dict] = Field(default_factory=list, description="Alternative framings for key claims")
     extracted_claims: list[dict] = Field(default_factory=list, description="Individual verifiable claims extracted")
     cached: bool = False
     analyzed_at: datetime = Field(default_factory=datetime.utcnow)
