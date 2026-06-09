@@ -7,6 +7,7 @@ import MetaCard from './MetaCard';
 import SimilarClaims from './SimilarClaims';
 import ExtractedClaims from './ExtractedClaims';
 import CounterfactualCard from './CounterfactualCard';
+import { DecisionButtons } from './DecisionJournal';
 import CompassCard from './CompassCard';
 import PulseCard from './PulseCard';
 
@@ -42,6 +43,11 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         <div className="anim-fade anim-d2"><TraceCard trace={data.trace} /></div>
         <div className="anim-fade anim-d3"><SignalCard signal={data.signal} /></div>
         <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
+      </div>
+
+      {/* Decision Journal */}
+      <div className="anim-fade" style={{ marginTop: 12 }}>
+        <DecisionButtons analysisId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} inputPreview={data.input_content || data.extracted_text?.slice(0, 200) || ''} />
       </div>
 
       {data.counterfactuals?.length > 0 && (

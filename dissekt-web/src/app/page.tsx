@@ -6,6 +6,8 @@ import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
 import ScanHistory, { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
+import ReaderMemory from '@/components/ReaderMemory';
+import DecisionJournalView from '@/components/DecisionJournal';
 
 const DAILY_LIMIT = 10;
 const MARKETS = ['all', 'india', 'germany', 'us', 'uk'];

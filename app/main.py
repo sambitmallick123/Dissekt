@@ -346,6 +346,22 @@ Write a 2-3 sentence comparison of how these two pieces of content differ in the
         logger.error(f"Compare failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Comparison failed")
 
+
+
+@app.get("/api/memory")
+async def search_memory(q: str = "", limit: int = 10):
+    """Search past analyses by topic using Qdrant similarity."""
+    if len(q) < 3:
+        return {"results": [], "query": q}
+    
+    try:
+        from app.claim_graph import find_similar
+        results = await find_similar(q, limit=limit)
+        return {"results": results, "query": q, "count": len(results)}
+    except Exception as e:
+        logger.warning(f"Memory search failed: {e}")
+        return {"results": [], "query": q, "error": str(e)}
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================
