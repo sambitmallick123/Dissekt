@@ -111,6 +111,7 @@ async def analyze_with_claude(
     text: str,
     mode: str,
     heuristics: HeuristicResult,
+    detected_language: str = "en",
 ) -> dict:
     """Run analysis via Claude Sonnet 4."""
     settings = get_settings()
@@ -211,6 +212,7 @@ async def route_and_analyze(
     text: str,
     mode: str,
     heuristics: HeuristicResult,
+    detected_language: str = "en",
 ) -> dict:
     """Route to the best model based on mode and content.
 
@@ -231,13 +233,13 @@ async def route_and_analyze(
         except Exception as e:
             logger.warning(f"GPT-4o mini failed, falling back to Claude: {e}")
             try:
-                return await analyze_with_claude(text, mode, heuristics)
+                return await analyze_with_claude(text, mode, heuristics, detected_language)
             except Exception:
                 return _build_heuristic_only_result(heuristics)
 
     # Detailed Mode → Claude primary, GPT-4o mini fallback
     try:
-        return await analyze_with_claude(text, mode, heuristics)
+        return await analyze_with_claude(text, mode, heuristics, detected_language)
     except Exception as e:
         logger.warning(f"Claude failed, falling back to GPT-4o mini: {e}")
         try:
