@@ -6,6 +6,8 @@ import TraceCard from './TraceCard';
 import MetaCard from './MetaCard';
 import SimilarClaims from './SimilarClaims';
 import ExtractedClaims from './ExtractedClaims';
+import CompassCard from './CompassCard';
+import PulseCard from './PulseCard';
 
 const LANG_NAMES: Record<string, string> = { en: 'English', hi: 'Hindi', de: 'German', es: 'Spanish', fr: 'French' };
 
@@ -47,6 +49,14 @@ export default function AnalysisResult({ data, onShare, onAnalyzeClaim }: { data
 
       {data.similar_claims?.length > 0 && (
         <div className="anim-fade anim-d4"><SimilarClaims claims={data.similar_claims} /></div>
+      )}
+
+      {data.compass?.politicians?.length > 0 && (
+        <div className="anim-fade anim-d3"><CompassCard compass={data.compass} /></div>
+      )}
+
+      {data.pulse?.detected && (
+        <div className="anim-fade anim-d4"><PulseCard pulse={data.pulse} /></div>
       )}
     </div>
   );

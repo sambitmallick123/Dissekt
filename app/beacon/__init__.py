@@ -375,7 +375,23 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     except Exception as e:
         logger.warning(f"Similar claims lookup failed: {e}")
 
-    # Step 10: Detect language
+    # Step 10: Political context (Compass)
+    try:
+        from app.compass import analyze_political_context
+        compass_data = await analyze_political_context(extracted_text)
+        analysis.compass = compass_data
+    except Exception as e:
+        logger.warning(f"Compass failed: {e}")
+
+    # Step 10b: Coordination detection (Pulse)
+    try:
+        from app.pulse import detect_coordination
+        pulse_data = await detect_coordination(extracted_text, analysis.similar_claims)
+        analysis.pulse = pulse_data
+    except Exception as e:
+        logger.warning(f"Pulse failed: {e}")
+
+    # Step 11: Detect language
     analysis.detected_language = detect_language(extracted_text)
 
     # Step 11: Extract individual claims (only if techniques found, to save API cost)

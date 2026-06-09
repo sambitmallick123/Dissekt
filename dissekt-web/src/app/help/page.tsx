@@ -92,6 +92,35 @@ const components = [
     ]
   },
   {
+    {
+    icon: '🏛',
+    name: 'Compass — Political Accountability',
+    color: '#d97706',
+    desc: 'Detects politician names in content and cross-references claims against their voting records, promises, and factual data.',
+    details: [
+      'Detects mentions of Indian politicians using name recognition',
+      'Shows politician profile: party, position, constituency, terms served',
+      'Displays key votes and key promises for context',
+      'Flags when controversies or promises are referenced in the content',
+      'Provides factual context notes from verified sources',
+      'Currently covers India — US, Germany, UK coming in future updates',
+    ]
+  },
+  {
+    icon: '📡',
+    name: 'Pulse — Coordination Detection',
+    color: '#dc2626',
+    desc: 'Detects signs of coordinated amplification — when multiple similar claims appear in patterns suggesting organized pushing.',
+    details: [
+      'Volume spike: flags when many similar claims exist in the knowledge base',
+      'Near-duplicate detection: finds claims with >85% text similarity',
+      'Temporal burst: detects multiple similar claims within 24 hours',
+      'Technique pattern: flags when similar claims all use the same manipulation technique',
+      'Risk levels: High (likely coordinated), Medium (suspicious patterns), Low (notable but inconclusive)',
+      'Note: coordination signals suggest organized amplification, not necessarily falsehood',
+    ]
+  },
+  {
     icon: '📡',
     name: 'Radar',
     color: '#ea580c',

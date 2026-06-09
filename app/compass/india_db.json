@@ -1,0 +1,74 @@
+{
+  "narendra modi": {
+    "name": "Narendra Modi",
+    "party": "BJP",
+    "position": "Prime Minister of India",
+    "constituency": "Varanasi, Uttar Pradesh",
+    "state": "Gujarat (origin)",
+    "terms": "PM since 2014 (3rd term from 2024)",
+    "key_votes": ["CAA 2019", "Farm Laws 2020 (repealed 2021)", "Abrogation of Article 370 (2019)"],
+    "key_promises": ["Achhe Din", "₹15 lakh in every account", "Make in India", "Digital India", "2 crore jobs/year"],
+    "controversies": ["Demonetisation 2016", "Electoral Bonds scheme", "Adani-Hindenburg row"],
+    "factual_notes": ["India GDP growth averaged ~6.5% 2014-2024", "Unemployment rate ~7-8% (CMIE data)", "Electoral Bonds struck down by SC in Feb 2024"]
+  },
+  "rahul gandhi": {
+    "name": "Rahul Gandhi",
+    "party": "INC",
+    "position": "Leader of Opposition in Lok Sabha",
+    "constituency": "Rae Bareli, Uttar Pradesh",
+    "state": "Delhi",
+    "terms": "MP since 2004",
+    "key_votes": ["Opposed CAA", "Opposed Farm Laws", "Opposed Article 370 abrogation"],
+    "key_promises": ["NYAY scheme (₹72,000/year)", "Caste census", "Legal guarantee for MSP"],
+    "controversies": ["National Herald case", "Defamation conviction (overturned)", "Bharat Jodo Yatra"],
+    "factual_notes": ["INC won 99 seats in 2024 general election (up from 52 in 2019)"]
+  },
+  "amit shah": {
+    "name": "Amit Shah",
+    "party": "BJP",
+    "position": "Minister of Home Affairs",
+    "constituency": "Gandhinagar, Gujarat",
+    "state": "Gujarat",
+    "terms": "MP since 2017, BJP President 2014-2020",
+    "key_votes": ["Authored CAA", "Article 370 abrogation", "NRC push"],
+    "key_promises": ["NRC nationwide", "Zero terrorism", "Congress-mukt Bharat"],
+    "controversies": ["Snoopgate allegations", "Fake encounter cases (acquitted)"],
+    "factual_notes": ["CAA + NRC triggered nationwide protests in 2019-2020"]
+  },
+  "arvind kejriwal": {
+    "name": "Arvind Kejriwal",
+    "party": "AAP",
+    "position": "Former Chief Minister of Delhi",
+    "constituency": "New Delhi",
+    "state": "Delhi",
+    "terms": "CM 2013 (49 days), 2015-2024",
+    "key_votes": ["Free water 20kL/month in Delhi", "Free electricity <200 units", "Mohalla Clinics"],
+    "key_promises": ["Free electricity", "Improved government schools", "Anti-corruption"],
+    "controversies": ["Excise policy case (arrested 2024)", "Delhi liquor scam allegations"],
+    "factual_notes": ["Delhi govt schools showed improved pass rates", "AAP won Punjab 2022"]
+  },
+  "mamata banerjee": {
+    "name": "Mamata Banerjee",
+    "party": "TMC",
+    "position": "Chief Minister of West Bengal",
+    "constituency": "Bhawanipur, West Bengal",
+    "state": "West Bengal",
+    "terms": "CM since 2011",
+    "key_votes": ["Opposed CAA/NRC", "Opposed farm laws"],
+    "key_promises": ["Kanyashree (girl child education)", "Duare Sarkar (doorstep governance)"],
+    "controversies": ["Sandeshkhali incidents 2024", "Post-election violence allegations 2021"],
+    "factual_notes": ["TMC won 215/294 seats in 2021 WB election"]
+  },
+  "yogi adityanath": {
+    "name": "Yogi Adityanath",
+    "party": "BJP",
+    "position": "Chief Minister of Uttar Pradesh",
+    "constituency": "Gorakhpur, UP",
+    "state": "Uttar Pradesh",
+    "terms": "CM since 2017",
+    "key_votes": ["Anti-conversion law", "Bulldozer policy"],
+    "key_promises": ["Zero tolerance for crime", "UP expressways", "Industrial development"],
+    "controversies": ["Bulldozer justice criticism", "Hathras case handling", "COVID management"],
+    "factual_notes": ["UP GDP grew but unemployment remained high per CMIE"]
+  }
+}

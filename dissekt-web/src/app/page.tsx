@@ -5,6 +5,7 @@ import ScanInput from '@/components/ScanInput';
 import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
 import ScanHistory, { addToHistory } from '@/components/ScanHistory';
+import BulkAnalysis from '@/components/BulkAnalysis';
 
 const DAILY_LIMIT = 10;
 const MARKETS = ['all', 'india', 'germany', 'us', 'uk'];
@@ -178,6 +179,7 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
   const [error, setError] = useState('');
   const [usage, setUsage] = useState(0);
   const [shareToast, setShareToast] = useState('');
+  const [scanTab, setScanTab] = useState<'single' | 'bulk'>('single');
 
   useEffect(() => {
     setUsage(getAnonUsage());
@@ -254,7 +256,6 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, background: remaining <= 3 ? '#fef2f2' : '#f0f0ee', color: remaining <= 3 ? '#b91c1c' : '#888' }}>{remaining} scans left today</span>
-            <a href='/compare' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>Compare</a>
             <a href='/help' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>Help</a>
             <button onClick={onShowFeedback} style={{ fontSize: 12, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>Feedback</button>
             <button onClick={onShowToast} style={{ fontSize: 12, color: '#888', background: 'none', border: '1px solid #e5e5e5', borderRadius: 6, padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}>Sign in</button>
@@ -264,7 +265,21 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
 
       <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 24px' }}>
-          <ScanInput onScan={handleScan} loading={loading} initialContent={inputContent} />
+          <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+            <button onClick={() => setScanTab('single')}
+              style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
+              Single scan
+            </button>
+            <button onClick={() => setScanTab('bulk')}
+              style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
+              📊 Bulk CSV
+            </button>
+            <a href="/compare" style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: '#f0f0ee', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              ⚖️ Compare
+            </a>
+          </div>
+          {scanTab === 'single' && <ScanInput onScan={handleScan} loading={loading} initialContent={inputContent} />}
+          {scanTab === 'bulk' && <BulkAnalysis />}
         </div>
       </div>
 

@@ -128,6 +128,8 @@ class FullAnalysis(BaseModel):
     signal: SignalResult
     blockchain: Optional[BlockchainProof] = None
 
+    compass: dict = Field(default_factory=dict, description="Political accountability data")
+    pulse: dict = Field(default_factory=dict, description="Coordination detection signals")
     similar_claims: list[dict] = Field(default_factory=list, description="Similar past analyses from Qdrant")
     detected_language: str = Field(default="en", description="Detected input language")
     extracted_claims: list[dict] = Field(default_factory=list, description="Individual verifiable claims extracted")
