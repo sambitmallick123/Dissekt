@@ -41,7 +41,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Inspect any content
           </button>
-          <button onClick={onSignIn} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#fff', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 10, fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>Sign in</button>
+          <button onClick={() => window.location.href = '/invite'} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#fff', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 10, fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>Sign in</button>
         </div>
         <p style={{ fontSize: 12, color: '#aaa', marginTop: 10 }}>Free · 10 scans/day · No signup required</p>
       </div>

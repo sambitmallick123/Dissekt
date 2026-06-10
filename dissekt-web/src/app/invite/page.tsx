@@ -40,9 +40,10 @@ export default function InvitePage() {
         localStorage.setItem('dissekt_tier', 'invited');
         localStorage.setItem('dissekt_invite_code', code.toUpperCase());
         localStorage.setItem('dissekt_invite_name', data.name || '');
+        if (data.access_expires_at) localStorage.setItem('dissekt_access_expires', data.access_expires_at);
         setStatus('success');
         setMessage('Access granted! Redirecting...');
-        setTimeout(() => window.location.href = '/', 1500);
+        setTimeout(() => window.location.href = '/analyze', 1500);
       } else {
         setStatus('error'); setMessage(data.error || 'Invalid code');
       }
@@ -91,7 +92,7 @@ export default function InvitePage() {
           {tab === 'request' && status !== 'success' && (
             <>
               <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>Request early access</div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>Full access includes: 25 scans/day, Detailed mode, Bulk analysis, Compare, Topics, and all future features.</div>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>Full access: 25 brief + 10 detailed scans/day, Bulk analysis, Compare, Topics, and all future features. Valid 6 months.</div>
               <input type="email" placeholder="Your email *" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
               <input type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} style={inputStyle} />
               <input type="text" placeholder="Organization (optional)" value={org} onChange={e => setOrg(e.target.value)} style={inputStyle} />
@@ -117,10 +118,15 @@ export default function InvitePage() {
           )}
         </div>
 
-        {/* Free tier info */}
+        {/* Info */}
         <div style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: '#888' }}>
-          <p>Free tier: 3 scans/day · Brief mode only</p>
-          <a href="/" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>Continue with free tier →</a>
+          <p>Free tier: 3 brief + 1 detailed scan/day (resets 00:00 GMT)</p>
+          <p style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>Invite codes expire in 7 days · Access valid for 6 months</p>
+          <a href="/analyze" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 500, display: 'inline-block', marginTop: 6 }}>Continue with free tier →</a>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 12, padding: '10px 14px', background: '#f8f8f6', borderRadius: 8, fontSize: 11, color: '#888' }}>
+          🚧 Account signup is under development. For now, access is invitation-based.
         </div>
       </div>
     </main>

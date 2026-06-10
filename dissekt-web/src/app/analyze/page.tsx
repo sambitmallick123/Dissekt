@@ -1,0 +1,144 @@
+'use client';
+import { useState, useEffect } from 'react';
+import SiteHeader from '@/components/SiteHeader';
+import ScanInput from '@/components/ScanInput';
+import AnalysisResult from '@/components/AnalysisResult';
+import LoadingState from '@/components/LoadingState';
+import ScanHistory, { addToHistory } from '@/components/ScanHistory';
+import BulkAnalysis from '@/components/BulkAnalysis';
+import ReaderMemory from '@/components/ReaderMemory';
+import DecisionJournalView from '@/components/DecisionJournal';
+import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+export default function ScanApp() {
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [inputContent, setInputContent] = useState('');
+  const [scanTab, setScanTab] = useState<'single' | 'bulk'>('single');
+  const [remaining, setRemaining] = useState<{ brief: number; detailed: number; tier: 'free' | 'invited' }>({ brief: 3, detailed: 1, tier: 'free' });
+  const [resetIn, setResetIn] = useState('');
+  const [shareToast, setShareToast] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setRemaining(getRemaining());
+    setResetIn(getResetTime());
+    const t = setInterval(() => setResetIn(getResetTime()), 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  const handleScan = async (content: string, modeArg: string) => {
+    const mode = (modeArg === 'detailed' ? 'detailed' : 'brief') as 'brief' | 'detailed';
+    if (!content || content.length < 10) { setError('Please enter at least 10 characters'); return; }
+
+    if (!canScan(mode)) {
+      const tier = getTier();
+      if (tier === 'free') {
+        setError(`Free tier limit reached for ${mode} scans (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT. Get an invite for more.`);
+      } else {
+        setError(`Daily limit reached for ${mode} scans. Resets in ${getResetTime()} at 00:00 GMT.`);
+      }
+      return;
+    }
+
+    setLoading(true); setError(''); setResult(null);
+    try {
+      const res = await fetch(`${API_URL}/api/scan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, mode }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.detail || 'Analysis failed'); return;
+      }
+      const data = await res.json();
+      setResult(data);
+      incrementUsage(mode);
+      setRemaining(getRemaining());
+      addToHistory({
+        id: data.id,
+        input: content.slice(0, 100),
+        score: 100 - Math.min((data.prism?.techniques?.length || 0) * 30, 100),
+        techniques: data.prism?.techniques?.length || 0,
+        mode,
+        time: new Date().toISOString(),
+      });
+    } catch {
+      setError('Could not connect to the analysis service.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!result?.id) return;
+    const url = `${window.location.origin}/report/${result.id}`;
+    await navigator.clipboard.writeText(url);
+    setShareToast('Report link copied!');
+    setTimeout(() => setShareToast(''), 2000);
+  };
+
+  if (!mounted) return null;
+
+  return (
+    <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
+      <SiteHeader active="Analyze" />
+
+      {shareToast && (
+        <div style={{ position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)', background: '#1a1a1a', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 13, zIndex: 100 }}>{shareToast}</div>
+      )}
+
+      {/* Scan input area */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button onClick={() => setScanTab('single')}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
+                Single scan
+              </button>
+              <button onClick={() => getTier() === 'invited' ? setScanTab('bulk') : (window.location.href = '/invite')}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
+                📊 Bulk CSV {getTier() !== 'invited' && '🔒'}
+              </button>
+              <a href="/compare" style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: '#f0f0ee', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>⚖️ Compare</a>
+            </div>
+            <div style={{ fontSize: 11, color: '#888', textAlign: 'right' }}>
+              <span style={{ fontWeight: 600, color: remaining.tier === 'invited' ? '#7c3aed' : '#888' }}>
+                {remaining.tier === 'invited' ? '🎫 Invited' : '🆓 Free'}
+              </span>
+              {' · '}{remaining.brief} brief, {remaining.detailed} detailed left
+              <div style={{ fontSize: 10, color: '#aaa' }}>Resets in {resetIn} (00:00 GMT)</div>
+            </div>
+          </div>
+
+          {scanTab === 'single' && <ScanInput onScan={handleScan} loading={loading} initialContent={inputContent} />}
+          {scanTab === 'bulk' && <BulkAnalysis />}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
+        {error && (
+          <div style={{ marginBottom: 16, padding: 12, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>
+        )}
+
+        {loading && <LoadingState />}
+
+        {result && !loading && <AnalysisResult data={result} onShare={handleShare} />}
+
+        {!result && !loading && (
+          <>
+            <ReaderMemory onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <DecisionJournalView />
+            <ScanHistory onReanalyze={(input) => handleScan(input, 'brief')} />
+          </>
+        )}
+      </div>
+    </main>
+  );
+}

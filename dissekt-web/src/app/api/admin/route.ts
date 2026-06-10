@@ -20,30 +20,31 @@ function generateCode(): string {
   return code;
 }
 
-// GET: List all invitations
+function codeExpiry(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 7); // code expires in 7 days
+  return d.toISOString();
+}
+
 export async function GET(req: NextRequest) {
   if (!checkAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const status = req.nextUrl.searchParams.get('status') || 'all';
   let query = supabase.from('invitations').select('*').order('created_at', { ascending: false });
   if (status !== 'all') query = query.eq('status', status);
-
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ invitations: data || [], count: data?.length || 0 });
 }
 
-// POST: Approve/reject/generate
 export async function POST(req: NextRequest) {
   if (!checkAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const body = await req.json();
 
   if (body.action === 'approve') {
     const code = generateCode();
     const { error } = await supabase
       .from('invitations')
-      .update({ status: 'approved', invite_code: code, reviewed_at: new Date().toISOString() })
+      .update({ status: 'approved', invite_code: code, reviewed_at: new Date().toISOString(), code_expires_at: codeExpiry() })
       .eq('id', body.id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true, code });
@@ -65,6 +66,7 @@ export async function POST(req: NextRequest) {
       name: body.name || 'Manual invite',
       status: 'approved',
       invite_code: code,
+      code_expires_at: codeExpiry(),
     });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true, code });

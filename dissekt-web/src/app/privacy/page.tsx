@@ -1,19 +1,11 @@
 'use client';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 
 export default function PrivacyPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
-      <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <span style={{ fontWeight: 600, fontSize: 15 }}>Dissekt</span>
-          </a>
-          <a href="/" style={{ fontSize: 13, color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>← Back</a>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Privacy Policy</h1>
@@ -70,6 +62,7 @@ export default function PrivacyPage() {
           <p>We may update this policy from time to time. The latest version will always be available at <a href="https://dissekt.info/privacy" style={{ color: '#7c3aed' }}>dissekt.info/privacy</a>.</p>
         </div>
       </div>
+    <SiteFooter />
     </main>
   );
 }
