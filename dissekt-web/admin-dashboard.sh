@@ -1,3 +1,202 @@
+#!/bin/bash
+# Dissekt — Comprehensive Admin Dashboard
+set -e
+
+cd /mnt/d/Startup\ Ideas/Dissekt/dissekt-web
+
+echo "⚠️  Run this SQL in Supabase:"
+echo ""
+echo "create table if not exists public.contacts ("
+echo "  id uuid default gen_random_uuid() primary key,"
+echo "  name text,"
+echo "  email text,"
+echo "  subject text,"
+echo "  message text not null,"
+echo "  status text default 'unread' check (status in ('unread', 'read', 'replied')),"
+echo "  created_at timestamptz default now()"
+echo ");"
+echo ""
+echo "alter table public.contacts enable row level security;"
+echo "create policy \"Anyone can insert\" on public.contacts for insert with check (true);"
+echo "create policy \"Anyone can read\" on public.contacts for select using (true);"
+echo "create policy \"Anyone can update\" on public.contacts for update using (true);"
+echo ""
+echo "-- Add status column to feedback if missing:"
+echo "alter table public.feedback add column if not exists status text default 'unread';"
+echo "alter table public.feedback add column if not exists component text;"
+echo "alter table public.feedback add column if not exists type text;"
+echo ""
+
+# ============================================
+# 1. Update contact API to also save to Supabase
+# ============================================
+
+cat > src/app/api/contact/route.ts << 'CAPI'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
+
+export async function POST(req: NextRequest) {
+  try {
+    const { name, email, subject, message } = await req.json();
+    if (!message) return NextResponse.json({ error: 'Message required' }, { status: 400 });
+
+    // Save to Supabase
+    await supabase.from('contacts').insert({ name, email, subject, message });
+
+    // Send email via Resend
+    const RESEND_KEY = process.env.RESEND_API_KEY || '';
+    if (RESEND_KEY) {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'Dissekt Contact <onboarding@resend.dev>',
+          to: 'sambitmallick123@gmail.com',
+          subject: `[Dissekt] ${subject || 'New message'} from ${name || 'Anonymous'}`,
+          html: `<p><strong>From:</strong> ${name || '-'} (${email || '-'})</p><p><strong>Subject:</strong> ${subject}</p><hr/><p>${message.replace(/\n/g, '<br/>')}</p>`,
+        }),
+      });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+CAPI
+
+echo "✅ Contact API: saves to Supabase + emails"
+
+# ============================================
+# 2. Admin API — add feedback, contacts, stats endpoints
+# ============================================
+
+# Keep existing admin API but add GET params for different data
+python3 << 'PYEOF'
+content = open('src/app/api/admin/route.ts').read()
+
+# Add feedback + contacts + stats to GET handler
+old_get = '''// GET: List invitations
+export async function GET(req: NextRequest) {
+  if (!checkAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const status = req.nextUrl.searchParams.get('status') || 'all';
+  let query = supabase.from('invitations').select('*').order('created_at', { ascending: false });
+  if (status !== 'all') query = query.eq('status', status);
+  const { data, error } = await query;
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const stats = {
+    total: data?.length || 0,
+    pending: data?.filter(d => d.status === 'pending').length || 0,
+    approved: data?.filter(d => d.status === 'approved').length || 0,
+    rejected: data?.filter(d => d.status === 'rejected').length || 0,
+  };
+
+  return NextResponse.json({ invitations: data || [], stats });
+}'''
+
+new_get = '''// GET: List invitations, feedback, contacts, stats
+export async function GET(req: NextRequest) {
+  if (!checkAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  
+  const view = req.nextUrl.searchParams.get('view') || 'invitations';
+  const status = req.nextUrl.searchParams.get('status') || 'all';
+
+  if (view === 'feedback') {
+    let q = supabase.from('feedback').select('*').order('created_at', { ascending: false }).limit(100);
+    if (status !== 'all') q = q.eq('status', status);
+    const { data } = await q;
+    return NextResponse.json({ items: data || [] });
+  }
+
+  if (view === 'contacts') {
+    let q = supabase.from('contacts').select('*').order('created_at', { ascending: false }).limit(100);
+    if (status !== 'all') q = q.eq('status', status);
+    const { data } = await q;
+    return NextResponse.json({ items: data || [] });
+  }
+
+  if (view === 'corrections') {
+    const { data } = await supabase.from('corrections').select('*').order('created_at', { ascending: false }).limit(100);
+    return NextResponse.json({ items: data || [] });
+  }
+
+  if (view === 'decisions') {
+    const { data } = await supabase.from('decisions').select('*').order('created_at', { ascending: false }).limit(100);
+    return NextResponse.json({ items: data || [] });
+  }
+
+  if (view === 'stats') {
+    const [inv, fb, ct, cor, dec] = await Promise.all([
+      supabase.from('invitations').select('status', { count: 'exact' }),
+      supabase.from('feedback').select('id', { count: 'exact' }),
+      supabase.from('contacts').select('id', { count: 'exact' }),
+      supabase.from('corrections').select('id', { count: 'exact' }),
+      supabase.from('decisions').select('id', { count: 'exact' }),
+    ]);
+    
+    const invData = inv.data || [];
+    return NextResponse.json({
+      invitations: {
+        total: invData.length,
+        pending: invData.filter((d: any) => d.status === 'pending').length,
+        approved: invData.filter((d: any) => d.status === 'approved').length,
+        rejected: invData.filter((d: any) => d.status === 'rejected').length,
+      },
+      feedback: fb.count || 0,
+      contacts: ct.count || 0,
+      corrections: cor.count || 0,
+      decisions: dec.count || 0,
+    });
+  }
+
+  // Default: invitations
+  let query = supabase.from('invitations').select('*').order('created_at', { ascending: false });
+  if (status !== 'all') query = query.eq('status', status);
+  const { data, error } = await query;
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const stats = {
+    total: data?.length || 0,
+    pending: data?.filter(d => d.status === 'pending').length || 0,
+    approved: data?.filter(d => d.status === 'approved').length || 0,
+    rejected: data?.filter(d => d.status === 'rejected').length || 0,
+  };
+
+  return NextResponse.json({ invitations: data || [], stats });
+}'''
+
+# Add mark_read action to POST
+mark_read = '''
+  // Mark feedback/contact as read/replied
+  if (body.action === 'mark_status') {
+    const table = body.table;
+    const newStatus = body.status;
+    if (!['feedback', 'contacts'].includes(table)) return NextResponse.json({ error: 'Invalid table' }, { status: 400 });
+    const { error } = await supabase.from(table).update({ status: newStatus }).eq('id', body.id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
+
+'''
+
+content = content.replace(old_get, new_get)
+content = content.replace("  return NextResponse.json({ error: 'Invalid action' }, { status: 400 });\n}", mark_read + "  return NextResponse.json({ error: 'Invalid action' }, { status: 400 });\n}")
+
+open('src/app/api/admin/route.ts', 'w').write(content)
+print('✅ Admin API: feedback, contacts, corrections, decisions, stats views')
+PYEOF
+
+# ============================================
+# 3. Full Admin Dashboard Page
+# ============================================
+
+cat > src/app/admin/page.tsx << 'ADMINEOF'
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import SiteHeader from '@/components/SiteHeader';
@@ -342,3 +541,11 @@ function DecisionsTab({ adminKey }: { adminKey: string }) {
     </div>
   );
 }
+ADMINEOF
+
+echo "✅ Admin dashboard: 6 tabs, stats, feedback, contacts, corrections, decisions"
+echo ""
+echo "⚠️  Create 'contacts' table in Supabase (SQL shown above)"
+echo "⚠️  Add status + component + type columns to feedback table"
+echo ""
+echo "Test: npm run build && npm run dev → /admin"
