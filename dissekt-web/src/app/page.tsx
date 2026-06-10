@@ -9,7 +9,17 @@ import BulkAnalysis from '@/components/BulkAnalysis';
 import ReaderMemory from '@/components/ReaderMemory';
 import DecisionJournalView from '@/components/DecisionJournal';
 
-const DAILY_LIMIT = 10;
+const FREE_LIMIT = 3;
+const INVITED_LIMIT = 25;
+
+function getTier(): 'free' | 'invited' {
+  if (typeof window === 'undefined') return 'free';
+  return localStorage.getItem('dissekt_tier') === 'invited' ? 'invited' : 'free';
+}
+
+function getDailyLimit(): number {
+  return getTier() === 'invited' ? INVITED_LIMIT : FREE_LIMIT;
+}
 const MARKETS = ['all', 'india', 'germany', 'us', 'uk'];
 const FLAGS: Record<string, string> = { india: '🇮🇳', germany: '🇩🇪', us: '🇺🇸', uk: '🇬🇧', all: '🌐' };
 const RISK_BADGE: Record<string, { emoji: string; color: string; bg: string }> = {
@@ -195,7 +205,7 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
 
   const handleScan = async (content: string, mode: string, image?: string) => {
     const currentUsage = getAnonUsage();
-    if (currentUsage >= DAILY_LIMIT) { onShowToast(); return; }
+    if (currentUsage >= getDailyLimit()) { onShowToast(); return; }
     setLoading(true); setError(''); setResult(null); setInputContent(content);
     try {
       const res = await fetch('/api/scan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, mode, image }) });
@@ -242,7 +252,7 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const remaining = Math.max(0, DAILY_LIMIT - usage);
+  const remaining = Math.max(0, getDailyLimit() - usage);
 
   return (
     <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
@@ -260,8 +270,9 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
             <span style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, background: remaining <= 3 ? '#fef2f2' : '#f0f0ee', color: remaining <= 3 ? '#b91c1c' : '#888' }}>{remaining} scans left today</span>
             <a href='/docs' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>API</a>
             <a href='/help' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>Help</a>
+            <a href='/privacy' style={{ fontSize: 12, color: '#404040', textDecoration: 'none', fontWeight: 500 }}>Privacy</a>
             <button onClick={onShowFeedback} style={{ fontSize: 12, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>Feedback</button>
-            <button onClick={onShowToast} style={{ fontSize: 12, color: '#888', background: 'none', border: '1px solid #e5e5e5', borderRadius: 6, padding: '4px 12px', cursor: 'pointer', fontWeight: 500 }}>Sign in</button>
+            <a href="/invite" style={{ fontSize: 12, color: '#888', textDecoration: 'none', border: '1px solid #e5e5e5', borderRadius: 6, padding: '4px 12px', fontWeight: 500 }}>Get access</a>
           </div>
         </div>
       </nav>
@@ -273,7 +284,7 @@ function ScanPage({ onShowToast, onShowFeedback, onBack }: { onShowToast: () => 
               style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
               Single scan
             </button>
-            <button onClick={() => setScanTab('bulk')}
+            <button onClick={() => getTier() === 'invited' ? setScanTab('bulk') : (window.location.href = '/invite')}
               style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
               📊 Bulk CSV
             </button>

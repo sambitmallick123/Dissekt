@@ -1,0 +1,224 @@
+{
+  "joe biden": {
+    "name": "Joe Biden",
+    "party": "Democrat",
+    "position": "46th President (ended Jan 2025)",
+    "constituency": "National",
+    "state": "Delaware",
+    "terms": "President 2021-2025",
+    "key_votes": [
+      "Infrastructure Act",
+      "CHIPS Act",
+      "IRA"
+    ],
+    "key_promises": [
+      "Build Back Better",
+      "Student loans",
+      "Climate"
+    ],
+    "controversies": [
+      "Age concerns",
+      "Afghanistan",
+      "Hunter Biden"
+    ],
+    "factual_notes": [
+      "Didn't seek re-election 2024"
+    ]
+  },
+  "donald trump": {
+    "name": "Donald Trump",
+    "party": "Republican",
+    "position": "47th President",
+    "constituency": "National",
+    "state": "Florida",
+    "terms": "President 2017-21, 2025-present",
+    "key_votes": [
+      "Tax Cuts 2017",
+      "USMCA",
+      "China tariffs"
+    ],
+    "key_promises": [
+      "Build the wall",
+      "America First"
+    ],
+    "controversies": [
+      "Jan 6",
+      "34 felony convictions"
+    ],
+    "factual_notes": [
+      "Won 2024 with 312 EVs"
+    ]
+  },
+  "kamala harris": {
+    "name": "Kamala Harris",
+    "party": "Democrat",
+    "position": "Former VP",
+    "constituency": "National",
+    "state": "California",
+    "terms": "VP 2021-2025",
+    "key_votes": [
+      "Tie-breaking votes",
+      "IRA"
+    ],
+    "key_promises": [
+      "Opportunity economy"
+    ],
+    "controversies": [
+      "Border response"
+    ],
+    "factual_notes": [
+      "First woman + Black + Asian VP"
+    ]
+  },
+  "bernie sanders": {
+    "name": "Bernie Sanders",
+    "party": "Independent",
+    "position": "Senator Vermont",
+    "constituency": "Vermont",
+    "state": "Vermont",
+    "terms": "Senator since 2007",
+    "key_votes": [
+      "Medicare for All",
+      "Opposed Iraq War"
+    ],
+    "key_promises": [
+      "Medicare for All",
+      "Free college",
+      "$15 min wage"
+    ],
+    "controversies": [
+      "2016/2020 primary losses"
+    ],
+    "factual_notes": [
+      "Longest-serving independent"
+    ]
+  },
+  "nancy pelosi": {
+    "name": "Nancy Pelosi",
+    "party": "Democrat",
+    "position": "Representative CA",
+    "constituency": "CA-11",
+    "state": "California",
+    "terms": "Rep since 1987",
+    "key_votes": [
+      "ACA",
+      "Both Trump impeachments"
+    ],
+    "key_promises": [
+      "Democratic unity"
+    ],
+    "controversies": [
+      "Stock trading",
+      "Taiwan visit"
+    ],
+    "factual_notes": [
+      "First woman Speaker"
+    ]
+  },
+  "ron desantis": {
+    "name": "Ron DeSantis",
+    "party": "Republican",
+    "position": "Governor Florida",
+    "constituency": "Florida",
+    "state": "Florida",
+    "terms": "Governor since 2019",
+    "key_votes": [
+      "Don't Say Gay",
+      "Anti-ESG"
+    ],
+    "key_promises": [
+      "Freedom agenda"
+    ],
+    "controversies": [
+      "COVID response",
+      "Disney feud"
+    ],
+    "factual_notes": [
+      "Won 2022 by 19 points"
+    ]
+  },
+  "alexandria ocasio-cortez": {
+    "name": "Alexandria Ocasio-Cortez",
+    "party": "Democrat",
+    "position": "Representative NY",
+    "constituency": "NY-14",
+    "state": "New York",
+    "terms": "Rep since 2019",
+    "key_votes": [
+      "Green New Deal"
+    ],
+    "key_promises": [
+      "Green New Deal",
+      "Medicare for All"
+    ],
+    "controversies": [
+      "Met Gala dress"
+    ],
+    "factual_notes": [
+      "Youngest woman elected to Congress"
+    ]
+  },
+  "elon musk": {
+    "name": "Elon Musk",
+    "party": "Republican-aligned",
+    "position": "DOGE advisor",
+    "constituency": "National",
+    "state": "Texas",
+    "terms": "DOGE 2025",
+    "key_votes": [
+      "Govt efficiency recs"
+    ],
+    "key_promises": [
+      "Cut $2T spending"
+    ],
+    "controversies": [
+      "Twitter/X",
+      "Political spending"
+    ],
+    "factual_notes": [
+      "World's richest, CEO Tesla+SpaceX"
+    ]
+  },
+  "mitch mcconnell": {
+    "name": "Mitch McConnell",
+    "party": "Republican",
+    "position": "Senator Kentucky",
+    "constituency": "Kentucky",
+    "state": "Kentucky",
+    "terms": "Senator since 1985",
+    "key_votes": [
+      "Blocked Garland",
+      "3 SCOTUS confirmations"
+    ],
+    "key_promises": [
+      "Conservative judiciary"
+    ],
+    "controversies": [
+      "Health concerns"
+    ],
+    "factual_notes": [
+      "Longest-serving Senate leader"
+    ]
+  },
+  "gavin newsom": {
+    "name": "Gavin Newsom",
+    "party": "Democrat",
+    "position": "Governor California",
+    "constituency": "California",
+    "state": "California",
+    "terms": "Governor since 2019",
+    "key_votes": [
+      "Climate bills",
+      "Gun control"
+    ],
+    "key_promises": [
+      "Climate leadership"
+    ],
+    "controversies": [
+      "French Laundry dinner"
+    ],
+    "factual_notes": [
+      "Survived 2021 recall"
+    ]
+  }
+}

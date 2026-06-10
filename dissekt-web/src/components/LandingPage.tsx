@@ -17,7 +17,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
             <a href="/docs" style={{ color: '#737373', textDecoration: 'none' }}>API</a>
             <a href="#how" style={{ color: '#737373', textDecoration: 'none' }}>How it works</a>
             {onShowFeedback && <button onClick={onShowFeedback} style={{ color: '#737373', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}>Feedback</button>}
-            <button onClick={onSignIn} style={{ padding: '5px 14px', background: 'transparent', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Sign in</button>
+            <button onClick={() => window.location.href="/invite"} style={{ padding: "5px 14px", background: "transparent", color: "#7c3aed", border: "1px solid #e5e5e5", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Get access</button>
             <button onClick={onTryFree} style={{ padding: '5px 14px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Try free</button>
           </div>
         </div>
@@ -228,6 +228,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
         <span style={{ margin: '0 6px' }}>·</span>Information transparency and argument inspection
         <span style={{ margin: '0 6px' }}>·</span><a href="mailto:sambitmallick123@gmail.com" style={{ color: '#7c3aed', textDecoration: 'none' }}>sambitmallick123@gmail.com</a>
         <span style={{ margin: '0 6px' }}>·</span>Munich, Germany · 2026
+        <span style={{ margin: "0 6px" }}>·</span><a href="/privacy" style={{ color: "#7c3aed", textDecoration: "none" }}>Privacy Policy</a>
       </div>
     </div>
   );

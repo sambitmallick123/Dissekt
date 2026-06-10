@@ -2,73 +2,611 @@
   "narendra modi": {
     "name": "Narendra Modi",
     "party": "BJP",
-    "position": "Prime Minister of India",
-    "constituency": "Varanasi, Uttar Pradesh",
-    "state": "Gujarat (origin)",
-    "terms": "PM since 2014 (3rd term from 2024)",
-    "key_votes": ["CAA 2019", "Farm Laws 2020 (repealed 2021)", "Abrogation of Article 370 (2019)"],
-    "key_promises": ["Achhe Din", "₹15 lakh in every account", "Make in India", "Digital India", "2 crore jobs/year"],
-    "controversies": ["Demonetisation 2016", "Electoral Bonds scheme", "Adani-Hindenburg row"],
-    "factual_notes": ["India GDP growth averaged ~6.5% 2014-2024", "Unemployment rate ~7-8% (CMIE data)", "Electoral Bonds struck down by SC in Feb 2024"]
+    "position": "Prime Minister",
+    "constituency": "Varanasi, UP",
+    "state": "Gujarat",
+    "terms": "PM since 2014",
+    "key_votes": [
+      "CAA 2019",
+      "Farm Laws 2020",
+      "Article 370 abrogation"
+    ],
+    "key_promises": [
+      "Achhe Din",
+      "Make in India",
+      "Digital India",
+      "2 crore jobs/year"
+    ],
+    "controversies": [
+      "Demonetisation",
+      "Electoral Bonds",
+      "Adani row"
+    ],
+    "factual_notes": [
+      "GDP growth avg ~6.5% 2014-24",
+      "Unemployment ~7-8% CMIE"
+    ]
   },
   "rahul gandhi": {
     "name": "Rahul Gandhi",
     "party": "INC",
-    "position": "Leader of Opposition in Lok Sabha",
-    "constituency": "Rae Bareli, Uttar Pradesh",
+    "position": "Leader of Opposition",
+    "constituency": "Rae Bareli, UP",
     "state": "Delhi",
     "terms": "MP since 2004",
-    "key_votes": ["Opposed CAA", "Opposed Farm Laws", "Opposed Article 370 abrogation"],
-    "key_promises": ["NYAY scheme (₹72,000/year)", "Caste census", "Legal guarantee for MSP"],
-    "controversies": ["National Herald case", "Defamation conviction (overturned)", "Bharat Jodo Yatra"],
-    "factual_notes": ["INC won 99 seats in 2024 general election (up from 52 in 2019)"]
+    "key_votes": [
+      "Opposed CAA",
+      "Opposed Farm Laws"
+    ],
+    "key_promises": [
+      "NYAY scheme",
+      "Caste census",
+      "MSP guarantee"
+    ],
+    "controversies": [
+      "National Herald case"
+    ],
+    "factual_notes": [
+      "INC won 99 seats 2024"
+    ]
   },
   "amit shah": {
     "name": "Amit Shah",
     "party": "BJP",
-    "position": "Minister of Home Affairs",
+    "position": "Home Minister",
     "constituency": "Gandhinagar, Gujarat",
     "state": "Gujarat",
-    "terms": "MP since 2017, BJP President 2014-2020",
-    "key_votes": ["Authored CAA", "Article 370 abrogation", "NRC push"],
-    "key_promises": ["NRC nationwide", "Zero terrorism", "Congress-mukt Bharat"],
-    "controversies": ["Snoopgate allegations", "Fake encounter cases (acquitted)"],
-    "factual_notes": ["CAA + NRC triggered nationwide protests in 2019-2020"]
+    "terms": "MP since 2017",
+    "key_votes": [
+      "CAA author",
+      "Article 370",
+      "NRC push"
+    ],
+    "key_promises": [
+      "NRC nationwide",
+      "Zero terrorism"
+    ],
+    "controversies": [
+      "Snoopgate"
+    ],
+    "factual_notes": [
+      "CAA+NRC triggered nationwide protests"
+    ]
   },
   "arvind kejriwal": {
     "name": "Arvind Kejriwal",
     "party": "AAP",
-    "position": "Former Chief Minister of Delhi",
+    "position": "Former CM Delhi",
     "constituency": "New Delhi",
     "state": "Delhi",
-    "terms": "CM 2013 (49 days), 2015-2024",
-    "key_votes": ["Free water 20kL/month in Delhi", "Free electricity <200 units", "Mohalla Clinics"],
-    "key_promises": ["Free electricity", "Improved government schools", "Anti-corruption"],
-    "controversies": ["Excise policy case (arrested 2024)", "Delhi liquor scam allegations"],
-    "factual_notes": ["Delhi govt schools showed improved pass rates", "AAP won Punjab 2022"]
+    "terms": "CM 2015-2024",
+    "key_votes": [
+      "Free water",
+      "Free electricity"
+    ],
+    "key_promises": [
+      "Anti-corruption",
+      "Improved schools"
+    ],
+    "controversies": [
+      "Excise policy case"
+    ],
+    "factual_notes": [
+      "AAP won Punjab 2022"
+    ]
   },
   "mamata banerjee": {
     "name": "Mamata Banerjee",
     "party": "TMC",
-    "position": "Chief Minister of West Bengal",
-    "constituency": "Bhawanipur, West Bengal",
+    "position": "CM West Bengal",
+    "constituency": "Bhawanipur",
     "state": "West Bengal",
     "terms": "CM since 2011",
-    "key_votes": ["Opposed CAA/NRC", "Opposed farm laws"],
-    "key_promises": ["Kanyashree (girl child education)", "Duare Sarkar (doorstep governance)"],
-    "controversies": ["Sandeshkhali incidents 2024", "Post-election violence allegations 2021"],
-    "factual_notes": ["TMC won 215/294 seats in 2021 WB election"]
+    "key_votes": [
+      "Opposed CAA/NRC"
+    ],
+    "key_promises": [
+      "Kanyashree",
+      "Duare Sarkar"
+    ],
+    "controversies": [
+      "Sandeshkhali 2024"
+    ],
+    "factual_notes": [
+      "TMC won 215/294 seats 2021"
+    ]
   },
   "yogi adityanath": {
     "name": "Yogi Adityanath",
     "party": "BJP",
-    "position": "Chief Minister of Uttar Pradesh",
-    "constituency": "Gorakhpur, UP",
-    "state": "Uttar Pradesh",
+    "position": "CM Uttar Pradesh",
+    "constituency": "Gorakhpur",
+    "state": "UP",
     "terms": "CM since 2017",
-    "key_votes": ["Anti-conversion law", "Bulldozer policy"],
-    "key_promises": ["Zero tolerance for crime", "UP expressways", "Industrial development"],
-    "controversies": ["Bulldozer justice criticism", "Hathras case handling", "COVID management"],
-    "factual_notes": ["UP GDP grew but unemployment remained high per CMIE"]
+    "key_votes": [
+      "Anti-conversion law",
+      "Bulldozer policy"
+    ],
+    "key_promises": [
+      "Zero crime",
+      "Expressways"
+    ],
+    "controversies": [
+      "Bulldozer justice",
+      "Hathras case"
+    ],
+    "factual_notes": [
+      "UP GDP grew but unemployment high"
+    ]
+  },
+  "sonia gandhi": {
+    "name": "Sonia Gandhi",
+    "party": "INC",
+    "position": "Rajya Sabha MP",
+    "constituency": "Rajya Sabha",
+    "state": "Delhi",
+    "terms": "INC President 1998-2024",
+    "key_votes": [
+      "RTI Act",
+      "MGNREGA",
+      "Food Security Act"
+    ],
+    "key_promises": [
+      "Inclusive growth"
+    ],
+    "controversies": [
+      "National Herald case"
+    ],
+    "factual_notes": [
+      "Led UPA to wins in 2004, 2009"
+    ]
+  },
+  "nitin gadkari": {
+    "name": "Nitin Gadkari",
+    "party": "BJP",
+    "position": "MP Nagpur",
+    "constituency": "Nagpur",
+    "state": "Maharashtra",
+    "terms": "MP since 2014",
+    "key_votes": [
+      "Highway expansion"
+    ],
+    "key_promises": [
+      "World-class highways",
+      "EVs"
+    ],
+    "controversies": [
+      "Purti Group"
+    ],
+    "factual_notes": [
+      "Highway construction doubled under tenure"
+    ]
+  },
+  "rajnath singh": {
+    "name": "Rajnath Singh",
+    "party": "BJP",
+    "position": "Defence Minister",
+    "constituency": "Lucknow",
+    "state": "UP",
+    "terms": "MP since 2004",
+    "key_votes": [
+      "Rafale deal",
+      "Defence reforms"
+    ],
+    "key_promises": [
+      "Modern armed forces"
+    ],
+    "controversies": [
+      "Rafale questions"
+    ],
+    "factual_notes": [
+      "India 4th largest defence spender"
+    ]
+  },
+  "nirmala sitharaman": {
+    "name": "Nirmala Sitharaman",
+    "party": "BJP",
+    "position": "Finance Minister",
+    "constituency": "Rajya Sabha",
+    "state": "Karnataka",
+    "terms": "FM since 2019",
+    "key_votes": [
+      "GST",
+      "PLI schemes"
+    ],
+    "key_promises": [
+      "$5T economy",
+      "Tax reform"
+    ],
+    "controversies": [
+      "Rising inflation"
+    ],
+    "factual_notes": [
+      "GST crossed \u20b92L crore/month 2024"
+    ]
+  },
+  "m k stalin": {
+    "name": "M K Stalin",
+    "party": "DMK",
+    "position": "CM Tamil Nadu",
+    "constituency": "Kolathur",
+    "state": "Tamil Nadu",
+    "terms": "CM since 2021",
+    "key_votes": [
+      "Opposed NEET"
+    ],
+    "key_promises": [
+      "Dravidian model",
+      "\u20b91000/month women"
+    ],
+    "controversies": [
+      "DMK corruption allegations"
+    ],
+    "factual_notes": [
+      "DMK won 133/234 seats 2021"
+    ]
+  },
+  "pinarayi vijayan": {
+    "name": "Pinarayi Vijayan",
+    "party": "CPI(M)",
+    "position": "CM Kerala",
+    "constituency": "Dharmadom",
+    "state": "Kerala",
+    "terms": "CM since 2016",
+    "key_votes": [
+      "Kerala model"
+    ],
+    "key_promises": [
+      "Knowledge economy"
+    ],
+    "controversies": [
+      "Gold smuggling case"
+    ],
+    "factual_notes": [
+      "First LDF consecutive win"
+    ]
+  },
+  "nitish kumar": {
+    "name": "Nitish Kumar",
+    "party": "JD(U)",
+    "position": "CM Bihar",
+    "constituency": "Bihar",
+    "state": "Bihar",
+    "terms": "CM multiple terms since 2005",
+    "key_votes": [
+      "Prohibition",
+      "Caste census"
+    ],
+    "key_promises": [
+      "Bihar development"
+    ],
+    "controversies": [
+      "Alliance switches"
+    ],
+    "factual_notes": [
+      "Switched NDA-INDIA multiple times"
+    ]
+  },
+  "chandrababu naidu": {
+    "name": "Chandrababu Naidu",
+    "party": "TDP",
+    "position": "CM Andhra Pradesh",
+    "constituency": "Kuppam",
+    "state": "AP",
+    "terms": "CM 2024-present",
+    "key_votes": [
+      "Amaravati capital"
+    ],
+    "key_promises": [
+      "AP development"
+    ],
+    "controversies": [
+      "Skill scam case (acquitted)"
+    ],
+    "factual_notes": [
+      "TDP won 135/175 seats 2024"
+    ]
+  },
+  "jagan mohan reddy": {
+    "name": "Jagan Mohan Reddy",
+    "party": "YSRCP",
+    "position": "Former CM AP",
+    "constituency": "Pulivendula",
+    "state": "AP",
+    "terms": "CM 2019-2024",
+    "key_votes": [
+      "Welfare schemes"
+    ],
+    "key_promises": [
+      "Welfare for poor"
+    ],
+    "controversies": [
+      "CBI cases"
+    ],
+    "factual_notes": [
+      "YSRCP won only 11/175 in 2024"
+    ]
+  },
+  "akhilesh yadav": {
+    "name": "Akhilesh Yadav",
+    "party": "SP",
+    "position": "SP President",
+    "constituency": "Kannauj",
+    "state": "UP",
+    "terms": "CM 2012-2017",
+    "key_votes": [
+      "Social justice"
+    ],
+    "key_promises": [
+      "Development + social justice"
+    ],
+    "controversies": [
+      "Family feud"
+    ],
+    "factual_notes": [
+      "SP won 37 seats 2024 LS"
+    ]
+  },
+  "mayawati": {
+    "name": "Mayawati",
+    "party": "BSP",
+    "position": "BSP President",
+    "constituency": "UP",
+    "state": "UP",
+    "terms": "CM 4 times",
+    "key_votes": [
+      "Dalit empowerment"
+    ],
+    "key_promises": [
+      "Dalit rights"
+    ],
+    "controversies": [
+      "Statues spending"
+    ],
+    "factual_notes": [
+      "First Dalit woman CM",
+      "BSP won 0 seats 2024"
+    ]
+  },
+  "uddhav thackeray": {
+    "name": "Uddhav Thackeray",
+    "party": "Shiv Sena (UBT)",
+    "position": "Party leader",
+    "constituency": "Mumbai",
+    "state": "Maharashtra",
+    "terms": "CM 2019-2022",
+    "key_votes": [
+      "MVA alliance"
+    ],
+    "key_promises": [
+      "Hindutva + development"
+    ],
+    "controversies": [
+      "Party split 2022"
+    ],
+    "factual_notes": [
+      "Lost CM after Shinde split"
+    ]
+  },
+  "eknath shinde": {
+    "name": "Eknath Shinde",
+    "party": "Shiv Sena",
+    "position": "CM Maharashtra",
+    "constituency": "Thane",
+    "state": "Maharashtra",
+    "terms": "CM since 2022",
+    "key_votes": [
+      "BJP alliance"
+    ],
+    "key_promises": [
+      "Maharashtra development"
+    ],
+    "controversies": [
+      "Party split legality"
+    ],
+    "factual_notes": [
+      "SC upheld his faction"
+    ]
+  },
+  "sharad pawar": {
+    "name": "Sharad Pawar",
+    "party": "NCP (SP)",
+    "position": "Party President",
+    "constituency": "Maharashtra",
+    "state": "Maharashtra",
+    "terms": "Active since 1970s",
+    "key_votes": [
+      "RTI",
+      "Farm policies"
+    ],
+    "key_promises": [
+      "Farmer welfare"
+    ],
+    "controversies": [
+      "NCP split 2023"
+    ],
+    "factual_notes": [
+      "Longest-serving Indian politician"
+    ]
+  },
+  "siddaramaiah": {
+    "name": "Siddaramaiah",
+    "party": "INC",
+    "position": "CM Karnataka",
+    "constituency": "Varuna",
+    "state": "Karnataka",
+    "terms": "CM 2023-present",
+    "key_votes": [
+      "5 guarantees scheme"
+    ],
+    "key_promises": [
+      "Free bus women",
+      "Free rice"
+    ],
+    "controversies": [
+      "MUDA land scam"
+    ],
+    "factual_notes": [
+      "Congress won 135/224 in 2023"
+    ]
+  },
+  "devendra fadnavis": {
+    "name": "Devendra Fadnavis",
+    "party": "BJP",
+    "position": "Deputy CM Maharashtra",
+    "constituency": "Nagpur SW",
+    "state": "Maharashtra",
+    "terms": "CM 2014-2019",
+    "key_votes": [
+      "Mumbai metro"
+    ],
+    "key_promises": [
+      "Mumbai transformation"
+    ],
+    "controversies": [
+      "Govt formation drama 2019"
+    ],
+    "factual_notes": [
+      "BJP key strategist Maharashtra"
+    ]
+  },
+  "hemant soren": {
+    "name": "Hemant Soren",
+    "party": "JMM",
+    "position": "CM Jharkhand",
+    "constituency": "Jharkhand",
+    "state": "Jharkhand",
+    "terms": "CM 2019-present",
+    "key_votes": [
+      "Tribal land rights"
+    ],
+    "key_promises": [
+      "Tribal welfare"
+    ],
+    "controversies": [
+      "Land scam arrest 2024"
+    ],
+    "factual_notes": [
+      "JMM retained Jharkhand 2024"
+    ]
+  },
+  "naveen patnaik": {
+    "name": "Naveen Patnaik",
+    "party": "BJD",
+    "position": "Former CM Odisha",
+    "constituency": "Hinjili",
+    "state": "Odisha",
+    "terms": "CM 2000-2024",
+    "key_votes": [
+      "KALIA scheme"
+    ],
+    "key_promises": [
+      "5T governance"
+    ],
+    "controversies": [
+      "VK Pandian influence"
+    ],
+    "factual_notes": [
+      "Lost after 24 years, BJP won 2024"
+    ]
+  },
+  "priyanka gandhi": {
+    "name": "Priyanka Gandhi",
+    "party": "INC",
+    "position": "MP Wayanad",
+    "constituency": "Wayanad",
+    "state": "Kerala",
+    "terms": "MP since 2024",
+    "key_votes": [],
+    "key_promises": [
+      "Congress revival"
+    ],
+    "controversies": [
+      "Dynasty criticism"
+    ],
+    "factual_notes": [
+      "Won Wayanad bypoll"
+    ]
+  },
+  "smriti irani": {
+    "name": "Smriti Irani",
+    "party": "BJP",
+    "position": "Former Minister",
+    "constituency": "Amethi (lost 2024)",
+    "state": "Delhi",
+    "terms": "Minister 2014-2024",
+    "key_votes": [
+      "NEP support"
+    ],
+    "key_promises": [
+      "Education reform"
+    ],
+    "controversies": [
+      "Degree row"
+    ],
+    "factual_notes": [
+      "Beat Rahul 2019, lost 2024"
+    ]
+  },
+  "asaduddin owaisi": {
+    "name": "Asaduddin Owaisi",
+    "party": "AIMIM",
+    "position": "MP Hyderabad",
+    "constituency": "Hyderabad",
+    "state": "Telangana",
+    "terms": "MP since 2004",
+    "key_votes": [
+      "Opposed CAA"
+    ],
+    "key_promises": [
+      "Minority welfare"
+    ],
+    "controversies": [
+      "Divisive politics allegations"
+    ],
+    "factual_notes": [
+      "Won Hyderabad 5 times"
+    ]
+  },
+  "tejashwi yadav": {
+    "name": "Tejashwi Yadav",
+    "party": "RJD",
+    "position": "RJD leader",
+    "constituency": "Bihar",
+    "state": "Bihar",
+    "terms": "Deputy CM 2022-2024",
+    "key_votes": [
+      "Caste census"
+    ],
+    "key_promises": [
+      "10 lakh jobs"
+    ],
+    "controversies": [
+      "IRCTC case (family)"
+    ],
+    "factual_notes": [
+      "Son of Lalu Prasad"
+    ]
+  },
+  "s jaishankar": {
+    "name": "S Jaishankar",
+    "party": "BJP",
+    "position": "External Affairs Minister",
+    "constituency": "Rajya Sabha",
+    "state": "Gujarat",
+    "terms": "Minister since 2019",
+    "key_votes": [
+      "Multi-alignment policy",
+      "Quad"
+    ],
+    "key_promises": [
+      "India global voice"
+    ],
+    "controversies": [
+      "China border criticism"
+    ],
+    "factual_notes": [
+      "Former Foreign Secretary"
+    ]
   }
 }

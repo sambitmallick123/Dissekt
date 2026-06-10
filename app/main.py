@@ -362,6 +362,55 @@ async def search_memory(q: str = "", limit: int = 10):
         logger.warning(f"Memory search failed: {e}")
         return {"results": [], "query": q, "error": str(e)}
 
+
+
+@app.get("/api/topics")
+async def topic_tracking(q: str = "", limit: int = 20):
+    """Track how a topic has been analyzed over time."""
+    if len(q) < 3:
+        return {"topic": q, "analyses": [], "trends": {}}
+    
+    try:
+        from app.claim_graph import find_similar
+        results = await find_similar(q, limit=limit)
+        
+        # Build temporal data
+        analyses = []
+        technique_freq = {}
+        timestamps = []
+        
+        for r in results:
+            ts = r.get("timestamp") or ""
+            analyses.append({
+                "text_preview": r.get("text_preview", ""),
+                "similarity": r.get("similarity", 0),
+                "techniques": r.get("techniques", []),
+                "timestamp": ts,
+            })
+            
+            for t in r.get("techniques", []):
+                technique_freq[t] = technique_freq.get(t, 0) + 1
+            
+            if ts:
+                try: timestamps.append(float(ts))
+                except: pass
+        
+        # Sort by timestamp
+        analyses.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+        
+        # Build trends
+        trends = {
+            "total_analyses": len(analyses),
+            "technique_frequency": dict(sorted(technique_freq.items(), key=lambda x: -x[1])),
+            "time_span_days": round((max(timestamps) - min(timestamps)) / 86400, 1) if len(timestamps) >= 2 else 0,
+            "avg_similarity": round(sum(r.get("similarity", 0) for r in results) / max(len(results), 1), 3),
+        }
+        
+        return {"topic": q, "analyses": analyses, "trends": trends, "count": len(analyses)}
+    except Exception as e:
+        logger.warning(f"Topic tracking failed: {e}")
+        return {"topic": q, "analyses": [], "trends": {}, "error": str(e)}
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================
