@@ -38,7 +38,7 @@ export default function ReaderMemory({ onAnalyze }: { onAnalyze: (text: string) 
           style={{ flex: 1, padding: '8px 12px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, outline: 'none', background: '#f8f8f6' }}
         />
         <button onClick={handleSearch} disabled={loading || query.length < 3}
-          style={{ padding: '8px 16px', background: query.length >= 3 ? '#7c3aed' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: query.length >= 3 ? 'pointer' : 'not-allowed' }}>
+          style={{ padding: '8px 16px', background: query.length >= 3 ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: query.length >= 3 ? 'pointer' : 'not-allowed' }}>
           {loading ? '...' : 'Search'}
         </button>
       </div>
@@ -53,8 +53,8 @@ export default function ReaderMemory({ onAnalyze }: { onAnalyze: (text: string) 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {results.map((r, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 10, padding: '8px 10px', border: '1px solid #e5e5e5', borderRadius: 8 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 6, background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#7c3aed' }}>{Math.round((r.similarity || 0) * 100)}%</span>
+              <div style={{ width: 32, height: 32, borderRadius: 6, background: '#f0fdfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#0d9488' }}>{Math.round((r.similarity || 0) * 100)}%</span>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12, color: '#404040', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
@@ -69,7 +69,7 @@ export default function ReaderMemory({ onAnalyze }: { onAnalyze: (text: string) 
                 )}
               </div>
               <button onClick={() => onAnalyze(r.text_preview)}
-                style={{ fontSize: 10, padding: '4px 8px', background: '#f3e8ff', color: '#7c3aed', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600, flexShrink: 0 }}>
+                style={{ fontSize: 10, padding: '4px 8px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600, flexShrink: 0 }}>
                 Rescan
               </button>
             </div>

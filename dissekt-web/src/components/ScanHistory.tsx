@@ -46,7 +46,7 @@ export default function ScanHistory({ onReanalyze }: { onReanalyze: (input: stri
           <div style={{ fontSize: 11, color: '#888' }}>{items.length} scans saved locally</div>
         </div>
         {items.length > 5 && (
-          <button onClick={() => setExpanded(!expanded)} style={{ fontSize: 11, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
+          <button onClick={() => setExpanded(!expanded)} style={{ fontSize: 11, color: '#0d9488', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
             {expanded ? 'Show less' : `Show all ${items.length}`}
           </button>
         )}
@@ -65,7 +65,7 @@ export default function ScanHistory({ onReanalyze }: { onReanalyze: (input: stri
             </div>
             <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
               <a href={`/report/${item.id}`} style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', padding: '3px 8px', background: '#eff6ff', borderRadius: 4, fontWeight: 500 }}>View</a>
-              <button onClick={() => onReanalyze(item.input)} style={{ fontSize: 10, color: '#7c3aed', background: '#f3e8ff', border: 'none', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontWeight: 500 }}>Rescan</button>
+              <button onClick={() => onReanalyze(item.input)} style={{ fontSize: 10, color: '#0d9488', background: '#f0fdfa', border: 'none', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontWeight: 500 }}>Rescan</button>
             </div>
           </div>
         ))}

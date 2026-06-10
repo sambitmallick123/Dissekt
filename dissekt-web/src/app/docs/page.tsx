@@ -1,4 +1,6 @@
 'use client';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
 
 export default function DocsPage() {
@@ -9,24 +11,13 @@ export default function DocsPage() {
     background: '#1a1a1a', color: '#e5e5e5', padding: 16, borderRadius: 10,
     fontSize: 12, lineHeight: 1.7, overflow: 'auto', fontFamily: 'monospace',
   };
-  const keywordStyle: React.CSSProperties = { color: '#7c3aed' };
+  const keywordStyle: React.CSSProperties = { color: '#0d9488' };
   const stringStyle: React.CSSProperties = { color: '#22c55e' };
   const commentStyle: React.CSSProperties = { color: '#666' };
 
   return (
     <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
-      <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <span style={{ fontWeight: 600, fontSize: 15 }}>Dissekt</span>
-            <span style={{ fontSize: 13, color: '#888' }}>API Docs</span>
-          </a>
-          <a href="/" style={{ fontSize: 13, color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>← Back</a>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Dissekt API</h1>
@@ -37,7 +28,7 @@ export default function DocsPage() {
         <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid #e5e5e5', paddingBottom: 0 }}>
           {(['overview', 'scan', 'compare', 'radar'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              style={{ padding: '8px 16px', fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer', background: 'none', color: tab === t ? '#7c3aed' : '#888', borderBottom: tab === t ? '2px solid #7c3aed' : '2px solid transparent', marginBottom: -1 }}>
+              style={{ padding: '8px 16px', fontSize: 13, fontWeight: 500, border: 'none', cursor: 'pointer', background: 'none', color: tab === t ? '#0d9488' : '#888', borderBottom: tab === t ? '2px solid #0d9488' : '2px solid transparent', marginBottom: -1 }}>
               {t === 'overview' ? 'Overview' : t === 'scan' ? 'POST /scan' : t === 'compare' ? 'POST /compare' : 'GET /radar'}
             </button>
           ))}
@@ -216,9 +207,10 @@ export default function DocsPage() {
 
         <div style={{ textAlign: 'center', marginTop: 32, paddingTop: 20, borderTop: '1px solid #e5e5e5' }}>
           <p style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>Need higher limits or a custom integration? Get in touch.</p>
-          <a href="mailto:sambitmallick123@gmail.com" style={{ padding: '10px 20px', background: '#7c3aed', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Contact us</a>
+          <a href="mailto:sambitmallick123@gmail.com" style={{ padding: '10px 20px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Contact us</a>
         </div>
       </div>
+    <SiteFooter />
     </main>
   );
 }

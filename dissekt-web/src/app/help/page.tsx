@@ -1,4 +1,6 @@
 'use client';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 
 const components = [
   {
@@ -16,7 +18,7 @@ const components = [
   {
     icon: '👁',
     name: 'Prism — Manipulation Techniques',
-    color: '#7c3aed',
+    color: '#0d9488',
     desc: 'Identifies specific manipulation techniques used in the content. Dissekt detects 20 techniques across 4 categories.',
     details: [
       'Framing: loaded language, emotional framing, cherry picking, misleading headlines',
@@ -138,24 +140,14 @@ const components = [
 export default function HelpPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
-      <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <span style={{ fontWeight: 600, fontSize: 15 }}>Dissekt</span>
-          </a>
-          <a href="/" style={{ fontSize: 13, color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>← Back to Scan</a>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>How Dissekt works</h1>
         <p style={{ fontSize: 14, color: '#888', marginBottom: 28 }}>Every component explained — what it does, how it works, and what the numbers mean.</p>
 
         
-        <div style={{ background: '#7c3aed', borderRadius: 14, padding: '24px 20px', marginBottom: 24, color: '#fff' }}>
+        <div style={{ background: '#0d9488', borderRadius: 14, padding: '24px 20px', marginBottom: 24, color: '#fff' }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Our approach</h2>
           <p style={{ fontSize: 13, lineHeight: 1.7, opacity: 0.9, marginBottom: 12 }}>
             Dissekt is interpretation infrastructure for the information age. It never tells you what's true or false. Instead, it shows you <em>how</em> content is constructed to influence you — the techniques, the framing, the missing context.
@@ -203,12 +195,13 @@ export default function HelpPage() {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 32, paddingTop: 20, borderTop: '1px solid #e5e5e5' }}>
-          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
+          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
             Try Dissekt now →
           </a>
           <p style={{ fontSize: 12, color: '#aaa', marginTop: 8 }}>Free · 10 scans/day · No signup required</p>
         </div>
       </div>
+    <SiteFooter />
     </main>
   );
 }

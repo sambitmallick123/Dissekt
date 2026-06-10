@@ -8,7 +8,7 @@ export default function ExtractedClaims({ claims }: { claims: any[] }) {
   const visible = expanded ? claims : claims.slice(0, 4);
   const typeColors: Record<string, { bg: string; color: string }> = {
     statistic: { bg: '#dbeafe', color: '#1e40af' },
-    quote: { bg: '#f3e8ff', color: '#6b21a8' },
+    quote: { bg: '#f0fdfa', color: '#115e59' },
     event: { bg: '#fef3c7', color: '#92400e' },
     prediction: { bg: '#fce7f3', color: '#9d174d' },
     causal: { bg: '#f0fdf4', color: '#166534' },
@@ -51,7 +51,7 @@ export default function ExtractedClaims({ claims }: { claims: any[] }) {
         })}
       </div>
       {claims.length > 4 && (
-        <button onClick={() => setExpanded(!expanded)} style={{ fontSize: 12, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500, marginTop: 8 }}>
+        <button onClick={() => setExpanded(!expanded)} style={{ fontSize: 12, color: '#0d9488', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500, marginTop: 8 }}>
           {expanded ? 'Show less' : `+ ${claims.length - 4} more claims`}
         </button>
       )}

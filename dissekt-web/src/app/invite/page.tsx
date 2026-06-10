@@ -57,7 +57,7 @@ export default function InvitePage() {
       <div style={{ width: 440, maxWidth: '90vw' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ width: 32, height: 32, background: '#7c3aed', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 32, height: 32, background: '#0d9488', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <span style={{ fontWeight: 700, fontSize: 18 }}>Dissekt</span>
@@ -68,11 +68,11 @@ export default function InvitePage() {
           {/* Tabs */}
           <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
             <button onClick={() => { setTab('request'); setStatus('idle'); }}
-              style={{ flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'request' ? '#7c3aed' : '#f0f0ee', color: tab === 'request' ? '#fff' : '#555' }}>
+              style={{ flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'request' ? '#0d9488' : '#f0f0ee', color: tab === 'request' ? '#fff' : '#555' }}>
               Request access
             </button>
             <button onClick={() => { setTab('redeem'); setStatus('idle'); }}
-              style={{ flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'redeem' ? '#7c3aed' : '#f0f0ee', color: tab === 'redeem' ? '#fff' : '#555' }}>
+              style={{ flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'redeem' ? '#0d9488' : '#f0f0ee', color: tab === 'redeem' ? '#fff' : '#555' }}>
               I have a code
             </button>
           </div>
@@ -98,7 +98,7 @@ export default function InvitePage() {
               <input type="text" placeholder="Organization (optional)" value={org} onChange={e => setOrg(e.target.value)} style={inputStyle} />
               <textarea placeholder="Why do you want access? What will you use Dissekt for?" value={reason} onChange={e => setReason(e.target.value)} rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
               <button onClick={handleRequest} disabled={!email || status === 'loading'}
-                style={{ width: '100%', padding: '11px 0', background: email ? '#7c3aed' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: email ? 'pointer' : 'not-allowed' }}>
+                style={{ width: '100%', padding: '11px 0', background: email ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: email ? 'pointer' : 'not-allowed' }}>
                 {status === 'loading' ? 'Submitting...' : 'Request access'}
               </button>
             </>
@@ -111,7 +111,7 @@ export default function InvitePage() {
               <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>Paste the code from your invitation email.</div>
               <input type="text" placeholder="DSK-XXXXXXXX" value={code} onChange={e => setCode(e.target.value.toUpperCase())} style={{ ...inputStyle, textAlign: 'center', fontSize: 18, fontWeight: 600, letterSpacing: '0.1em' }} />
               <button onClick={handleRedeem} disabled={!code || status === 'loading'}
-                style={{ width: '100%', padding: '11px 0', background: code ? '#7c3aed' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: code ? 'pointer' : 'not-allowed' }}>
+                style={{ width: '100%', padding: '11px 0', background: code ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: code ? 'pointer' : 'not-allowed' }}>
                 {status === 'loading' ? 'Verifying...' : 'Unlock access'}
               </button>
             </>
@@ -122,7 +122,7 @@ export default function InvitePage() {
         <div style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: '#888' }}>
           <p>Free tier: 3 brief + 1 detailed scan/day (resets 00:00 GMT)</p>
           <p style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>Invite codes expire in 7 days · Access valid for 6 months</p>
-          <a href="/analyze" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 500, display: 'inline-block', marginTop: 6 }}>Continue with free tier →</a>
+          <a href="/analyze" style={{ color: '#0d9488', textDecoration: 'none', fontWeight: 500, display: 'inline-block', marginTop: 6 }}>Continue with free tier →</a>
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 12, padding: '10px 14px', background: '#f8f8f6', borderRadius: 8, fontSize: 11, color: '#888' }}>

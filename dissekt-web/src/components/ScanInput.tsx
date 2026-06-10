@@ -53,14 +53,14 @@ export default function ScanInput({ onScan, loading, initialContent }: Props) {
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: dragOver ? '#f3e8ff' : '#f5f5f4', borderRadius: 10, padding: '10px 12px', border: dragOver ? '2px dashed #7c3aed' : '1px solid #e5e5e5', transition: 'all 0.15s ease', minWidth: 0 }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: dragOver ? '#f0fdfa' : '#f5f5f4', borderRadius: 10, padding: '10px 12px', border: dragOver ? '2px dashed #0d9488' : '1px solid #e5e5e5', transition: 'all 0.15s ease', minWidth: 0 }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2" style={{ flexShrink: 0 }}><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input type="text" value={content} onChange={e => setContent(e.target.value)}
             placeholder={image ? "Add context..." : "Paste URL, text, or drop image..."}
             onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }} onPaste={handlePaste}
             style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#1a1a1a', minWidth: 0 }} />
-          {isUrl && !image && <span style={{ fontSize: 10, fontWeight: 600, color: '#7c3aed', background: '#f3e8ff', padding: '2px 8px', borderRadius: 20, whiteSpace: 'nowrap', flexShrink: 0 }}>URL</span>}
+          {isUrl && !image && <span style={{ fontSize: 10, fontWeight: 600, color: '#0d9488', background: '#f0fdfa', padding: '2px 8px', borderRadius: 20, whiteSpace: 'nowrap', flexShrink: 0 }}>URL</span>}
           <button onClick={() => fileRef.current?.click()} title="Upload image" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', color: '#888', flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           </button>
@@ -77,7 +77,7 @@ export default function ScanInput({ onScan, loading, initialContent }: Props) {
               <button key={m} onClick={() => setMode(m)} style={{ padding: '6px 10px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: mode === m ? '#fff' : 'transparent', color: mode === m ? '#1a1a1a' : '#888', boxShadow: mode === m ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{m}</button>
             ))}
           </div>
-          <button onClick={handleSubmit} disabled={!canSubmit} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 16px', background: canSubmit ? '#7c3aed' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: canSubmit ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap' }}>
+          <button onClick={handleSubmit} disabled={!canSubmit} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 16px', background: canSubmit ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: canSubmit ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap' }}>
             {loading ? (<><svg style={{ animation: 'spin 0.8s linear infinite' }} width="14" height="14" viewBox="0 0 24 24"><circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/><path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Scanning</>) : (<><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Scan</>)}
           </button>
         </div>
@@ -95,8 +95,8 @@ export default function ScanInput({ onScan, loading, initialContent }: Props) {
       )}
 
       {dragOver && (
-        <div style={{ marginTop: 8, padding: 16, border: '2px dashed #7c3aed', borderRadius: 10, background: '#faf5ff', textAlign: 'center' }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#7c3aed' }}>Drop image here</div>
+        <div style={{ marginTop: 8, padding: 16, border: '2px dashed #0d9488', borderRadius: 10, background: '#f0fdfa', textAlign: 'center' }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#0d9488' }}>Drop image here</div>
           <div style={{ fontSize: 11, color: '#888' }}>PNG, JPG, WEBP up to 10MB</div>
         </div>
       )}

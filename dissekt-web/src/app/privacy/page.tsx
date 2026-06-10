@@ -31,8 +31,8 @@ export default function PrivacyPage() {
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, marginTop: 20 }}>4. Third-party services</h2>
           <p>Dissekt uses the following third-party services to process your content:</p>
-          <p>• <strong>OpenAI API</strong> (GPT-4o mini) — for Brief Mode analysis and claim extraction. Your submitted text is sent to OpenAI for processing. See <a href="https://openai.com/privacy" style={{ color: '#7c3aed' }}>OpenAI Privacy Policy</a>.</p>
-          <p>• <strong>Anthropic API</strong> (Claude) — for Detailed Mode analysis. See <a href="https://www.anthropic.com/privacy" style={{ color: '#7c3aed' }}>Anthropic Privacy Policy</a>.</p>
+          <p>• <strong>OpenAI API</strong> (GPT-4o mini) — for Brief Mode analysis and claim extraction. Your submitted text is sent to OpenAI for processing. See <a href="https://openai.com/privacy" style={{ color: '#0d9488' }}>OpenAI Privacy Policy</a>.</p>
+          <p>• <strong>Anthropic API</strong> (Claude) — for Detailed Mode analysis. See <a href="https://www.anthropic.com/privacy" style={{ color: '#0d9488' }}>Anthropic Privacy Policy</a>.</p>
           <p>• <strong>Google Fact Check API</strong> — for finding existing fact-checks. Only the claim text is sent.</p>
           <p>• <strong>Supabase</strong> — for storing reports, feedback, and corrections. Data is hosted in EU (Frankfurt).</p>
           <p>• <strong>Qdrant Cloud</strong> — for the knowledge graph. Text embeddings (not raw text) are stored for similarity search.</p>
@@ -55,11 +55,11 @@ export default function PrivacyPage() {
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, marginTop: 20 }}>8. Contact</h2>
           <p>For privacy questions or data deletion requests:</p>
-          <p>Email: <a href="mailto:sambitmallick123@gmail.com" style={{ color: '#7c3aed' }}>sambitmallick123@gmail.com</a></p>
+          <p>Email: <a href="mailto:sambitmallick123@gmail.com" style={{ color: '#0d9488' }}>sambitmallick123@gmail.com</a></p>
           <p>Operator: Sambit Mallick, Munich, Germany</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, marginTop: 20 }}>9. Changes</h2>
-          <p>We may update this policy from time to time. The latest version will always be available at <a href="https://dissekt.info/privacy" style={{ color: '#7c3aed' }}>dissekt.info/privacy</a>.</p>
+          <p>We may update this policy from time to time. The latest version will always be available at <a href="https://dissekt.info/privacy" style={{ color: '#0d9488' }}>dissekt.info/privacy</a>.</p>
         </div>
       </div>
     <SiteFooter />

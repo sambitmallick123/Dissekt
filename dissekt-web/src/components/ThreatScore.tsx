@@ -85,17 +85,17 @@ export default function ThreatScore({ data }: { data: any }) {
           {confLabel === 'High' && <span style={{ fontSize: 10, color: '#aaa' }}>— strong signals detected</span>}
         </div>
         <button onClick={() => setShowFormula(!showFormula)}
-          style={{ fontSize: 10, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
+          style={{ fontSize: 10, color: '#0d9488', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
           {showFormula ? 'Hide' : 'How is this calculated?'}
         </button>
       </div>
 
       {showFormula && (
-        <div style={{ marginTop: 8, padding: '10px 12px', background: '#faf5ff', border: '1px solid #ede9fe', borderRadius: 8, fontSize: 11, lineHeight: 1.8 }}>
-          <div style={{ fontWeight: 600, marginBottom: 4, color: '#7c3aed' }}>Transparency = 100 − manipulation signals</div>
+        <div style={{ marginTop: 8, padding: '10px 12px', background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: 8, fontSize: 11, lineHeight: 1.8 }}>
+          <div style={{ fontWeight: 600, marginBottom: 4, color: '#0d9488' }}>Transparency = 100 − manipulation signals</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: '2px 10px', alignItems: 'center' }}>
             <span style={{ color: '#888' }}>Technique confidence</span>
-            <div style={{ height: 3, background: '#f0f0ee', borderRadius: 2 }}><div style={{ height: '100%', width: `${Math.min(techScore / 40 * 100, 100)}%`, background: '#7c3aed', borderRadius: 2 }} /></div>
+            <div style={{ height: 3, background: '#f0f0ee', borderRadius: 2 }}><div style={{ height: '100%', width: `${Math.min(techScore / 40 * 100, 100)}%`, background: '#0d9488', borderRadius: 2 }} /></div>
             <span style={{ fontWeight: 600 }}>−{techScore}</span>
             <span style={{ color: '#888' }}>Cross-reference matches</span>
             <div style={{ height: 3, background: '#f0f0ee', borderRadius: 2 }}><div style={{ height: '100%', width: `${Math.min(fcScore / 30 * 100, 100)}%`, background: '#2563eb', borderRadius: 2 }} /></div>

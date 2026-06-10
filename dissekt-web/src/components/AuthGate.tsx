@@ -38,7 +38,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     <div style={{ minHeight: '100vh', background: '#f5f5f4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 32, width: 380, maxWidth: '90vw' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, justifyContent: 'center' }}>
-          <div style={{ width: 32, height: 32, background: '#7c3aed', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 32, height: 32, background: '#0d9488', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <span style={{ fontWeight: 700, fontSize: 18 }}>Dissekt</span>
@@ -50,11 +50,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none', background: '#f8f8f6' }} />
         <input type="password" placeholder="Password (min 6 characters)" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()}
           style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none', background: '#f8f8f6' }} />
-        <button onClick={handleSubmit} style={{ width: '100%', padding: '10px 0', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 8 }}>
+        <button onClick={handleSubmit} style={{ width: '100%', padding: '10px 0', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 8 }}>
           {isSignUp ? 'Create account' : 'Sign in'}
         </button>
         <button onClick={() => { setIsSignUp(!isSignUp); setError(''); setSuccess(''); }}
-          style={{ fontSize: 13, color: '#7c3aed', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', width: '100%', marginTop: 8 }}>
+          style={{ fontSize: 13, color: '#0d9488', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center', width: '100%', marginTop: 8 }}>
           {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up free"}
         </button>
       </div>

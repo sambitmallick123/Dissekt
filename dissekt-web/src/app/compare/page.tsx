@@ -1,4 +1,6 @@
 'use client';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
 import ThreatScore from '@/components/ThreatScore';
 import PrismCard from '@/components/PrismCard';
@@ -30,18 +32,7 @@ export default function ComparePage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
-      <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
-            <div style={{ width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <span style={{ fontWeight: 600, fontSize: 15 }}>Dissekt</span>
-            <span style={{ fontSize: 13, color: '#888' }}>Compare</span>
-          </a>
-          <a href="/" style={{ fontSize: 13, color: '#7c3aed', textDecoration: 'none', fontWeight: 500 }}>← Back to Scan</a>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px' }}>
         <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>⚖️ Comparative Analysis</h1>
@@ -49,7 +40,7 @@ export default function ComparePage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#7c3aed', marginBottom: 6 }}>Source A</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 6 }}>Source A</div>
             <textarea placeholder="Paste URL or text..." value={contentA} onChange={e => setContentA(e.target.value)} rows={4} style={inputStyle} />
           </div>
           <div>
@@ -61,7 +52,7 @@ export default function ComparePage() {
         {error && <div style={{ marginBottom: 16, padding: 12, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>}
 
         <button onClick={handleCompare} disabled={loading || contentA.length < 10 || contentB.length < 10}
-          style={{ width: '100%', padding: '12px 0', background: (contentA.length >= 10 && contentB.length >= 10 && !loading) ? '#7c3aed' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', marginBottom: 20 }}>
+          style={{ width: '100%', padding: '12px 0', background: (contentA.length >= 10 && contentB.length >= 10 && !loading) ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', marginBottom: 20 }}>
           {loading ? '🔍 Comparing... (this takes 10-20 seconds)' : '⚖️ Compare both sources'}
         </button>
 
@@ -73,13 +64,13 @@ export default function ComparePage() {
               <p style={{ fontSize: 13, color: '#404040', lineHeight: 1.6 }}>{result.comparison?.summary}</p>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 12 }}>
-                <div style={{ padding: '8px 10px', background: '#f3e8ff', borderRadius: 8 }}>
-                  <div style={{ fontSize: 10, color: '#7c3aed', fontWeight: 600 }}>SHARED TECHNIQUES</div>
+                <div style={{ padding: '8px 10px', background: '#f0fdfa', borderRadius: 8 }}>
+                  <div style={{ fontSize: 10, color: '#0d9488', fontWeight: 600 }}>SHARED TECHNIQUES</div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{result.comparison?.shared_techniques?.length || 0}</div>
                   <div style={{ fontSize: 10, color: '#888' }}>{(result.comparison?.shared_techniques || []).map((t: string) => t.replace(/_/g, ' ')).join(', ') || 'none'}</div>
                 </div>
-                <div style={{ padding: '8px 10px', background: '#faf5ff', borderRadius: 8 }}>
-                  <div style={{ fontSize: 10, color: '#7c3aed', fontWeight: 600 }}>ONLY IN A</div>
+                <div style={{ padding: '8px 10px', background: '#f0fdfa', borderRadius: 8 }}>
+                  <div style={{ fontSize: 10, color: '#0d9488', fontWeight: 600 }}>ONLY IN A</div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{result.comparison?.only_a_techniques?.length || 0}</div>
                   <div style={{ fontSize: 10, color: '#888' }}>{(result.comparison?.only_a_techniques || []).map((t: string) => t.replace(/_/g, ' ')).join(', ') || 'none'}</div>
                 </div>
@@ -94,7 +85,7 @@ export default function ComparePage() {
             {/* Side by side results */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#7c3aed', marginBottom: 8, padding: '6px 12px', background: '#faf5ff', borderRadius: 8, textAlign: 'center' }}>Source A</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#0d9488', marginBottom: 8, padding: '6px 12px', background: '#f0fdfa', borderRadius: 8, textAlign: 'center' }}>Source A</div>
                 <ThreatScore data={result.result_a} />
                 <div style={{ marginTop: 12 }}><PrismCard prism={result.result_a?.prism} /></div>
                 <div style={{ marginTop: 12 }}><TraceCard trace={result.result_a?.trace} /></div>
@@ -109,6 +100,7 @@ export default function ComparePage() {
           </>
         )}
       </div>
+    <SiteFooter />
     </main>
   );
 }

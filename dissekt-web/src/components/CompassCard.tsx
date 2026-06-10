@@ -79,7 +79,7 @@ export default function CompassCard({ compass }: { compass: any }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: '#404040', marginBottom: 6 }}>📎 Factual Context</div>
           {compass.context.map((c: any, i: number) => (
             <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 8, padding: '6px 10px', border: '1px solid #e5e5e5', borderRadius: 6, marginBottom: 4 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#7c3aed', flexShrink: 0 }}>{c.politician}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#0d9488', flexShrink: 0 }}>{c.politician}</span>
               <span style={{ fontSize: 11, color: '#555', flex: 1 }}>{c.detail}</span>
               <a href={`https://www.google.com/search?q=${encodeURIComponent(c.detail)}`} target="_blank" rel="noopener" style={{ fontSize: 9, color: '#2563eb', textDecoration: 'none', flexShrink: 0 }}>verify ↗</a>
             </div>

@@ -6,17 +6,17 @@ export default function SimilarClaims({ claims }: { claims: any[] }) {
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18, marginTop: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <div style={{ width: 24, height: 24, borderRadius: 6, background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <div style={{ width: 24, height: 24, borderRadius: 6, background: '#f0fdfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </div>
         <span style={{ fontSize: 14, fontWeight: 600, color: '#404040' }}>Similar claims analyzed before</span>
         <span style={{ fontSize: 12, color: '#888' }}>{claims.length} found</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {claims.map((c, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 10, padding: '8px 12px', background: '#faf5ff', border: '1px solid #ede9fe', borderRadius: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#7c3aed' }}>{Math.round(c.similarity * 100)}%</span>
+          <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 10, padding: '8px 12px', background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: 8 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ccfbf1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#0d9488' }}>{Math.round(c.similarity * 100)}%</span>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, color: '#404040', lineHeight: 1.5 }}>{c.text_preview}</div>

@@ -75,7 +75,7 @@ function TechniqueVote({ analysisId, technique }: { analysisId: string; techniqu
             style={{ flex: 1, fontSize: 10, padding: '4px 8px', border: '1px solid #e5e5e5', borderRadius: 4, outline: 'none' }}
           />
           <button onClick={submitDisagree}
-            style={{ fontSize: 10, padding: '4px 10px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600 }}>
+            style={{ fontSize: 10, padding: '4px 10px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600 }}>
             Send
           </button>
         </div>
@@ -94,8 +94,8 @@ export default function PrismCard({ prism, analysisId }: { prism: any; analysisI
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 24, height: 24, borderRadius: 6, background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <div style={{ width: 24, height: 24, borderRadius: 6, background: '#f0fdfa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           </div>
           <span style={{ fontSize: 14, fontWeight: 600, color: '#404040' }}>Prism — techniques</span>
         </div>
@@ -136,7 +136,7 @@ export default function PrismCard({ prism, analysisId }: { prism: any; analysisI
       )}
 
       {brief && (
-        <div style={{ marginTop: 12, padding: '10px 12px', background: '#faf5ff', border: '1px solid #ede9fe', borderRadius: 8, fontSize: 12, color: '#404040', lineHeight: 1.6 }}>
+        <div style={{ marginTop: 12, padding: '10px 12px', background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: 8, fontSize: 12, color: '#404040', lineHeight: 1.6 }}>
           {brief}
         </div>
       )}

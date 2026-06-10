@@ -1,13 +1,15 @@
 'use client';
+import SiteFooter from './SiteFooter';
 
 export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { onSignIn: () => void; onTryFree: () => void; onShowFeedback?: () => void }) {
   return (
+    <>
     <div style={{ minHeight: '100vh', background: '#f5f5f4' }}>
       {/* Nav */}
       <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
         <div className="nav-inner" style={{ maxWidth: 1100, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, background: '#7c3aed', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 28, height: 28, background: '#0d9488', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <span style={{ fontWeight: 600, fontSize: 15 }}>Dissekt</span>
@@ -17,8 +19,8 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
             <a href="/docs" style={{ color: '#737373', textDecoration: 'none' }}>API</a>
             <a href="#how" style={{ color: '#737373', textDecoration: 'none' }}>How it works</a>
             {onShowFeedback && <button onClick={onShowFeedback} style={{ color: '#737373', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13 }}>Feedback</button>}
-            <button onClick={() => window.location.href="/invite"} style={{ padding: "5px 14px", background: "transparent", color: "#7c3aed", border: "1px solid #e5e5e5", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Get access</button>
-            <button onClick={onTryFree} style={{ padding: '5px 14px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Try free</button>
+            <button onClick={() => window.location.href="/invite"} style={{ padding: "5px 14px", background: "transparent", color: "#0d9488", border: "1px solid #e5e5e5", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Get access</button>
+            <button onClick={onTryFree} style={{ padding: '5px 14px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Try free</button>
           </div>
         </div>
       </nav>
@@ -37,13 +39,13 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
           ))}
         </div>
         <div className="hero-buttons" style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
-          <button onClick={onTryFree} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={onTryFree} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Inspect any content
           </button>
-          <button onClick={() => window.location.href = '/invite'} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#fff', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 10, fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>Sign in</button>
+          <button onClick={() => window.location.href = '/invite'} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: '#fff', color: '#0d9488', border: '1px solid #e5e5e5', borderRadius: 10, fontSize: 15, fontWeight: 500, cursor: 'pointer' }}>Sign in</button>
         </div>
-        <p style={{ fontSize: 12, color: '#aaa', marginTop: 10 }}>Free · 10 scans/day · No signup required</p>
+        <p style={{ fontSize: 12, color: '#aaa', marginTop: 10 }}>Free · 3 brief + 1 detailed/day · No signup required</p>
       </div>
 
       {/* Live demo */}
@@ -58,7 +60,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
           </div>
           <div className="demo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
             <div className="demo-panel" style={{ padding: 14, borderRight: '1px solid #e5e5e5' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#7c3aed', marginBottom: 8 }}>👁 Prism — Techniques</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 8 }}>👁 Prism — Techniques</div>
               <div style={{ border: '1px solid #e5e5e5', borderRadius: 8, padding: 8, marginBottom: 6 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 3 }}><span style={{ fontWeight: 600 }}>Loaded language</span><span style={{ fontWeight: 700, color: '#dc2626' }}>90%</span></div>
                 <div style={{ height: 3, background: '#f0f0ee', borderRadius: 2 }}><div style={{ height: '100%', width: '90%', background: '#dc2626', borderRadius: 2 }}></div></div>
@@ -88,7 +90,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
           </div>
         </div>
         <div style={{ textAlign: 'center', marginTop: 14 }}>
-          <button onClick={onTryFree} style={{ padding: '10px 20px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Try it yourself →</button>
+          <button onClick={onTryFree} style={{ padding: '10px 20px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Try it yourself →</button>
         </div>
       </div>
 
@@ -104,7 +106,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
             { n: '4', t: 'Signal scores', d: 'Rates source bias, factuality, toxicity, and sentiment — all running locally, zero external data.' },
           ].map(s => (
             <div key={s.n} style={{ display: 'flex', alignItems: 'start', gap: 14, marginBottom: 16 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 16, background: '#f3e8ff', color: '#7c3aed', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{s.n}</div>
+              <div style={{ width: 32, height: 32, borderRadius: 16, background: '#f0fdfa', color: '#0d9488', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{s.n}</div>
               <div><div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>{s.t}</div><div style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>{s.d}</div></div>
             </div>
           ))}
@@ -136,7 +138,7 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
       <div className="section" style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 20px' }}>
         <div className="stats-grid landing-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           {[
-            { num: '20', label: 'Manipulation techniques', color: '#7c3aed' },
+            { num: '20', label: 'Manipulation techniques', color: '#0d9488' },
             { num: '100+', label: 'Fact-checker organizations', color: '#2563eb' },
             { num: '231', label: 'Rated news sources', color: '#d97706' },
             { num: '~3s', label: 'Average scan time', color: '#059669' },
@@ -209,16 +211,16 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
           </div>
         </div>
         <div style={{ textAlign: 'center', marginTop: 16 }}>
-          <a href="/docs" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#fff', color: '#7c3aed', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>View API documentation →</a>
+          <a href="/docs" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#fff', color: '#0d9488', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>View API documentation →</a>
         </div>
       </div>
 
       {/* CTA */}
       <div style={{ padding: '0 20px' }}>
-        <div className="cta-section" style={{ background: '#7c3aed', borderRadius: 14, padding: '36px 20px', textAlign: 'center', margin: '36px auto', maxWidth: 800 }}>
+        <div className="cta-section" style={{ background: '#0d9488', borderRadius: 14, padding: '36px 20px', textAlign: 'center', margin: '36px auto', maxWidth: 800 }}>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 6 }}>Information transparency for everyone.</div>
-          <div style={{ fontSize: 13, color: '#d4bfff', marginBottom: 16 }}>Free · No signup · 10 scans per day</div>
-          <button onClick={onTryFree} style={{ padding: '12px 24px', background: '#fff', color: '#7c3aed', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>Inspect any content →</button>
+          <div style={{ fontSize: 13, color: '#d4bfff', marginBottom: 16 }}>Free · No signup · 3 brief + 1 detailed scan per day</div>
+          <button onClick={onTryFree} style={{ padding: '12px 24px', background: '#fff', color: '#0d9488', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>Inspect any content →</button>
         </div>
       </div>
 
@@ -226,10 +228,12 @@ export default function LandingPage({ onSignIn, onTryFree, onShowFeedback }: { o
       <div style={{ borderTop: '1px solid #e5e5e5', padding: '16px 20px', textAlign: 'center', fontSize: 12, color: '#aaa' }}>
         <span style={{ fontWeight: 600, color: '#555' }}>Dissekt</span>
         <span style={{ margin: '0 6px' }}>·</span>Information transparency and argument inspection
-        <span style={{ margin: '0 6px' }}>·</span><a href="mailto:sambitmallick123@gmail.com" style={{ color: '#7c3aed', textDecoration: 'none' }}>sambitmallick123@gmail.com</a>
+        <span style={{ margin: '0 6px' }}>·</span><a href="mailto:sambitmallick123@gmail.com" style={{ color: '#0d9488', textDecoration: 'none' }}>sambitmallick123@gmail.com</a>
         <span style={{ margin: '0 6px' }}>·</span>Munich, Germany · 2026
-        <span style={{ margin: "0 6px" }}>·</span><a href="/privacy" style={{ color: "#7c3aed", textDecoration: "none" }}>Privacy Policy</a>
+        <span style={{ margin: "0 6px" }}>·</span><a href="/privacy" style={{ color: "#0d9488", textDecoration: "none" }}>Privacy Policy</a>
       </div>
     </div>
+    <SiteFooter />
+    </>
   );
 }

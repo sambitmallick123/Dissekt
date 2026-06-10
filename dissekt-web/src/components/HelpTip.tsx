@@ -12,7 +12,7 @@ export default function HelpTip({ text }: { text: string }) {
         onClick={() => setShow(!show)}
         style={{
           width: 16, height: 16, borderRadius: 8, border: '1px solid #d4d4d4',
-          background: show ? '#7c3aed' : '#f0f0ee', color: show ? '#fff' : '#888',
+          background: show ? '#0d9488' : '#f0f0ee', color: show ? '#fff' : '#888',
           fontSize: 10, fontWeight: 600, cursor: 'pointer', display: 'flex',
           alignItems: 'center', justifyContent: 'center', padding: 0, lineHeight: 1,
         }}

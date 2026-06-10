@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 import ScanInput from '@/components/ScanInput';
 import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
@@ -86,7 +87,7 @@ export default function ScanApp() {
   if (!mounted) return null;
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
+    <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
       <SiteHeader active="Analyze" />
 
       {shareToast && (
@@ -99,17 +100,17 @@ export default function ScanApp() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 6 }}>
               <button onClick={() => setScanTab('single')}
-                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
                 Single scan
               </button>
               <button onClick={() => getTier() === 'invited' ? setScanTab('bulk') : (window.location.href = '/invite')}
-                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#7c3aed' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
                 📊 Bulk CSV {getTier() !== 'invited' && '🔒'}
               </button>
               <a href="/compare" style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: '#f0f0ee', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>⚖️ Compare</a>
             </div>
             <div style={{ fontSize: 11, color: '#888', textAlign: 'right' }}>
-              <span style={{ fontWeight: 600, color: remaining.tier === 'invited' ? '#7c3aed' : '#888' }}>
+              <span style={{ fontWeight: 600, color: remaining.tier === 'invited' ? '#0d9488' : '#888' }}>
                 {remaining.tier === 'invited' ? '🎫 Invited' : '🆓 Free'}
               </span>
               {' · '}{remaining.brief} brief, {remaining.detailed} detailed left
@@ -139,6 +140,7 @@ export default function ScanApp() {
           </>
         )}
       </div>
+    <SiteFooter />
     </main>
   );
 }

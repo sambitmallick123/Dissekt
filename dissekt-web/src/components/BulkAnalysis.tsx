@@ -107,7 +107,7 @@ export default function BulkAnalysis() {
           {items.length > 0 && items.some(i => i.result) && (
             <button onClick={downloadCSV} style={{ fontSize: 12, padding: '6px 12px', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 6, cursor: 'pointer', color: '#404040', fontWeight: 500 }}>Download CSV</button>
           )}
-          <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12, padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
+          <button onClick={() => fileRef.current?.click()} style={{ fontSize: 12, padding: '6px 12px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
             Upload CSV
           </button>
           <input ref={fileRef} type="file" accept=".csv,.txt" style={{ display: 'none' }} onChange={handleFile} />
@@ -124,14 +124,14 @@ export default function BulkAnalysis() {
                 <span>{Math.round(progress / items.length * 100)}%</span>
               </div>
               <div style={{ height: 4, background: '#f0f0ee', borderRadius: 2 }}>
-                <div style={{ height: '100%', width: `${(progress / items.length) * 100}%`, background: '#7c3aed', borderRadius: 2, transition: 'width 0.3s' }} />
+                <div style={{ height: '100%', width: `${(progress / items.length) * 100}%`, background: '#0d9488', borderRadius: 2, transition: 'width 0.3s' }} />
               </div>
             </div>
           )}
 
           {/* Start button */}
           {!running && items.every(i => i.status === 'pending') && (
-            <button onClick={runBulk} style={{ width: '100%', padding: '10px 0', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 12 }}>
+            <button onClick={runBulk} style={{ width: '100%', padding: '10px 0', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 12 }}>
               Analyze {items.length} items
             </button>
           )}
@@ -161,7 +161,7 @@ export default function BulkAnalysis() {
                       <td style={{ padding: '6px 8px', textAlign: 'center' }}>{item.result ? item.result.trace?.fact_checks?.length || 0 : '—'}</td>
                       <td style={{ padding: '6px 8px', textAlign: 'center' }}>
                         {item.status === 'pending' && <span style={{ color: '#aaa' }}>⏳</span>}
-                        {item.status === 'analyzing' && <span style={{ color: '#7c3aed' }}>🔍</span>}
+                        {item.status === 'analyzing' && <span style={{ color: '#0d9488' }}>🔍</span>}
                         {item.status === 'done' && <span style={{ color: '#16a34a' }}>✅</span>}
                         {item.status === 'error' && <span title={item.error} style={{ color: '#dc2626' }}>❌</span>}
                       </td>

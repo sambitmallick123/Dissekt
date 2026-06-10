@@ -63,7 +63,7 @@ export function DecisionButtons({ analysisId, inputPreview }: { analysisId: stri
         <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
           <input type="text" value={note} onChange={e => setNote(e.target.value)} placeholder="Why are you unsure? (optional)"
             style={{ flex: 1, padding: '6px 10px', border: '1px solid #e5e5e5', borderRadius: 6, fontSize: 11, outline: 'none' }} />
-          <button onClick={saveWithNote} style={{ padding: '6px 12px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Save</button>
+          <button onClick={saveWithNote} style={{ padding: '6px 12px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>Save</button>
         </div>
       )}
     </div>
@@ -100,7 +100,7 @@ export default function DecisionJournalView() {
           <span style={{ fontSize: 12, color: '#888' }}>Your past verdicts</span>
         </div>
         {!loaded && (
-          <button onClick={loadJournal} style={{ fontSize: 11, padding: '4px 12px', background: '#f3e8ff', color: '#7c3aed', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
+          <button onClick={loadJournal} style={{ fontSize: 11, padding: '4px 12px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>
             {loading ? 'Loading...' : 'Load journal'}
           </button>
         )}

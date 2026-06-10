@@ -61,12 +61,12 @@ export default function EmbedPage({ params }: { params: Promise<{ id: string }> 
       {/* Footer */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid #e5e5e5' }}>
         <a href={`https://dissekt.info/report/${id}`} target="_blank" rel="noopener"
-          style={{ fontSize: 11, color: '#7c3aed', textDecoration: 'none', fontWeight: 600 }}>
+          style={{ fontSize: 11, color: '#0d9488', textDecoration: 'none', fontWeight: 600 }}>
           Full analysis →
         </a>
         <a href="https://dissekt.info" target="_blank" rel="noopener"
           style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#888', textDecoration: 'none' }}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Powered by Dissekt
         </a>
       </div>

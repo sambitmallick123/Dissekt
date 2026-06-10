@@ -40,7 +40,7 @@ export default function TermsPage() {
           <p>We may modify these terms or the service at any time. Continued use after changes constitutes acceptance.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>9. Contact</h2>
-          <p>Questions: <a href="mailto:sambitmallick123@gmail.com" style={{ color: '#7c3aed' }}>sambitmallick123@gmail.com</a> · Operator: Sambit Mallick, Munich, Germany</p>
+          <p>Questions: <a href="mailto:sambitmallick123@gmail.com" style={{ color: '#0d9488' }}>sambitmallick123@gmail.com</a> · Operator: Sambit Mallick, Munich, Germany</p>
         </div>
       </div>
       <SiteFooter />

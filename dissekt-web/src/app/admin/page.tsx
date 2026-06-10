@@ -57,7 +57,7 @@ export default function AdminPage() {
           <input type="password" placeholder="Admin key" value={key} onChange={e => setKey(e.target.value)}
             style={{ width: '100%', padding: '10px 14px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, marginBottom: 10, outline: 'none', boxSizing: 'border-box' }} />
           <button onClick={() => fetchInvitations('pending')}
-            style={{ width: '100%', padding: '10px 0', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+            style={{ width: '100%', padding: '10px 0', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
             Enter
           </button>
         </div>
@@ -72,7 +72,7 @@ export default function AdminPage() {
           <span style={{ fontWeight: 600 }}>🔐 Dissekt Admin</span>
           <span style={{ fontSize: 12, color: '#888' }}>{invitations.length} invitations</span>
         </div>
-        <a href="/" style={{ fontSize: 13, color: '#7c3aed', textDecoration: 'none' }}>← Back</a>
+        <a href="/" style={{ fontSize: 13, color: '#0d9488', textDecoration: 'none' }}>← Back</a>
       </nav>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 24px' }}>
@@ -85,7 +85,7 @@ export default function AdminPage() {
             <input type="text" placeholder="Name" value={genName} onChange={e => setGenName(e.target.value)}
               style={{ flex: 1, padding: '8px 12px', border: '1px solid #e5e5e5', borderRadius: 6, fontSize: 13, outline: 'none' }} />
             <button onClick={handleGenerate}
-              style={{ padding: '8px 16px', background: '#7c3aed', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ padding: '8px 16px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
               Generate
             </button>
           </div>
@@ -100,7 +100,7 @@ export default function AdminPage() {
         <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
           {['pending', 'approved', 'rejected', 'all'].map(s => (
             <button key={s} onClick={() => setFilter(s)}
-              style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: filter === s ? '#7c3aed' : '#fff', color: filter === s ? '#fff' : '#555', boxShadow: filter === s ? 'none' : '0 0 0 1px #e5e5e5' }}>
+              style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: filter === s ? '#0d9488' : '#fff', color: filter === s ? '#fff' : '#555', boxShadow: filter === s ? 'none' : '0 0 0 1px #e5e5e5' }}>
               {s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
