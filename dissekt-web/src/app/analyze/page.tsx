@@ -11,6 +11,7 @@ import ReaderMemory from '@/components/ReaderMemory';
 import DecisionJournalView from '@/components/DecisionJournal';
 import RadarFeed from '@/components/RadarFeed';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
+import { fetchConfig, isFeatureEnabled } from '@/lib/config';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -24,9 +25,11 @@ export default function ScanApp() {
   const [resetIn, setResetIn] = useState('');
   const [shareToast, setShareToast] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [platformConfig, setPlatformConfig] = useState<Record<string, any>>({});
 
   useEffect(() => {
     setMounted(true);
+    fetchConfig().then(setPlatformConfig);
     setRemaining(getRemaining());
     setResetIn(getResetTime());
     const t = setInterval(() => setResetIn(getResetTime()), 60000);
@@ -104,7 +107,7 @@ export default function ScanApp() {
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
                 Single scan
               </button>
-              <button onClick={() => getTier() === 'invited' ? setScanTab('bulk') : (window.location.href = '/invite')}
+              <button onClick={() => isFeatureEnabled(platformConfig, 'bulk') ? setScanTab('bulk') : (window.location.href = '/invite')}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
                 📊 Bulk CSV {getTier() !== 'invited' && '🔒'}
               </button>

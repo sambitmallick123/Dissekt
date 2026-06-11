@@ -361,8 +361,8 @@ function SettingsTab({ adminKey }: { adminKey: string }) {
     }
     setConfig(JSON.parse(JSON.stringify(draft)));
     setDirty(false);
-    setSaveMsg('✅ Changes applied across the platform');
-    setTimeout(() => setSaveMsg(''), 3000);
+    setSaveMsg('✅ Changes applied — live on all pages now');
+    setTimeout(() => setSaveMsg(''), 4000);
   };
 
   const resetDraft = () => {
@@ -375,10 +375,27 @@ function SettingsTab({ adminKey }: { adminKey: string }) {
 
   const freeLimits = draft.free_limits || { brief: 3, detailed: 1 };
   const invitedLimits = draft.invited_limits || { brief: 25, detailed: 10 };
-  const featuresFree: string[] = draft.features_free || ['single_scan', 'radar', 'help', 'feedback'];
-  const featuresInvited: string[] = draft.features_invited || ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'help', 'feedback'];
-  const allFeatures = ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'memory', 'journal', 'compass', 'pulse', 'counterfactual', 'claims', 'help', 'feedback'];
-  const labels: Record<string, string> = { single_scan: 'Single scan', bulk: 'Bulk CSV', compare: 'Compare', topics: 'Topics', radar: 'Radar', detailed_mode: 'Detailed mode', memory: 'Reader memory', journal: 'Decision journal', compass: 'Compass', pulse: 'Pulse', counterfactual: 'Counterfactual', claims: 'Claims', help: 'Help', feedback: 'Feedback' };
+  const featuresFree: string[] = draft.features_free || ['single_scan', 'radar'];
+  const featuresInvited: string[] = draft.features_invited || ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'image_upload', 'camera_upload'];
+
+  // Components that can be toggled (help/feedback are always on, not listed here)
+  const toggleableFeatures = [
+    { key: 'single_scan', label: 'Single scan' },
+    { key: 'bulk', label: 'Bulk CSV analysis' },
+    { key: 'compare', label: 'Compare sources' },
+    { key: 'topics', label: 'Topic tracking' },
+    { key: 'radar', label: 'Radar feeds' },
+    { key: 'detailed_mode', label: 'Detailed mode' },
+    { key: 'image_upload', label: 'Image upload' },
+    { key: 'camera_upload', label: 'Camera upload' },
+    { key: 'memory', label: 'Reader memory' },
+    { key: 'journal', label: 'Decision journal' },
+    { key: 'compass', label: 'Compass (political)' },
+    { key: 'pulse', label: 'Pulse (coordination)' },
+    { key: 'counterfactual', label: 'Counterfactual view' },
+    { key: 'claims', label: 'Claim extraction' },
+  ];
+
   const inp: React.CSSProperties = { padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none', width: 80, textAlign: 'center' as const };
 
   return (
@@ -423,15 +440,16 @@ function SettingsTab({ adminKey }: { adminKey: string }) {
 
       {/* Feature toggles */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>🔒 Feature access by tier</div>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>🔒 Component access by tier</div>
+        <div style={{ fontSize: 11, color: '#888', marginBottom: 12 }}>Help and Feedback are always available to all users.</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6 }}>🆓 Free</div>
-            {allFeatures.map(f => (<label key={f} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresFree.includes(f)} onChange={e => { const u = e.target.checked ? [...featuresFree, f] : featuresFree.filter(x => x !== f); updateDraft('features_free', u); }} />{labels[f] || f}</label>))}
+            {toggleableFeatures.map(f => (<label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresFree.includes(f.key)} onChange={e => { const u = e.target.checked ? [...featuresFree, f.key] : featuresFree.filter(x => x !== f.key); updateDraft('features_free', u); }} />{f.label}</label>))}
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 6 }}>🎫 Invited</div>
-            {allFeatures.map(f => (<label key={f} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresInvited.includes(f)} onChange={e => { const u = e.target.checked ? [...featuresInvited, f] : featuresInvited.filter(x => x !== f); updateDraft('features_invited', u); }} />{labels[f] || f}</label>))}
+            {toggleableFeatures.map(f => (<label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresInvited.includes(f.key)} onChange={e => { const u = e.target.checked ? [...featuresInvited, f.key] : featuresInvited.filter(x => x !== f.key); updateDraft('features_invited', u); }} />{f.label}</label>))}
           </div>
         </div>
       </div>
