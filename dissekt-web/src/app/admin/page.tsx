@@ -329,57 +329,65 @@ function DecisionsTab({ adminKey }: { adminKey: string }) {
 }
 
 function SettingsTab({ adminKey }: { adminKey: string }) {
-  const [config, setConfig] = useState<Record<string, any>>({});
-  const [draft, setDraft] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [dirty, setDirty] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
+  const [freeBrief, setFreeBrief] = useState(3);
+  const [freeDetailed, setFreeDetailed] = useState(1);
+  const [invBrief, setInvBrief] = useState(25);
+  const [invDetailed, setInvDetailed] = useState(10);
+  const [codeDays, setCodeDays] = useState(7);
+  const [accessMonths, setAccessMonths] = useState(6);
+  const [featuresFree, setFeaturesFree] = useState<string[]>(['single_scan', 'radar']);
+  const [featuresInv, setFeaturesInv] = useState<string[]>(['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'image_upload', 'camera_upload']);
 
   useEffect(() => {
     fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'get_config' }) })
-      .then(r => r.json()).then(d => { 
+      .then(r => r.json()).then(d => {
         const c = d.config || {};
-        setConfig(c); 
-        setDraft(JSON.parse(JSON.stringify(c)));
-        setLoading(false); 
-      });
+        if (c.free_limits) { setFreeBrief(c.free_limits.brief ?? 3); setFreeDetailed(c.free_limits.detailed ?? 1); }
+        if (c.invited_limits) { setInvBrief(c.invited_limits.brief ?? 25); setInvDetailed(c.invited_limits.detailed ?? 10); }
+        if (c.invite_code_days) setCodeDays(c.invite_code_days);
+        if (c.access_months) setAccessMonths(c.access_months);
+        if (c.features_free) setFeaturesFree(c.features_free);
+        if (c.features_invited) setFeaturesInv(c.features_invited);
+        setLoading(false);
+      }).catch(() => setLoading(false));
   }, [adminKey]);
 
-  const updateDraft = (key: string, value: any) => {
-    setDraft(prev => ({ ...prev, [key]: value }));
-    setDirty(true);
-    setSaveMsg('');
+  const markDirty = () => { setDirty(true); setSaveMsg(''); };
+
+  const toggleFree = (key: string) => {
+    setFeaturesFree(prev => prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key]);
+    markDirty();
+  };
+
+  const toggleInv = (key: string) => {
+    setFeaturesInv(prev => prev.includes(key) ? prev.filter(x => x !== key) : [...prev, key]);
+    markDirty();
   };
 
   const applyChanges = async () => {
     setSaveMsg('Saving...');
-    const keys = Object.keys(draft);
-    for (const key of keys) {
-      if (JSON.stringify(draft[key]) !== JSON.stringify(config[key])) {
-        await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'update_config', key, value: draft[key] }) });
-      }
+    const updates: [string, any][] = [
+      ['free_limits', { brief: freeBrief, detailed: freeDetailed }],
+      ['invited_limits', { brief: invBrief, detailed: invDetailed }],
+      ['invite_code_days', codeDays],
+      ['access_months', accessMonths],
+      ['features_free', featuresFree],
+      ['features_invited', featuresInv],
+    ];
+    for (const [key, value] of updates) {
+      await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'update_config', key, value }) });
     }
-    setConfig(JSON.parse(JSON.stringify(draft)));
     setDirty(false);
     setSaveMsg('✅ Changes applied — live on all pages now');
     setTimeout(() => setSaveMsg(''), 4000);
   };
 
-  const resetDraft = () => {
-    setDraft(JSON.parse(JSON.stringify(config)));
-    setDirty(false);
-    setSaveMsg('');
-  };
-
   if (loading) return <div style={{ color: '#888', fontSize: 13 }}>Loading...</div>;
 
-  const freeLimits = draft.free_limits || { brief: 3, detailed: 1 };
-  const invitedLimits = draft.invited_limits || { brief: 25, detailed: 10 };
-  const featuresFree: string[] = draft.features_free || ['single_scan', 'radar'];
-  const featuresInvited: string[] = draft.features_invited || ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'image_upload', 'camera_upload'];
-
-  // Components that can be toggled (help/feedback are always on, not listed here)
-  const toggleableFeatures = [
+  const toggleable = [
     { key: 'single_scan', label: 'Single scan' },
     { key: 'bulk', label: 'Bulk CSV analysis' },
     { key: 'compare', label: 'Compare sources' },
@@ -400,56 +408,62 @@ function SettingsTab({ adminKey }: { adminKey: string }) {
 
   return (
     <div>
-      {/* Apply bar */}
       {dirty && (
         <div style={{ position: 'sticky', top: 48, zIndex: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: '#0d9488', borderRadius: 8, marginBottom: 12 }}>
           <span style={{ fontSize: 13, color: '#fff', fontWeight: 500 }}>You have unsaved changes</span>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={resetDraft} style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Discard</button>
+            <button onClick={() => { setDirty(false); setSaveMsg(''); }} style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Discard</button>
             <button onClick={applyChanges} style={{ padding: '6px 14px', background: '#fff', color: '#0d9488', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Apply changes</button>
           </div>
         </div>
       )}
       {saveMsg && !dirty && <div style={{ padding: 10, background: '#f0fdfa', borderRadius: 8, fontSize: 13, color: '#0d9488', marginBottom: 12 }}>{saveMsg}</div>}
 
-      {/* Scan limits */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>📊 Scan limits (per day, resets 00:00 GMT)</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 8 }}>🆓 Free tier</div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><span style={{ fontSize: 12, width: 70 }}>Brief:</span><input type="number" value={freeLimits.brief} onChange={e => updateDraft('free_limits', { ...freeLimits, brief: parseInt(e.target.value) || 0 })} style={inp} /></div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ fontSize: 12, width: 70 }}>Detailed:</span><input type="number" value={freeLimits.detailed} onChange={e => updateDraft('free_limits', { ...freeLimits, detailed: parseInt(e.target.value) || 0 })} style={inp} /></div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><span style={{ fontSize: 12, width: 70 }}>Brief:</span><input type="number" value={freeBrief} onChange={e => { setFreeBrief(parseInt(e.target.value) || 0); markDirty(); }} style={inp} /></div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ fontSize: 12, width: 70 }}>Detailed:</span><input type="number" value={freeDetailed} onChange={e => { setFreeDetailed(parseInt(e.target.value) || 0); markDirty(); }} style={inp} /></div>
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 8 }}>🎫 Invited tier</div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><span style={{ fontSize: 12, width: 70 }}>Brief:</span><input type="number" value={invitedLimits.brief} onChange={e => updateDraft('invited_limits', { ...invitedLimits, brief: parseInt(e.target.value) || 0 })} style={inp} /></div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ fontSize: 12, width: 70 }}>Detailed:</span><input type="number" value={invitedLimits.detailed} onChange={e => updateDraft('invited_limits', { ...invitedLimits, detailed: parseInt(e.target.value) || 0 })} style={inp} /></div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><span style={{ fontSize: 12, width: 70 }}>Brief:</span><input type="number" value={invBrief} onChange={e => { setInvBrief(parseInt(e.target.value) || 0); markDirty(); }} style={inp} /></div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ fontSize: 12, width: 70 }}>Detailed:</span><input type="number" value={invDetailed} onChange={e => { setInvDetailed(parseInt(e.target.value) || 0); markDirty(); }} style={inp} /></div>
           </div>
         </div>
       </div>
 
-      {/* Expiry */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>⏰ Access expiry</div>
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 12 }}>Code expires:</span><input type="number" value={draft.invite_code_days || 7} onChange={e => updateDraft('invite_code_days', parseInt(e.target.value) || 7)} style={inp} /><span style={{ fontSize: 12, color: '#888' }}>days</span></div>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 12 }}>Access valid:</span><input type="number" value={draft.access_months || 6} onChange={e => updateDraft('access_months', parseInt(e.target.value) || 6)} style={inp} /><span style={{ fontSize: 12, color: '#888' }}>months</span></div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 12 }}>Code expires:</span><input type="number" value={codeDays} onChange={e => { setCodeDays(parseInt(e.target.value) || 7); markDirty(); }} style={inp} /><span style={{ fontSize: 12, color: '#888' }}>days</span></div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 12 }}>Access valid:</span><input type="number" value={accessMonths} onChange={e => { setAccessMonths(parseInt(e.target.value) || 6); markDirty(); }} style={inp} /><span style={{ fontSize: 12, color: '#888' }}>months</span></div>
         </div>
       </div>
 
-      {/* Feature toggles */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16 }}>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>🔒 Component access by tier</div>
         <div style={{ fontSize: 11, color: '#888', marginBottom: 12 }}>Help and Feedback are always available to all users.</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6 }}>🆓 Free</div>
-            {toggleableFeatures.map(f => (<label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresFree.includes(f.key)} onChange={e => { const u = e.target.checked ? [...featuresFree, f.key] : featuresFree.filter(x => x !== f.key); updateDraft('features_free', u); }} />{f.label}</label>))}
+            {toggleable.map(f => (
+              <label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
+                <input type="checkbox" checked={featuresFree.includes(f.key)} onChange={() => toggleFree(f.key)} />
+                {f.label}
+              </label>
+            ))}
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 6 }}>🎫 Invited</div>
-            {toggleableFeatures.map(f => (<label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresInvited.includes(f.key)} onChange={e => { const u = e.target.checked ? [...featuresInvited, f.key] : featuresInvited.filter(x => x !== f.key); updateDraft('features_invited', u); }} />{f.label}</label>))}
+            {toggleable.map(f => (
+              <label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
+                <input type="checkbox" checked={featuresInv.includes(f.key)} onChange={() => toggleInv(f.key)} />
+                {f.label}
+              </label>
+            ))}
           </div>
         </div>
       </div>

@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Dissekt — Threat Intelligence for Content',
-  description: 'Detect manipulation. Trace claims. Export evidence.',
+  title: 'Dissekt — See how information is constructed',
+  description: 'Information transparency tool. Inspect how articles frame claims, what evidence supports them, and what context is missing.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
