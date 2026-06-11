@@ -9,6 +9,7 @@ import ExtractedClaims from './ExtractedClaims';
 import CounterfactualCard from './CounterfactualCard';
 import ReadingMode from './ReadingMode';
 import Annotations from './Annotations';
+import TrustNetwork from './TrustNetwork';
 import PrePublishCheck from './PrePublishCheck';
 import { DecisionButtons } from './DecisionJournal';
 import CompassCard from './CompassCard';
@@ -72,6 +73,9 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
       {data.pulse?.detected && (
         <div className="anim-fade anim-d4"><PulseCard pulse={data.pulse} /></div>
       )}
+      {/* Trust network */}
+      <TrustNetwork reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
+
       {/* Community notes */}
       <Annotations reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
     </div>

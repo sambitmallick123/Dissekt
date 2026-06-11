@@ -547,6 +547,179 @@ async def add_annotation(body: dict):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+
+
+@app.get("/api/fingerprint")
+async def technique_fingerprint(source: str = ""):
+    """Analyze technique patterns for a specific source/outlet across all past analyses."""
+    settings = get_settings()
+    
+    if len(source) < 2:
+        return {"error": "Provide a source name (e.g., 'bbc', 'ndtv', 'fox')"}
+    
+    try:
+        from app.claim_graph import find_similar
+        results = await find_similar(source, limit=50)
+        
+        technique_counts: dict = {}
+        total_analyses = len(results)
+        confidence_sums: dict = {}
+        
+        for r in results:
+            for t in r.get("techniques", []):
+                technique_counts[t] = technique_counts.get(t, 0) + 1
+                confidence_sums[t] = confidence_sums.get(t, 0) + 0.7  # approx avg
+        
+        # Calculate rates (how often each technique appears per analysis)
+        technique_rates = {}
+        for tech, count in technique_counts.items():
+            technique_rates[tech] = {
+                "count": count,
+                "rate": round(count / max(total_analyses, 1), 2),
+                "avg_confidence": round(confidence_sums.get(tech, 0) / max(count, 1), 2),
+            }
+        
+        sorted_techs = sorted(technique_rates.items(), key=lambda x: -x[1]["count"])
+        
+        # Build fingerprint summary
+        top3 = [t[0].replace("_", " ") for t in sorted_techs[:3]]
+        
+        return {
+            "source": source,
+            "total_analyses": total_analyses,
+            "techniques": dict(sorted_techs),
+            "fingerprint_summary": f"{source} most frequently uses: {', '.join(top3)}." if top3 else "Not enough data.",
+            "unique_techniques": len(technique_counts),
+        }
+    except Exception as e:
+        logger.warning(f"Fingerprint failed: {e}")
+        return {"source": source, "total_analyses": 0, "techniques": {}, "error": str(e)}
+
+
+@app.get("/api/fingerprint/compare")
+async def compare_fingerprints(sources: str = ""):
+    """Compare technique fingerprints across multiple sources. Pass comma-separated source names."""
+    source_list = [s.strip() for s in sources.split(",") if s.strip()]
+    if len(source_list) < 2:
+        return {"error": "Provide 2+ sources comma-separated (e.g., 'bbc,fox,ndtv')"}
+    
+    results = {}
+    for src in source_list[:5]:
+        from starlette.testclient import TestClient
+        fp = await technique_fingerprint(src)
+        results[src] = fp
+    
+    return {"sources": results, "count": len(results)}
+
+
+
+@app.get("/api/claim-lifecycle")
+async def claim_lifecycle(claim: str = ""):
+    """Track a claim's lifecycle: first appearance, spread, fact-checks, evolution."""
+    if len(claim) < 10:
+        return {"error": "Provide a claim (min 10 chars)"}
+    
+    try:
+        from app.claim_graph import find_similar
+        matches = await find_similar(claim, limit=30)
+        
+        # Sort by timestamp
+        timeline = []
+        for m in matches:
+            ts = m.get("timestamp", "")
+            try:
+                ts_val = float(ts) if ts else 0
+            except:
+                ts_val = 0
+            timeline.append({
+                "text_preview": m.get("text_preview", ""),
+                "similarity": m.get("similarity", 0),
+                "techniques": m.get("techniques", []),
+                "timestamp": ts_val,
+                "date": "",
+            })
+        
+        timeline.sort(key=lambda x: x["timestamp"])
+        
+        # Add formatted dates
+        from datetime import datetime
+        for item in timeline:
+            if item["timestamp"] > 0:
+                item["date"] = datetime.fromtimestamp(item["timestamp"]).strftime("%Y-%m-%d %H:%M")
+        
+        # Calculate lifecycle stats
+        if len(timeline) >= 2 and timeline[0]["timestamp"] > 0:
+            first_seen = timeline[0]["date"]
+            last_seen = timeline[-1]["date"]
+            spread_days = round((timeline[-1]["timestamp"] - timeline[0]["timestamp"]) / 86400, 1)
+        else:
+            first_seen = "Unknown"
+            last_seen = "Unknown"
+            spread_days = 0
+        
+        # Technique evolution
+        early_techs: dict = {}
+        late_techs: dict = {}
+        mid = len(timeline) // 2
+        for item in timeline[:mid]:
+            for t in item["techniques"]:
+                early_techs[t] = early_techs.get(t, 0) + 1
+        for item in timeline[mid:]:
+            for t in item["techniques"]:
+                late_techs[t] = late_techs.get(t, 0) + 1
+        
+        return {
+            "claim": claim,
+            "total_appearances": len(timeline),
+            "first_seen": first_seen,
+            "last_seen": last_seen,
+            "spread_days": spread_days,
+            "timeline": timeline[:20],
+            "technique_evolution": {
+                "early": dict(sorted(early_techs.items(), key=lambda x: -x[1])[:5]),
+                "late": dict(sorted(late_techs.items(), key=lambda x: -x[1])[:5]),
+            },
+        }
+    except Exception as e:
+        logger.warning(f"Claim lifecycle failed: {e}")
+        return {"claim": claim, "total_appearances": 0, "error": str(e)}
+
+
+
+@app.get("/api/trust-network/{report_id}")
+async def trust_network(report_id: str):
+    """Get aggregate anonymous trust signals for a report or claim."""
+    settings = get_settings()
+    try:
+        from supabase import create_client
+        sb = create_client(settings.supabase_url, settings.supabase_key)
+        
+        result = sb.table("decisions").select("decision, note").eq("analysis_id", report_id).execute()
+        decisions = result.data or []
+        
+        total = len(decisions)
+        trust = sum(1 for d in decisions if d["decision"] == "trust")
+        unsure = sum(1 for d in decisions if d["decision"] == "unsure")
+        reject = sum(1 for d in decisions if d["decision"] == "reject")
+        
+        # Extract common concerns from notes
+        notes = [d.get("note", "") for d in decisions if d.get("note")]
+        
+        return {
+            "report_id": report_id,
+            "total_votes": total,
+            "trust": trust,
+            "unsure": unsure,
+            "reject": reject,
+            "trust_pct": round(trust / max(total, 1) * 100),
+            "unsure_pct": round(unsure / max(total, 1) * 100),
+            "reject_pct": round(reject / max(total, 1) * 100),
+            "notes": notes[:5],
+        }
+    except Exception as e:
+        return {"report_id": report_id, "total_votes": 0, "error": str(e)}
+
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================

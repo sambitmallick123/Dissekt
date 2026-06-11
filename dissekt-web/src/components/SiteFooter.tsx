@@ -23,6 +23,8 @@ export default function SiteFooter() {
               <a href="/topics" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Topics</a>
               <a href="/compare" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Compare</a>
               <a href="/docs" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>API</a>
+              <a href="/fingerprint" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Fingerprint</a>
+              <a href="/lifecycle" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Claim lifecycle</a>
             </div>
           </div>
           <div>
@@ -32,6 +34,7 @@ export default function SiteFooter() {
               <a href="/invite" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Get access</a>
               <a href="/feedback" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Feedback</a>
               <a href="/bookmarklet" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Bookmarklet</a>
+              <a href="/badge" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Embed badge</a>
               <a href="/contact" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Contact</a>
             </div>
           </div>
