@@ -1,4 +1,5 @@
 'use client';
+import SourceMatrix from '@/components/SourceMatrix';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
@@ -100,7 +101,10 @@ export default function ComparePage() {
           </>
         )}
       </div>
-    <SiteFooter />
+            <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 32px' }}>
+          <SourceMatrix />
+        </div>
+        <SiteFooter />
     </main>
   );
 }

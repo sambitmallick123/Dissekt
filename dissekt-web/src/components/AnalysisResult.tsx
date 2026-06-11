@@ -7,6 +7,8 @@ import MetaCard from './MetaCard';
 import SimilarClaims from './SimilarClaims';
 import ExtractedClaims from './ExtractedClaims';
 import CounterfactualCard from './CounterfactualCard';
+import ReadingMode from './ReadingMode';
+import PrePublishCheck from './PrePublishCheck';
 import { DecisionButtons } from './DecisionJournal';
 import CompassCard from './CompassCard';
 import PulseCard from './PulseCard';

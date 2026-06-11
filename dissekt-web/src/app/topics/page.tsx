@@ -1,4 +1,5 @@
 'use client';
+import NarrativeArc from '@/components/NarrativeArc';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
@@ -82,6 +83,11 @@ export default function TopicsPage() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* Narrative Arc */}
+            {data.analyses?.length >= 2 && (
+              <NarrativeArc analyses={data.analyses} topic={data.topic} />
             )}
 
             {/* Timeline */}
