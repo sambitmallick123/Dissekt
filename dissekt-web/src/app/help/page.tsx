@@ -198,7 +198,7 @@ export default function HelpPage() {
           <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
             Try Dissekt now →
           </a>
-          <p style={{ fontSize: 12, color: '#aaa', marginTop: 8 }}>Free · 10 scans/day · No signup required</p>
+          <p style={{ fontSize: 12, color: '#aaa', marginTop: 8 }}>Free · 3 brief + 1 detailed scan/day · No signup required</p>
         </div>
       </div>
     <SiteFooter />

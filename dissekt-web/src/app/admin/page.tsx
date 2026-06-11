@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 
-type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions';
+type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings';
 
 export default function AdminPage() {
   const [password, setPassword] = useState('');
@@ -52,7 +52,7 @@ export default function AdminPage() {
           <button onClick={() => { setAuthenticated(false); setAdminKey(''); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
         <div style={{ display: 'flex', gap: 4, marginBottom: 20, overflowX: 'auto' }}>
-          {(['overview', 'invitations', 'feedback', 'contacts', 'corrections', 'decisions'] as Tab[]).map(t => (
+          {(['overview', 'invitations', 'feedback', 'contacts', 'corrections', 'decisions', 'settings'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: '7px 16px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === t ? '#0d9488' : '#fff', color: tab === t ? '#fff' : '#555', boxShadow: tab !== t ? '0 0 0 0.5px #e5eaea' : 'none', whiteSpace: 'nowrap' }}>
               {t === 'overview' ? '📊 Overview' : t === 'invitations' ? '🎟️ Invitations' : t === 'feedback' ? '💬 Feedback' : t === 'contacts' ? '📧 Contacts' : t === 'corrections' ? '👍 Corrections' : '📓 Decisions'}
             </button>
@@ -64,6 +64,7 @@ export default function AdminPage() {
         {tab === 'contacts' && <ContactsTab adminKey={adminKey} />}
         {tab === 'corrections' && <CorrectionsTab adminKey={adminKey} />}
         {tab === 'decisions' && <DecisionsTab adminKey={adminKey} />}
+        {tab === 'settings' && <SettingsTab adminKey={adminKey} />}
       </div>
       <SiteFooter />
     </main>
@@ -146,11 +147,11 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
 
   useEffect(() => { load(); }, [load]);
 
-  const action = async (id: string, act: 'approve' | 'reject') => {
+  const action = async (id: string, act: 'approve' | 'reject' | 'revoke') => {
     setMsg('');
     const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: act, id }) });
     const data = await res.json();
-    setMsg(act === 'approve' ? `✅ Approved! Code: ${data.code} · Email sent` : '❌ Rejected · User notified');
+    setMsg(act === 'approve' ? `✅ Approved! Code: ${data.code} · Email sent` : act === 'revoke' ? '🚫 Access revoked · User notified' : '❌ Rejected · User notified');
     load();
   };
 
@@ -342,3 +343,143 @@ function DecisionsTab({ adminKey }: { adminKey: string }) {
     </div>
   );
 }
+
+function SettingsTab({ adminKey }: { adminKey: string }) {
+  const [config, setConfig] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState(true);
+  const [saveMsg, setSaveMsg] = useState('');
+
+  useEffect(() => {
+    fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify({ action: 'get_config' }),
+    }).then(r => r.json()).then(d => { setConfig(d.config || {}); setLoading(false); });
+  }, [adminKey]);
+
+  const updateConfig = async (key: string, value: any) => {
+    setConfig(prev => ({ ...prev, [key]: value }));
+    await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify({ action: 'update_config', key, value }),
+    });
+    setSaveMsg(`✅ ${key} updated`);
+    setTimeout(() => setSaveMsg(''), 2000);
+  };
+
+  if (loading) return <div style={{ color: '#888', fontSize: 13 }}>Loading config...</div>;
+
+  const freeLimits = config.free_limits || { brief: 3, detailed: 1 };
+  const invitedLimits = config.invited_limits || { brief: 25, detailed: 10 };
+  const featuresFree = config.features_free || ['single_scan', 'radar', 'help', 'feedback'];
+  const featuresInvited = config.features_invited || ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'help', 'feedback'];
+  const inviteCodeDays = config.invite_code_days || 7;
+  const accessMonths = config.access_months || 6;
+
+  const allFeatures = ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'memory', 'journal', 'compass', 'pulse', 'counterfactual', 'claims', 'help', 'feedback'];
+  const featureLabels: Record<string, string> = {
+    single_scan: 'Single scan', bulk: 'Bulk CSV', compare: 'Compare', topics: 'Topics',
+    radar: 'Radar feeds', detailed_mode: 'Detailed mode', memory: 'Reader memory',
+    journal: 'Decision journal', compass: 'Compass (political)', pulse: 'Pulse (coordination)',
+    counterfactual: 'Counterfactual view', claims: 'Claim extraction', help: 'Help page', feedback: 'Feedback',
+  };
+
+  const inputStyle: React.CSSProperties = { padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none', width: 80, textAlign: 'center' as const };
+
+  return (
+    <div>
+      {saveMsg && <div style={{ padding: 10, background: '#f0fdfa', borderRadius: 8, fontSize: 12, color: '#0d9488', marginBottom: 12 }}>{saveMsg}</div>}
+
+      {/* Scan limits */}
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>📊 Scan limits (per day, resets 00:00 GMT)</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 8 }}>🆓 Free tier</div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, width: 80 }}>Brief:</span>
+              <input type="number" value={freeLimits.brief} onChange={e => updateConfig('free_limits', { ...freeLimits, brief: parseInt(e.target.value) || 0 })} style={inputStyle} />
+            </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <span style={{ fontSize: 12, width: 80 }}>Detailed:</span>
+              <input type="number" value={freeLimits.detailed} onChange={e => updateConfig('free_limits', { ...freeLimits, detailed: parseInt(e.target.value) || 0 })} style={inputStyle} />
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 8 }}>🎫 Invited tier</div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, width: 80 }}>Brief:</span>
+              <input type="number" value={invitedLimits.brief} onChange={e => updateConfig('invited_limits', { ...invitedLimits, brief: parseInt(e.target.value) || 0 })} style={inputStyle} />
+            </div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <span style={{ fontSize: 12, width: 80 }}>Detailed:</span>
+              <input type="number" value={invitedLimits.detailed} onChange={e => updateConfig('invited_limits', { ...invitedLimits, detailed: parseInt(e.target.value) || 0 })} style={inputStyle} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Access expiry */}
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>⏰ Access expiry</div>
+        <div style={{ display: 'flex', gap: 20 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <span style={{ fontSize: 12 }}>Invite code expires in:</span>
+            <input type="number" value={inviteCodeDays} onChange={e => updateConfig('invite_code_days', parseInt(e.target.value) || 7)} style={inputStyle} />
+            <span style={{ fontSize: 12, color: '#888' }}>days</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <span style={{ fontSize: 12 }}>Access valid for:</span>
+            <input type="number" value={accessMonths} onChange={e => updateConfig('access_months', parseInt(e.target.value) || 6)} style={inputStyle} />
+            <span style={{ fontSize: 12, color: '#888' }}>months</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Feature access control */}
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>🔒 Feature access by tier</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 8 }}>🆓 Free tier features</div>
+            {allFeatures.map(f => (
+              <label key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
+                <input type="checkbox" checked={featuresFree.includes(f)}
+                  onChange={e => {
+                    const updated = e.target.checked ? [...featuresFree, f] : featuresFree.filter((x: string) => x !== f);
+                    updateConfig('features_free', updated);
+                  }} />
+                {featureLabels[f] || f}
+              </label>
+            ))}
+          </div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 8 }}>🎫 Invited tier features</div>
+            {allFeatures.map(f => (
+              <label key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
+                <input type="checkbox" checked={featuresInvited.includes(f)}
+                  onChange={e => {
+                    const updated = e.target.checked ? [...featuresInvited, f] : featuresInvited.filter((x: string) => x !== f);
+                    updateConfig('features_invited', updated);
+                  }} />
+                {featureLabels[f] || f}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Radar control */}
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>📡 System controls</div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
+          <input type="checkbox" checked={config.radar_enabled !== false}
+            onChange={e => updateConfig('radar_enabled', e.target.checked)} />
+          Radar feeds enabled
+        </label>
+      </div>
+    </div>
+  );
+}
+

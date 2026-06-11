@@ -210,6 +210,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
+
+  // Revoke user access
+  if (body.action === 'revoke') {
+    const { error } = await supabase
+      .from('invitations')
+      .update({ status: 'rejected', access_expires_at: new Date().toISOString() })
+      .eq('id', body.id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Notify user
+    const { data: inv } = await supabase.from('invitations').select('email, name').eq('id', body.id).single();
+    if (inv?.email) {
+      await sendEmail(inv.email, 'Dissekt access update', '<p>Your Dissekt access has been revoked. Contact us for more info.</p>');
+    }
+    return NextResponse.json({ success: true });
+  }
+
+  // Update platform config
+  if (body.action === 'update_config') {
+    const { key, value } = body;
+    const { error } = await supabase
+      .from('platform_config')
+      .upsert({ key, value, updated_at: new Date().toISOString() });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true });
+  }
+
+  // Get platform config
+  if (body.action === 'get_config') {
+    const { data } = await supabase.from('platform_config').select('*');
+    const config: Record<string, any> = {};
+    (data || []).forEach((row: any) => { config[row.key] = row.value; });
+    return NextResponse.json({ config });
+  }
+
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 }
 
