@@ -411,6 +411,142 @@ async def topic_tracking(q: str = "", limit: int = 20):
         logger.warning(f"Topic tracking failed: {e}")
         return {"topic": q, "analyses": [], "trends": {}, "error": str(e)}
 
+
+
+@app.get("/api/digest")
+async def weekly_digest():
+    """Generate weekly digest data: trending topics, top techniques, recent analyses."""
+    from datetime import datetime, timedelta
+    
+    try:
+        # Get analyses from last 7 days via Qdrant
+        from app.claim_graph import find_similar
+        recent = await find_similar("news analysis", limit=50)
+        
+        # Aggregate techniques
+        technique_counts: dict = {}
+        topics: dict = {}
+        total = len(recent)
+        
+        for r in recent:
+            for t in r.get("techniques", []):
+                technique_counts[t] = technique_counts.get(t, 0) + 1
+            preview = r.get("text_preview", "")[:50]
+            if preview:
+                # Simple topic extraction: first 3 significant words
+                words = [w for w in preview.split()[:6] if len(w) > 3]
+                key = " ".join(words[:3])
+                if key:
+                    topics[key] = topics.get(key, 0) + 1
+        
+        top_techniques = sorted(technique_counts.items(), key=lambda x: -x[1])[:5]
+        trending_topics = sorted(topics.items(), key=lambda x: -x[1])[:5]
+        
+        return {
+            "total_analyses": total,
+            "period": "last 7 days",
+            "top_techniques": [{"name": t[0], "count": t[1]} for t in top_techniques],
+            "trending_topics": [{"topic": t[0], "count": t[1]} for t in trending_topics],
+        }
+    except Exception as e:
+        logger.warning(f"Digest failed: {e}")
+        return {"total_analyses": 0, "top_techniques": [], "trending_topics": []}
+
+
+@app.post("/api/digest/send")
+async def send_digest(email: str = ""):
+    """Send weekly digest email to specified address or all invited users."""
+    settings = get_settings()
+    digest = await weekly_digest()
+    
+    if digest["total_analyses"] == 0:
+        return {"sent": False, "reason": "No analyses this week"}
+    
+    techs_html = "".join(f"<li>{t['name'].replace('_', ' ')} ({t['count']}x)</li>" for t in digest["top_techniques"])
+    topics_html = "".join(f"<li>{t['topic']} ({t['count']} analyses)</li>" for t in digest["trending_topics"])
+    
+    html = f"""
+    <div style="font-family: -apple-system, sans-serif; max-width: 520px; margin: 0 auto;">
+      <div style="background: #0d9488; padding: 16px 20px; border-radius: 10px 10px 0 0;">
+        <h2 style="color: white; margin: 0; font-size: 18px;">Dissekt Weekly Digest</h2>
+      </div>
+      <div style="background: #fff; padding: 20px; border: 1px solid #e5eaea; border-top: none; border-radius: 0 0 10px 10px;">
+        <p style="font-size: 14px; color: #555;">{digest['total_analyses']} analyses this week.</p>
+        
+        <h3 style="font-size: 14px; color: #1a1a1a; margin: 16px 0 8px;">Top techniques detected</h3>
+        <ul style="font-size: 13px; color: #555; padding-left: 20px;">{techs_html}</ul>
+        
+        <h3 style="font-size: 14px; color: #1a1a1a; margin: 16px 0 8px;">Trending topics</h3>
+        <ul style="font-size: 13px; color: #555; padding-left: 20px;">{topics_html}</ul>
+        
+        <div style="margin-top: 20px; text-align: center;">
+          <a href="https://dissekt.info/analyze" style="display: inline-block; background: #0d9488; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Analyze something new</a>
+        </div>
+        
+        <p style="font-size: 11px; color: #aaa; margin-top: 20px; text-align: center;">
+          You're receiving this because you have a Dissekt invitation.<br/>
+          <a href="https://dissekt.info" style="color: #0d9488;">dissekt.info</a>
+        </p>
+      </div>
+    </div>
+    """
+    
+    target = email or "sambitmallick123@gmail.com"
+    
+    import httpx
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post("https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                json={
+                    "from": "Dissekt <onboarding@resend.dev>",
+                    "to": target,
+                    "subject": f"Dissekt Weekly: {digest['total_analyses']} analyses, top trends",
+                    "html": html,
+                })
+            return {"sent": res.status_code == 200, "to": target}
+    except Exception as e:
+        return {"sent": False, "error": str(e)}
+
+
+
+@app.get("/api/annotations/{report_id}")
+async def get_annotations(report_id: str):
+    """Get collaborative annotations for a report."""
+    settings = get_settings()
+    try:
+        from supabase import create_client
+        sb = create_client(settings.supabase_url, settings.supabase_key)
+        result = sb.table("annotations").select("*").eq("report_id", report_id).order("created_at").execute()
+        return {"annotations": result.data or []}
+    except Exception as e:
+        return {"annotations": [], "error": str(e)}
+
+
+@app.post("/api/annotations")
+async def add_annotation(body: dict):
+    """Add a collaborative annotation to a report."""
+    settings = get_settings()
+    report_id = body.get("report_id")
+    text = body.get("text", "")
+    author = body.get("author", "Anonymous")
+    
+    if not report_id or not text:
+        from fastapi import HTTPException
+        raise HTTPException(400, "report_id and text required")
+    
+    try:
+        from supabase import create_client
+        sb = create_client(settings.supabase_url, settings.supabase_key)
+        result = sb.table("annotations").insert({
+            "report_id": report_id,
+            "text": text[:500],
+            "author": author,
+        }).execute()
+        return {"success": True, "annotation": result.data[0] if result.data else None}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================

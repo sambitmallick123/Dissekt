@@ -9,6 +9,7 @@ import ScanHistory, { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
 import ReaderMemory from '@/components/ReaderMemory';
 import DecisionJournalView from '@/components/DecisionJournal';
+import BiasProfile from '@/components/BiasProfile';
 import RadarFeed from '@/components/RadarFeed';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
 import { fetchConfig, isFeatureEnabled } from '@/lib/config';
@@ -139,6 +140,7 @@ export default function ScanApp() {
         {!result && !loading && (
           <>
             <ReaderMemory onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <BiasProfile />
             <DecisionJournalView />
             <ScanHistory onReanalyze={(input) => handleScan(input, 'brief')} />
             <RadarFeed onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />

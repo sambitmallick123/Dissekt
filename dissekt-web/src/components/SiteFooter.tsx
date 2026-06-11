@@ -31,6 +31,7 @@ export default function SiteFooter() {
               <a href="/help" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>How it works</a>
               <a href="/invite" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Get access</a>
               <a href="/feedback" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Feedback</a>
+              <a href="/bookmarklet" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Bookmarklet</a>
               <a href="/contact" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Contact</a>
             </div>
           </div>
