@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export default function InvitePage() {
-  const [tab, setTab] = useState<'request' | 'redeem'>('request');
+  const [tab, setTab] = useState<'request' | 'redeem' | 'login'>('request');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [org, setOrg] = useState('');
@@ -75,6 +75,10 @@ export default function InvitePage() {
               style={{ flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'redeem' ? '#0d9488' : '#f0f0ee', color: tab === 'redeem' ? '#fff' : '#555' }}>
               I have a code
             </button>
+            <button onClick={() => { setTab('login'); setStatus('idle'); }}
+              style={{ flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'login' ? '#0d9488' : '#f0f0ee', color: tab === 'login' ? '#fff' : '#555' }}>
+              Sign in
+            </button>
           </div>
 
           {status === 'success' && (
@@ -113,6 +117,20 @@ export default function InvitePage() {
               <button onClick={handleRedeem} disabled={!code || status === 'loading'}
                 style={{ width: '100%', padding: '11px 0', background: code ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: code ? 'pointer' : 'not-allowed' }}>
                 {status === 'loading' ? 'Verifying...' : 'Unlock access'}
+              </button>
+            </>
+          )}
+
+          {/* Login with email + code */}
+          {tab === 'login' && status !== 'success' && (
+            <>
+              <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>Sign in</div>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>Enter your email and invite code to restore access.</div>
+              <input type="email" placeholder="Your email *" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+              <input type="text" placeholder="DSK-XXXXXXXX" value={code} onChange={e => setCode(e.target.value.toUpperCase())} style={{ ...inputStyle, textAlign: 'center', fontSize: 16, fontWeight: 600, letterSpacing: '0.08em' }} />
+              <button onClick={handleRedeem} disabled={!email || !code || status === 'loading'}
+                style={{ width: '100%', padding: '11px 0', background: email && code ? '#0d9488' : '#ccc', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: email && code ? 'pointer' : 'not-allowed' }}>
+                {status === 'loading' ? 'Verifying...' : 'Sign in'}
               </button>
             </>
           )}

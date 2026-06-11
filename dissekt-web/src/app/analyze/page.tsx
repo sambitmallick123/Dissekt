@@ -9,6 +9,7 @@ import ScanHistory, { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
 import ReaderMemory from '@/components/ReaderMemory';
 import DecisionJournalView from '@/components/DecisionJournal';
+import RadarFeed from '@/components/RadarFeed';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -137,6 +138,7 @@ export default function ScanApp() {
             <ReaderMemory onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
             <DecisionJournalView />
             <ScanHistory onReanalyze={(input) => handleScan(input, 'brief')} />
+            <RadarFeed onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </>
         )}
       </div>

@@ -1,12 +1,21 @@
 'use client';
+import { useEffect, useState } from 'react';
 
 export default function SiteHeader({ active }: { active?: string }) {
+  const [tier, setTier] = useState('free');
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setTier(localStorage.getItem('dissekt_tier') || 'free');
+    }
+  }, []);
+
   const links = [
     { href: '/analyze', label: 'Analyze' },
     { href: '/topics', label: 'Topics' },
     { href: '/compare', label: 'Compare' },
-    { href: '/docs', label: 'API' },
     { href: '/help', label: 'Help' },
+    { href: '/feedback', label: 'Feedback' },
   ];
 
   return (
@@ -22,16 +31,20 @@ export default function SiteHeader({ active }: { active?: string }) {
             <span style={{ fontSize: 9, fontWeight: 700, color: '#0d9488', background: '#f0fdfa', padding: '2px 6px', borderRadius: 4, letterSpacing: '0.05em' }}>BETA</span>
           </a>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {links.map(l => (
               <a key={l.href} href={l.href}
                 style={{ fontSize: 13, color: active === l.label ? '#0d9488' : '#777', textDecoration: 'none', fontWeight: active === l.label ? 600 : 500 }}>
                 {l.label}
               </a>
             ))}
-            <a href="/invite" style={{ fontSize: 13, color: '#fff', textDecoration: 'none', borderRadius: 8, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>
-              Get access
-            </a>
+            {tier === 'invited' ? (
+              <span style={{ fontSize: 11, color: '#0d9488', background: '#f0fdfa', padding: '4px 12px', borderRadius: 6, fontWeight: 600 }}>🎫 Invited</span>
+            ) : (
+              <a href="/invite" style={{ fontSize: 13, color: '#fff', textDecoration: 'none', borderRadius: 8, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>
+                Get access
+              </a>
+            )}
           </div>
         </div>
       </div>

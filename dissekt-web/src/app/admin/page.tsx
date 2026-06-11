@@ -43,6 +43,11 @@ export default function AdminPage() {
     );
   }
 
+  const tabLabels: Record<Tab, string> = {
+    overview: '📊 Overview', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
+    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', settings: '⚙️ Settings',
+  };
+
   return (
     <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
       <SiteHeader />
@@ -52,9 +57,9 @@ export default function AdminPage() {
           <button onClick={() => { setAuthenticated(false); setAdminKey(''); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
         <div style={{ display: 'flex', gap: 4, marginBottom: 20, overflowX: 'auto' }}>
-          {(['overview', 'invitations', 'feedback', 'contacts', 'corrections', 'decisions', 'settings'] as Tab[]).map(t => (
+          {(Object.keys(tabLabels) as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: '7px 16px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === t ? '#0d9488' : '#fff', color: tab === t ? '#fff' : '#555', boxShadow: tab !== t ? '0 0 0 0.5px #e5eaea' : 'none', whiteSpace: 'nowrap' }}>
-              {t === 'overview' ? '📊 Overview' : t === 'invitations' ? '🎟️ Invitations' : t === 'feedback' ? '💬 Feedback' : t === 'contacts' ? '📧 Contacts' : t === 'corrections' ? '👍 Corrections' : '📓 Decisions'}
+              {tabLabels[t]}
             </button>
           ))}
         </div>
@@ -76,43 +81,34 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
   const [showPw, setShowPw] = useState(false);
   const [newPw, setNewPw] = useState('');
   const [pwMsg, setPwMsg] = useState('');
-
-  useEffect(() => {
-    fetch(`/api/admin?key=${adminKey}&view=stats`).then(r => r.json()).then(setStats);
-  }, [adminKey]);
-
+  useEffect(() => { fetch(`/api/admin?key=${adminKey}&view=stats`).then(r => r.json()).then(setStats); }, [adminKey]);
   const changePw = async () => {
     const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'change_password', new_password: newPw }) });
     const data = await res.json();
     setPwMsg(data.message || data.error);
   };
-
   if (!stats) return <div style={{ color: '#888', fontSize: 13 }}>Loading...</div>;
   const cards = [
     { label: 'Pending invites', value: stats.invitations?.pending || 0, color: '#d97706', icon: '⏳' },
     { label: 'Approved users', value: stats.invitations?.approved || 0, color: '#16a34a', icon: '✅' },
     { label: 'Rejected', value: stats.invitations?.rejected || 0, color: '#dc2626', icon: '❌' },
     { label: 'Total invitations', value: stats.invitations?.total || 0, color: '#0d9488', icon: '🎟️' },
-    { label: 'Feedback received', value: stats.feedback || 0, color: '#2563eb', icon: '💬' },
-    { label: 'Contact messages', value: stats.contacts || 0, color: '#7c3aed', icon: '📧' },
-    { label: 'Technique corrections', value: stats.corrections || 0, color: '#ea580c', icon: '👍' },
-    { label: 'User decisions', value: stats.decisions || 0, color: '#0891b2', icon: '📓' },
+    { label: 'Feedback', value: stats.feedback || 0, color: '#2563eb', icon: '💬' },
+    { label: 'Contacts', value: stats.contacts || 0, color: '#0d9488', icon: '📧' },
+    { label: 'Corrections', value: stats.corrections || 0, color: '#ea580c', icon: '👍' },
+    { label: 'Decisions', value: stats.decisions || 0, color: '#0891b2', icon: '📓' },
   ];
-
   return (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
         {cards.map((c, i) => (
           <div key={i} style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: '#888' }}>{c.label}</span>
-              <span style={{ fontSize: 14 }}>{c.icon}</span>
-            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: 11, color: '#888' }}>{c.label}</span><span style={{ fontSize: 14 }}>{c.icon}</span></div>
             <div style={{ fontSize: 26, fontWeight: 700, color: c.color, marginTop: 4 }}>{c.value}</div>
           </div>
         ))}
       </div>
-      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 14, fontWeight: 600 }}>🔑 Security</div>
           <button onClick={() => setShowPw(!showPw)} style={{ fontSize: 11, padding: '4px 12px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>{showPw ? 'Cancel' : 'Change password'}</button>
@@ -137,32 +133,25 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
   const [genEmail, setGenEmail] = useState('');
   const [genName, setGenName] = useState('');
   const [genResult, setGenResult] = useState('');
-
   const load = useCallback(async () => {
     const res = await fetch(`/api/admin?key=${adminKey}&status=${filter}`);
     const data = await res.json();
-    setItems(data.invitations || []);
-    setStats(data.stats || stats);
+    setItems(data.invitations || []); setStats(data.stats || stats);
   }, [adminKey, filter]);
-
   useEffect(() => { load(); }, [load]);
-
   const action = async (id: string, act: 'approve' | 'reject' | 'revoke') => {
     setMsg('');
     const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: act, id }) });
     const data = await res.json();
-    setMsg(act === 'approve' ? `✅ Approved! Code: ${data.code} · Email sent` : act === 'revoke' ? '🚫 Access revoked · User notified' : '❌ Rejected · User notified');
+    setMsg(act === 'approve' ? `✅ Approved! Code: ${data.code} · Email sent` : act === 'revoke' ? '🚫 Revoked · User notified' : '❌ Rejected · User notified');
     load();
   };
-
   const generate = async () => {
     const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'generate', email: genEmail, name: genName }) });
     const data = await res.json();
     if (data.success) { setGenResult(data.code); setGenEmail(''); setGenName(''); load(); }
   };
-
   const sc: Record<string, { bg: string; color: string }> = { pending: { bg: '#fffbeb', color: '#92400e' }, approved: { bg: '#f0fdf4', color: '#166534' }, rejected: { bg: '#fef2f2', color: '#b91c1c' } };
-
   return (
     <div>
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
@@ -172,7 +161,7 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
           <input placeholder="Name" value={genName} onChange={e => setGenName(e.target.value)} style={{ flex: 1, padding: '8px 12px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none' }} />
           <button onClick={generate} style={{ padding: '8px 16px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Generate + send</button>
         </div>
-        {genResult && <div style={{ marginTop: 8, padding: '8px', background: '#f0fdf4', borderRadius: 6, fontSize: 13, fontWeight: 600, color: '#166534', textAlign: 'center' }}>{genResult}</div>}
+        {genResult && <div style={{ marginTop: 8, padding: 8, background: '#f0fdf4', borderRadius: 6, fontSize: 13, fontWeight: 600, color: '#166534', textAlign: 'center' }}>{genResult}</div>}
       </div>
       {msg && <div style={{ padding: 10, background: '#f0fdfa', borderRadius: 8, fontSize: 13, color: '#0d9488', marginBottom: 12 }}>{msg}</div>}
       <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
@@ -194,18 +183,21 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
                 </div>
                 <div style={{ fontSize: 12, color: '#555' }}>{inv.email}</div>
                 {inv.organization && <div style={{ fontSize: 11, color: '#888' }}>🏢 {inv.organization}</div>}
-                {inv.reason && <div style={{ fontSize: 11, color: '#888', fontStyle: 'italic', marginTop: 2 }}>"{inv.reason}"</div>}
+                {inv.reason && <div style={{ fontSize: 11, color: '#888', fontStyle: 'italic', marginTop: 2 }}>{inv.reason}</div>}
                 <div style={{ fontSize: 10, color: '#aaa', marginTop: 4 }}>
                   {new Date(inv.created_at).toLocaleDateString()}
                   {inv.invite_code && <span style={{ marginLeft: 8, color: '#0d9488', fontWeight: 600 }}>{inv.invite_code}</span>}
                 </div>
               </div>
-              {inv.status === 'pending' && (
-                <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                {inv.status === 'pending' && (<>
                   <button onClick={() => action(inv.id, 'approve')} style={{ padding: '6px 14px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>✅ Approve</button>
                   <button onClick={() => action(inv.id, 'reject')} style={{ padding: '6px 14px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>❌ Reject</button>
-                </div>
-              )}
+                </>)}
+                {inv.status === 'approved' && (
+                  <button onClick={() => action(inv.id, 'revoke')} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #dc2626', color: '#dc2626', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>🚫 Revoke</button>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -218,14 +210,11 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
 function FeedbackTab({ adminKey }: { adminKey: string }) {
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => { fetch(`/api/admin?key=${adminKey}&view=feedback`).then(r => r.json()).then(d => setItems(d.items || [])); }, [adminKey]);
-
   const markStatus = async (id: string, status: string) => {
     await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'mark_status', table: 'feedback', id, status }) });
     setItems(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   };
-
   const typeIcons: Record<string, string> = { feedback: '💬', bug: '🐛', feature: '💡', question: '❓' };
-
   return (
     <div>
       <div style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>{items.length} feedback submissions</div>
@@ -233,7 +222,7 @@ function FeedbackTab({ adminKey }: { adminKey: string }) {
         <div key={i} style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: '12px 16px', marginBottom: 6 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
                 <span>{typeIcons[fb.type] || '💬'}</span>
                 <span style={{ fontSize: 12, fontWeight: 600 }}>{fb.name || 'Anonymous'}</span>
                 {fb.component && <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: '#f0fdfa', color: '#0d9488' }}>{fb.component}</span>}
@@ -241,7 +230,7 @@ function FeedbackTab({ adminKey }: { adminKey: string }) {
                 <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: fb.status === 'read' ? '#f0fdf4' : '#fffbeb', color: fb.status === 'read' ? '#166534' : '#92400e' }}>{fb.status || 'unread'}</span>
               </div>
               {fb.email && <div style={{ fontSize: 11, color: '#888' }}>{fb.email}</div>}
-              <div style={{ fontSize: 12, color: '#404040', marginTop: 4, lineHeight: 1.6, maxWidth: 600 }}>{fb.message}</div>
+              <div style={{ fontSize: 12, color: '#404040', marginTop: 4, lineHeight: 1.6 }}>{fb.message}</div>
               <div style={{ fontSize: 10, color: '#aaa', marginTop: 4 }}>{new Date(fb.created_at).toLocaleString()}</div>
             </div>
             <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
@@ -259,12 +248,10 @@ function FeedbackTab({ adminKey }: { adminKey: string }) {
 function ContactsTab({ adminKey }: { adminKey: string }) {
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => { fetch(`/api/admin?key=${adminKey}&view=contacts`).then(r => r.json()).then(d => setItems(d.items || [])); }, [adminKey]);
-
   const markStatus = async (id: string, status: string) => {
     await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'mark_status', table: 'contacts', id, status }) });
     setItems(prev => prev.map(i => i.id === id ? { ...i, status } : i));
   };
-
   return (
     <div>
       <div style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>{items.length} contact messages</div>
@@ -279,12 +266,12 @@ function ContactsTab({ adminKey }: { adminKey: string }) {
                 <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: ct.status === 'replied' ? '#f0fdf4' : ct.status === 'read' ? '#eff6ff' : '#fffbeb', color: ct.status === 'replied' ? '#166534' : ct.status === 'read' ? '#2563eb' : '#92400e' }}>{ct.status || 'unread'}</span>
               </div>
               {ct.email && <div style={{ fontSize: 11, color: '#888' }}>{ct.email}</div>}
-              <div style={{ fontSize: 12, color: '#404040', marginTop: 4, lineHeight: 1.6, maxWidth: 600 }}>{ct.message}</div>
+              <div style={{ fontSize: 12, color: '#404040', marginTop: 4, lineHeight: 1.6 }}>{ct.message}</div>
               <div style={{ fontSize: 10, color: '#aaa', marginTop: 4 }}>{new Date(ct.created_at).toLocaleString()}</div>
             </div>
             <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
               {ct.status === 'unread' && <button onClick={() => markStatus(ct.id, 'read')} style={{ padding: '4px 10px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 5, fontSize: 10, cursor: 'pointer', fontWeight: 600 }}>Mark read</button>}
-              {ct.email && <a href={`mailto:${ct.email}?subject=Re: ${ct.subject || 'Your Dissekt inquiry'}`} onClick={() => markStatus(ct.id, 'replied')} style={{ padding: '4px 10px', background: '#0d9488', color: '#fff', borderRadius: 5, fontSize: 10, textDecoration: 'none', fontWeight: 600 }}>Reply</a>}
+              {ct.email && <a href={`mailto:${ct.email}?subject=Re: ${ct.subject || 'Dissekt inquiry'}`} onClick={() => markStatus(ct.id, 'replied')} style={{ padding: '4px 10px', background: '#0d9488', color: '#fff', borderRadius: 5, fontSize: 10, textDecoration: 'none', fontWeight: 600 }}>Reply</a>}
             </div>
           </div>
         </div>
@@ -297,7 +284,6 @@ function ContactsTab({ adminKey }: { adminKey: string }) {
 function CorrectionsTab({ adminKey }: { adminKey: string }) {
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => { fetch(`/api/admin?key=${adminKey}&view=corrections`).then(r => r.json()).then(d => setItems(d.items || [])); }, [adminKey]);
-
   return (
     <div>
       <div style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>{items.length} technique corrections (training data for Cortex)</div>
@@ -306,7 +292,7 @@ function CorrectionsTab({ adminKey }: { adminKey: string }) {
           <span style={{ fontSize: 14 }}>{c.vote === 'agree' ? '👍' : '👎'}</span>
           <div style={{ flex: 1 }}>
             <span style={{ fontSize: 12, fontWeight: 600 }}>{c.technique_name?.replace(/_/g, ' ')}</span>
-            {c.comment && <span style={{ fontSize: 11, color: '#888', marginLeft: 8 }}>"{c.comment}"</span>}
+            {c.comment && <span style={{ fontSize: 11, color: '#888', marginLeft: 8 }}>{c.comment}</span>}
           </div>
           <span style={{ fontSize: 10, color: '#aaa' }}>{new Date(c.created_at).toLocaleDateString()}</span>
         </div>
@@ -319,10 +305,8 @@ function CorrectionsTab({ adminKey }: { adminKey: string }) {
 function DecisionsTab({ adminKey }: { adminKey: string }) {
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => { fetch(`/api/admin?key=${adminKey}&view=decisions`).then(r => r.json()).then(d => setItems(d.items || [])); }, [adminKey]);
-
   const icons: Record<string, string> = { trust: '✅', unsure: '🤔', reject: '❌' };
   const colors: Record<string, { bg: string; color: string }> = { trust: { bg: '#f0fdf4', color: '#166534' }, unsure: { bg: '#fffbeb', color: '#92400e' }, reject: { bg: '#fef2f2', color: '#b91c1c' } };
-
   return (
     <div>
       <div style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>{items.length} user decisions</div>
@@ -348,138 +332,65 @@ function SettingsTab({ adminKey }: { adminKey: string }) {
   const [config, setConfig] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [saveMsg, setSaveMsg] = useState('');
-
   useEffect(() => {
-    fetch('/api/admin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify({ action: 'get_config' }),
-    }).then(r => r.json()).then(d => { setConfig(d.config || {}); setLoading(false); });
+    fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'get_config' }) })
+      .then(r => r.json()).then(d => { setConfig(d.config || {}); setLoading(false); });
   }, [adminKey]);
-
   const updateConfig = async (key: string, value: any) => {
     setConfig(prev => ({ ...prev, [key]: value }));
-    await fetch('/api/admin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify({ action: 'update_config', key, value }),
-    });
-    setSaveMsg(`✅ ${key} updated`);
-    setTimeout(() => setSaveMsg(''), 2000);
+    await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'update_config', key, value }) });
+    setSaveMsg('✅ Saved'); setTimeout(() => setSaveMsg(''), 2000);
   };
-
-  if (loading) return <div style={{ color: '#888', fontSize: 13 }}>Loading config...</div>;
-
+  if (loading) return <div style={{ color: '#888', fontSize: 13 }}>Loading...</div>;
   const freeLimits = config.free_limits || { brief: 3, detailed: 1 };
   const invitedLimits = config.invited_limits || { brief: 25, detailed: 10 };
-  const featuresFree = config.features_free || ['single_scan', 'radar', 'help', 'feedback'];
-  const featuresInvited = config.features_invited || ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'help', 'feedback'];
-  const inviteCodeDays = config.invite_code_days || 7;
-  const accessMonths = config.access_months || 6;
-
+  const featuresFree: string[] = config.features_free || ['single_scan', 'radar', 'help', 'feedback'];
+  const featuresInvited: string[] = config.features_invited || ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'help', 'feedback'];
   const allFeatures = ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'memory', 'journal', 'compass', 'pulse', 'counterfactual', 'claims', 'help', 'feedback'];
-  const featureLabels: Record<string, string> = {
-    single_scan: 'Single scan', bulk: 'Bulk CSV', compare: 'Compare', topics: 'Topics',
-    radar: 'Radar feeds', detailed_mode: 'Detailed mode', memory: 'Reader memory',
-    journal: 'Decision journal', compass: 'Compass (political)', pulse: 'Pulse (coordination)',
-    counterfactual: 'Counterfactual view', claims: 'Claim extraction', help: 'Help page', feedback: 'Feedback',
-  };
-
-  const inputStyle: React.CSSProperties = { padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none', width: 80, textAlign: 'center' as const };
-
+  const labels: Record<string, string> = { single_scan: 'Single scan', bulk: 'Bulk CSV', compare: 'Compare', topics: 'Topics', radar: 'Radar', detailed_mode: 'Detailed mode', memory: 'Reader memory', journal: 'Decision journal', compass: 'Compass', pulse: 'Pulse', counterfactual: 'Counterfactual', claims: 'Claims', help: 'Help', feedback: 'Feedback' };
+  const inp: React.CSSProperties = { padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none', width: 80, textAlign: 'center' as const };
   return (
     <div>
-      {saveMsg && <div style={{ padding: 10, background: '#f0fdfa', borderRadius: 8, fontSize: 12, color: '#0d9488', marginBottom: 12 }}>{saveMsg}</div>}
-
-      {/* Scan limits */}
+      {saveMsg && <div style={{ padding: 8, background: '#f0fdfa', borderRadius: 6, fontSize: 12, color: '#0d9488', marginBottom: 10 }}>{saveMsg}</div>}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>📊 Scan limits (per day, resets 00:00 GMT)</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 8 }}>🆓 Free tier</div>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: 12, width: 80 }}>Brief:</span>
-              <input type="number" value={freeLimits.brief} onChange={e => updateConfig('free_limits', { ...freeLimits, brief: parseInt(e.target.value) || 0 })} style={inputStyle} />
-            </div>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <span style={{ fontSize: 12, width: 80 }}>Detailed:</span>
-              <input type="number" value={freeLimits.detailed} onChange={e => updateConfig('free_limits', { ...freeLimits, detailed: parseInt(e.target.value) || 0 })} style={inputStyle} />
-            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><span style={{ fontSize: 12, width: 70 }}>Brief:</span><input type="number" value={freeLimits.brief} onChange={e => updateConfig('free_limits', { ...freeLimits, brief: parseInt(e.target.value) || 0 })} style={inp} /></div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ fontSize: 12, width: 70 }}>Detailed:</span><input type="number" value={freeLimits.detailed} onChange={e => updateConfig('free_limits', { ...freeLimits, detailed: parseInt(e.target.value) || 0 })} style={inp} /></div>
           </div>
           <div>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 8 }}>🎫 Invited tier</div>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ fontSize: 12, width: 80 }}>Brief:</span>
-              <input type="number" value={invitedLimits.brief} onChange={e => updateConfig('invited_limits', { ...invitedLimits, brief: parseInt(e.target.value) || 0 })} style={inputStyle} />
-            </div>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <span style={{ fontSize: 12, width: 80 }}>Detailed:</span>
-              <input type="number" value={invitedLimits.detailed} onChange={e => updateConfig('invited_limits', { ...invitedLimits, detailed: parseInt(e.target.value) || 0 })} style={inputStyle} />
-            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><span style={{ fontSize: 12, width: 70 }}>Brief:</span><input type="number" value={invitedLimits.brief} onChange={e => updateConfig('invited_limits', { ...invitedLimits, brief: parseInt(e.target.value) || 0 })} style={inp} /></div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ fontSize: 12, width: 70 }}>Detailed:</span><input type="number" value={invitedLimits.detailed} onChange={e => updateConfig('invited_limits', { ...invitedLimits, detailed: parseInt(e.target.value) || 0 })} style={inp} /></div>
           </div>
         </div>
       </div>
-
-      {/* Access expiry */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>⏰ Access expiry</div>
-        <div style={{ display: 'flex', gap: 20 }}>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ fontSize: 12 }}>Invite code expires in:</span>
-            <input type="number" value={inviteCodeDays} onChange={e => updateConfig('invite_code_days', parseInt(e.target.value) || 7)} style={inputStyle} />
-            <span style={{ fontSize: 12, color: '#888' }}>days</span>
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ fontSize: 12 }}>Access valid for:</span>
-            <input type="number" value={accessMonths} onChange={e => updateConfig('access_months', parseInt(e.target.value) || 6)} style={inputStyle} />
-            <span style={{ fontSize: 12, color: '#888' }}>months</span>
-          </div>
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 12 }}>Code expires:</span><input type="number" value={config.invite_code_days || 7} onChange={e => updateConfig('invite_code_days', parseInt(e.target.value) || 7)} style={inp} /><span style={{ fontSize: 12, color: '#888' }}>days</span></div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><span style={{ fontSize: 12 }}>Access valid:</span><input type="number" value={config.access_months || 6} onChange={e => updateConfig('access_months', parseInt(e.target.value) || 6)} style={inp} /><span style={{ fontSize: 12, color: '#888' }}>months</span></div>
         </div>
       </div>
-
-      {/* Feature access control */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16, marginBottom: 12 }}>
         <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>🔒 Feature access by tier</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 8 }}>🆓 Free tier features</div>
-            {allFeatures.map(f => (
-              <label key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
-                <input type="checkbox" checked={featuresFree.includes(f)}
-                  onChange={e => {
-                    const updated = e.target.checked ? [...featuresFree, f] : featuresFree.filter((x: string) => x !== f);
-                    updateConfig('features_free', updated);
-                  }} />
-                {featureLabels[f] || f}
-              </label>
-            ))}
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 6 }}>🆓 Free</div>
+            {allFeatures.map(f => (<label key={f} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresFree.includes(f)} onChange={e => { const u = e.target.checked ? [...featuresFree, f] : featuresFree.filter(x => x !== f); updateConfig('features_free', u); }} />{labels[f] || f}</label>))}
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 8 }}>🎫 Invited tier features</div>
-            {allFeatures.map(f => (
-              <label key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
-                <input type="checkbox" checked={featuresInvited.includes(f)}
-                  onChange={e => {
-                    const updated = e.target.checked ? [...featuresInvited, f] : featuresInvited.filter((x: string) => x !== f);
-                    updateConfig('features_invited', updated);
-                  }} />
-                {featureLabels[f] || f}
-              </label>
-            ))}
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#0d9488', marginBottom: 6 }}>🎫 Invited</div>
+            {allFeatures.map(f => (<label key={f} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={featuresInvited.includes(f)} onChange={e => { const u = e.target.checked ? [...featuresInvited, f] : featuresInvited.filter(x => x !== f); updateConfig('features_invited', u); }} />{labels[f] || f}</label>))}
           </div>
         </div>
       </div>
-
-      {/* Radar control */}
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>📡 System controls</div>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}>
-          <input type="checkbox" checked={config.radar_enabled !== false}
-            onChange={e => updateConfig('radar_enabled', e.target.checked)} />
-          Radar feeds enabled
-        </label>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>📡 System</div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer' }}><input type="checkbox" checked={config.radar_enabled !== false} onChange={e => updateConfig('radar_enabled', e.target.checked)} />Radar feeds enabled</label>
       </div>
     </div>
   );
 }
-
