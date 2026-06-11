@@ -21,7 +21,7 @@ export default function DocsPage() {
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Dissekt API</h1>
-        <p style={{ fontSize: 14, color: '#888', marginBottom: 6 }}>Interpretation infrastructure for information systems. Integrate manipulation detection into any platform.</p>
+        <p style={{ fontSize: 14, color: '#888', marginBottom: 6 }}>Interpretation infrastructure for information systems. Integrate information transparency into any platform.</p>
         <p style={{ fontSize: 12, color: '#aaa', marginBottom: 24 }}>Base URL: <code style={{ background: '#f0f0ee', padding: '2px 6px', borderRadius: 4 }}>{apiUrl}</code></p>
 
         {/* Tabs */}

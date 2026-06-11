@@ -5,7 +5,7 @@ import SiteFooter from '@/components/SiteFooter';
 const components = [
   {
     icon: '🎯',
-    name: 'Threat Score',
+    name: 'Transparency Score',
     color: '#dc2626',
     desc: 'An overall risk score from 0 to 100 based on the combination of manipulation techniques found, existing cross-references, and toxicity level.',
     details: [

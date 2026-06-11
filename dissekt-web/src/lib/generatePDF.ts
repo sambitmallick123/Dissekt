@@ -75,7 +75,7 @@ export function downloadPDF(data: any, inputContent: string) {
   let score = (techniques.length > 0 ? Math.round(maxConf * 40) : 0) + Math.min(fcs.length * 4, 30) + Math.round(tox * 20) + (fcs.length >= 3 ? 10 : 0);
   score = Math.min(score, 100);
   const scoreColor = score >= 70 ? red : score >= 40 ? amber : green;
-  const scoreLabel = score >= 70 ? 'HIGH RISK' : score >= 40 ? 'MEDIUM RISK' : 'LOW RISK';
+  const scoreLabel = score >= 70 ? 'LOW TRANSPARENCY' : score >= 40 ? 'MODERATE' : 'HIGH TRANSPARENCY';
 
   newPageIfNeeded(22);
   fillRound(M, y, CW, 18, 2, white); drawBorder(M, y, CW, 18);
