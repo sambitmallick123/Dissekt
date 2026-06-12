@@ -52,14 +52,41 @@ function getDefaults(): Record<string, any> {
   };
 }
 
+// Map display names to config keys
+const featureNameMap: Record<string, string> = {
+  'Bulk CSV analysis': 'bulk',
+  'Bulk CSV': 'bulk',
+  'Compare sources': 'compare',
+  'Compare': 'compare',
+  'Topic tracking': 'topics',
+  'Observatory': 'topics',
+  'Detailed mode': 'detailed_mode',
+  'Scope feeds': 'radar',
+  'Radar': 'radar',
+  'Image upload': 'image_upload',
+  'Camera upload': 'camera_upload',
+  'Reader memory': 'memory',
+  'Recall': 'memory',
+  'Decision journal': 'journal',
+  'Ledger': 'journal',
+  'Meridian': 'compass',
+  'Flare': 'pulse',
+  'Mirror view': 'counterfactual',
+  'Facet extraction': 'claims',
+  'Imprint': 'imprint',
+  'Thread': 'thread',
+};
+
 export function isFeatureEnabled(config: Record<string, any>, feature: string): boolean {
   // Help and Feedback are ALWAYS available
   if (feature === 'help' || feature === 'feedback') return true;
+  // Resolve display name to config key
+  const key = featureNameMap[feature] || feature;
 
   const tier = getTier();
-  const key = tier === 'invited' ? 'features_invited' : 'features_free';
-  const features: string[] = config[key] || [];
-  return features.includes(feature);
+  const tierKey = tier === 'invited' ? 'features_invited' : 'features_free';
+  const features: string[] = config[tierKey] || [];
+  return features.includes(key);
 }
 
 // Force refresh config cache (call after admin applies changes)

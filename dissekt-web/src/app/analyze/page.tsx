@@ -12,7 +12,8 @@ import LedgerView from '@/components/Ledger';
 import Reflect from '@/components/Reflect';
 import Scope from '@/components/Scope';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
-import { fetchConfig, isFeatureEnabled } from '@/lib/config';
+import { fetchConfig } from '@/lib/config';
+import { FeatureLockedPopup, useFeatureGate } from '@/components/FeatureGate';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -26,11 +27,16 @@ export default function ScanApp() {
   const [resetIn, setResetIn] = useState('');
   const [shareToast, setShareToast] = useState('');
   const [mounted, setMounted] = useState(false);
-  const [platformConfig, setPlatformConfig] = useState<Record<string, any>>({});
+  const [enabledFeatures, setEnabledFeatures] = useState<string[]>([]);
+  const { lockedFeature, checkFeature, closePopup } = useFeatureGate();
 
   useEffect(() => {
     setMounted(true);
-    fetchConfig().then(setPlatformConfig);
+    fetchConfig().then(cfg => {
+      const tier = getTier();
+      const key = tier === 'invited' ? 'features_invited' : 'features_free';
+      setEnabledFeatures(cfg[key] || ['single_scan', 'radar']);
+    });
     setRemaining(getRemaining());
     setResetIn(getResetTime());
     const t = setInterval(() => setResetIn(getResetTime()), 60000);
@@ -41,10 +47,16 @@ export default function ScanApp() {
     const mode = (modeArg === 'detailed' ? 'detailed' : 'brief') as 'brief' | 'detailed';
     if (!content || content.length < 10) { setError('Please enter at least 10 characters'); return; }
 
+    // Gate detailed mode
+    if (mode === 'detailed' && !enabledFeatures.includes('detailed_mode')) {
+      checkFeature('Detailed mode', enabledFeatures);
+      return;
+    }
+
     if (!canScan(mode)) {
       const tier = getTier();
       if (tier === 'free') {
-        setError(`Free tier limit reached for ${mode} scans (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT. Get an invite for more.`);
+        setError(`Free tier limit reached for ${mode} scans (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT.`);
       } else {
         setError(`Daily limit reached for ${mode} scans. Resets in ${getResetTime()} at 00:00 GMT.`);
       }
@@ -95,12 +107,14 @@ export default function ScanApp() {
     <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
       <SiteHeader active="Analyze" />
 
+      {lockedFeature && <FeatureLockedPopup feature={lockedFeature} onClose={closePopup} />}
+
       {shareToast && (
         <div style={{ position: 'fixed', top: 70, left: '50%', transform: 'translateX(-50%)', background: '#1a1a1a', color: '#fff', padding: '8px 16px', borderRadius: 8, fontSize: 13, zIndex: 100 }}>{shareToast}</div>
       )}
 
       {/* Scan input area */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5' }}>
+      <div style={{ background: '#fff', borderBottom: '0.5px solid #e5eaea' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 6 }}>
@@ -108,9 +122,9 @@ export default function ScanApp() {
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
                 Single scan
               </button>
-              <button onClick={() => isFeatureEnabled(platformConfig, 'bulk') ? setScanTab('bulk') : (window.location.href = '/invite')}
+              <button onClick={() => { if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
-                📊 Bulk CSV {getTier() !== 'invited' && '🔒'}
+                📊 Bulk CSV {!enabledFeatures.includes('bulk') && '🔒'}
               </button>
               <a href="/compare" style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: '#f0f0ee', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>⚖️ Compare</a>
             </div>
@@ -130,7 +144,7 @@ export default function ScanApp() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
         {error && (
-          <div style={{ marginBottom: 16, padding: 12, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>
+          <div style={{ marginBottom: 16, padding: 12, background: '#fef2f2', border: '0.5px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>
         )}
 
         {loading && <LoadingState />}
@@ -139,15 +153,15 @@ export default function ScanApp() {
 
         {!result && !loading && (
           <>
-            <Recall onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
             <Reflect />
             <LedgerView />
-            <ScanHistory onReanalyze={(input) => handleScan(input, 'brief')} />
-            <Scope onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <Recall onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <ScanHistory onReanalyze={(input: string) => handleScan(input, 'brief')} />
+            <Scope onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </>
         )}
       </div>
-    <SiteFooter />
+      <SiteFooter />
     </main>
   );
 }
