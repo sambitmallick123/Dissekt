@@ -41,7 +41,7 @@ export default function SiteHeader({ active }: { active?: string }) {
             {tier === 'invited' ? (
               <span style={{ fontSize: 11, color: '#0d9488', background: '#f0fdfa', padding: '4px 12px', borderRadius: 6, fontWeight: 600 }}>🎫 Invited</span>
             ) : (
-              <a href="/invite" style={{ fontSize: 13, color: '#fff', textDecoration: 'none', borderRadius: 8, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>
+              <a href="/signup" style={{ fontSize: 13, color: '#fff', textDecoration: 'none', borderRadius: 8, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>
                 Get access
               </a>
             )}

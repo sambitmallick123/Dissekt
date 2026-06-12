@@ -31,7 +31,7 @@ export default function SiteFooter() {
             <div style={{ fontSize: 11, fontWeight: 600, color: '#404040', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Resources</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <a href="/help" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>How it works</a>
-              <a href="/invite" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Get access</a>
+              <a href="/signup" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Sign up</a>
               <a href="/feedback" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Feedback</a>
               <a href="/aperture" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Aperture</a>
               <a href="/seal" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Seal</a>

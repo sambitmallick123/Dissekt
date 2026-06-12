@@ -720,6 +720,293 @@ async def trust_network(report_id: str):
         return {"report_id": report_id, "total_votes": 0, "error": str(e)}
 
 
+
+
+# ============================================
+# Auth endpoints
+# ============================================
+
+@app.post("/api/auth/signup")
+async def signup(body: dict):
+    """Register a new user."""
+    import bcrypt
+    settings = get_settings()
+    email = (body.get("email") or "").strip().lower()
+    name = body.get("name", "")
+    password = body.get("password", "")
+    
+    if not email or not password:
+        from fastapi import HTTPException
+        raise HTTPException(400, "Email and password required")
+    if len(password) < 8:
+        from fastapi import HTTPException
+        raise HTTPException(400, "Password must be at least 8 characters")
+    
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    
+    existing = sb.table("users").select("id").eq("email", email).execute()
+    if existing.data:
+        from fastapi import HTTPException
+        raise HTTPException(400, "Email already registered")
+    
+    pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    
+    # Check if they have an invitation
+    inv = sb.table("invitations").select("status, invite_code, access_expires_at").eq("email", email).eq("status", "approved").execute()
+    tier = "invited" if inv.data else "free"
+    expires = inv.data[0].get("access_expires_at") if inv.data else None
+    
+    result = sb.table("users").insert({
+        "email": email, "name": name, "password_hash": pw_hash,
+        "tier": tier, "invite_code": inv.data[0].get("invite_code") if inv.data else None,
+        "access_expires_at": expires,
+    }).execute()
+    
+    user = result.data[0] if result.data else {}
+    
+    import hashlib, time
+    token = hashlib.sha256(f"{email}:{time.time()}:{settings.supabase_key}".encode()).hexdigest()[:48]
+    
+    return {"success": True, "token": token, "user": {"email": email, "name": name, "tier": tier}}
+
+
+@app.post("/api/auth/login")
+async def login(body: dict):
+    """Login with email and password."""
+    import bcrypt
+    settings = get_settings()
+    email = (body.get("email") or "").strip().lower()
+    password = body.get("password", "")
+    
+    if not email or not password:
+        from fastapi import HTTPException
+        raise HTTPException(400, "Email and password required")
+    
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    
+    result = sb.table("users").select("*").eq("email", email).execute()
+    if not result.data:
+        from fastapi import HTTPException
+        raise HTTPException(401, "Invalid email or password")
+    
+    user = result.data[0]
+    if not bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
+        from fastapi import HTTPException
+        raise HTTPException(401, "Invalid email or password")
+    
+    # Check access expiry
+    from datetime import datetime
+    if user.get("access_expires_at"):
+        if datetime.fromisoformat(user["access_expires_at"].replace("Z", "+00:00")) < datetime.now(datetime.now().astimezone().tzinfo):
+            sb.table("users").update({"tier": "free"}).eq("id", user["id"]).execute()
+            user["tier"] = "free"
+    
+    sb.table("users").update({"last_login": datetime.utcnow().isoformat()}).eq("id", user["id"]).execute()
+    
+    import hashlib, time
+    token = hashlib.sha256(f"{email}:{time.time()}:{settings.supabase_key}".encode()).hexdigest()[:48]
+    
+    return {"success": True, "token": token, "user": {"email": user["email"], "name": user.get("name"), "tier": user["tier"]}}
+
+
+
+# ============================================
+# API key management
+# ============================================
+
+@app.post("/api/keys/create")
+async def create_api_key(body: dict):
+    """Generate a new API key for a user."""
+    import hashlib, secrets
+    settings = get_settings()
+    email = body.get("email", "")
+    name = body.get("name", "Default")
+    
+    if not email:
+        from fastapi import HTTPException
+        raise HTTPException(400, "Email required")
+    
+    raw_key = f"dsk_{secrets.token_hex(24)}"
+    key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
+    key_prefix = raw_key[:12]
+    
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    sb.table("api_keys").insert({
+        "user_email": email, "key_hash": key_hash, "key_prefix": key_prefix, "name": name,
+    }).execute()
+    
+    return {"key": raw_key, "prefix": key_prefix, "name": name, "note": "Save this key — it cannot be shown again."}
+
+
+@app.get("/api/keys")
+async def list_api_keys(email: str = ""):
+    """List API keys for a user (shows prefix only)."""
+    settings = get_settings()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    result = sb.table("api_keys").select("id, key_prefix, name, tier, rate_limit, requests_today, active, created_at").eq("user_email", email).execute()
+    return {"keys": result.data or []}
+
+
+@app.post("/api/keys/revoke")
+async def revoke_api_key(body: dict):
+    """Deactivate an API key."""
+    settings = get_settings()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    sb.table("api_keys").update({"active": False}).eq("id", body.get("id")).execute()
+    return {"success": True}
+
+
+async def validate_api_key(key: str) -> dict | None:
+    """Validate an API key and return user info. Returns None if invalid."""
+    import hashlib
+    settings = get_settings()
+    key_hash = hashlib.sha256(key.encode()).hexdigest()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    result = sb.table("api_keys").select("*").eq("key_hash", key_hash).eq("active", True).execute()
+    if not result.data:
+        return None
+    row = result.data[0]
+    # Rate limit check (reset daily)
+    from datetime import datetime, timedelta
+    last_reset = datetime.fromisoformat(row["last_reset"].replace("Z", "+00:00")) if row.get("last_reset") else datetime.min
+    now = datetime.utcnow()
+    if (now - last_reset.replace(tzinfo=None)).days >= 1:
+        sb.table("api_keys").update({"requests_today": 1, "last_reset": now.isoformat()}).eq("id", row["id"]).execute()
+        return row
+    if row["requests_today"] >= row["rate_limit"]:
+        return None  # rate limited
+    sb.table("api_keys").update({"requests_today": row["requests_today"] + 1}).eq("id", row["id"]).execute()
+    return row
+
+
+
+# ============================================
+# Webhooks
+# ============================================
+
+@app.post("/api/webhooks/create")
+async def create_webhook(body: dict):
+    """Register a webhook URL."""
+    settings = get_settings()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    sb.table("webhooks").insert({
+        "user_email": body.get("email", ""),
+        "url": body.get("url", ""),
+        "events": body.get("events", ["scan.complete"]),
+        "topic_filter": body.get("topic_filter"),
+        "confidence_threshold": body.get("confidence_threshold", 0.7),
+    }).execute()
+    return {"success": True}
+
+
+@app.get("/api/webhooks")
+async def list_webhooks(email: str = ""):
+    """List webhooks for a user."""
+    settings = get_settings()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    result = sb.table("webhooks").select("*").eq("user_email", email).execute()
+    return {"webhooks": result.data or []}
+
+
+@app.delete("/api/webhooks/{webhook_id}")
+async def delete_webhook(webhook_id: str):
+    """Delete a webhook."""
+    settings = get_settings()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    sb.table("webhooks").delete().eq("id", webhook_id).execute()
+    return {"success": True}
+
+
+async def fire_webhooks(event: str, data: dict):
+    """Fire all matching webhooks for an event."""
+    settings = get_settings()
+    try:
+        from supabase import create_client
+        sb = create_client(settings.supabase_url, settings.supabase_key)
+        hooks = sb.table("webhooks").select("*").eq("active", True).contains("events", [event]).execute()
+        
+        import httpx
+        async with httpx.AsyncClient(timeout=10) as client:
+            for hook in (hooks.data or []):
+                topic = hook.get("topic_filter")
+                if topic and topic.lower() not in str(data).lower():
+                    continue
+                try:
+                    await client.post(hook["url"], json={"event": event, "data": data})
+                except:
+                    pass
+    except:
+        pass
+
+
+
+# ============================================
+# Dispatch cron (call weekly via external cron)
+# ============================================
+
+@app.post("/api/dispatch/cron")
+async def dispatch_cron(body: dict = {}):
+    """Send weekly digest to all invited users. Call via cron.org or Railway cron."""
+    settings = get_settings()
+    secret = body.get("secret", "")
+    if secret != (settings.dissekt_admin_key if hasattr(settings, "dissekt_admin_key") else "dissekt-sambit-2026"):
+        from fastapi import HTTPException
+        raise HTTPException(401, "Invalid secret")
+    
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    
+    # Get all invited users
+    users = sb.table("invitations").select("email, name").eq("status", "approved").execute()
+    emails = [u["email"] for u in (users.data or []) if u.get("email")]
+    
+    if not emails:
+        return {"sent": 0, "reason": "No invited users"}
+    
+    # Get digest data
+    digest = await weekly_digest()
+    if digest["total_analyses"] == 0:
+        return {"sent": 0, "reason": "No analyses this week"}
+    
+    techs_html = "".join(f"<li>{t['name'].replace('_', ' ')} ({t['count']}x)</li>" for t in digest.get("top_techniques", []))
+    topics_html = "".join(f"<li>{t['topic']} ({t['count']} analyses)</li>" for t in digest.get("trending_topics", []))
+    
+    sent = 0
+    import httpx
+    async with httpx.AsyncClient() as client:
+        for email in emails:
+            try:
+                await client.post("https://api.resend.com/emails",
+                    headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                    json={
+                        "from": "Dissekt <onboarding@resend.dev>",
+                        "to": email,
+                        "subject": f"Dissekt Dispatch: {digest['total_analyses']} analyses this week",
+                        "html": f"""<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;">
+                            <div style="background:#0d9488;padding:16px 20px;border-radius:10px 10px 0 0;"><h2 style="color:white;margin:0;">Dissekt Dispatch</h2></div>
+                            <div style="background:#fff;padding:20px;border:1px solid #e5eaea;border-top:none;border-radius:0 0 10px 10px;">
+                            <p>{digest['total_analyses']} analyses this week.</p>
+                            <h3 style="font-size:14px;">Top techniques</h3><ul>{techs_html or '<li>None</li>'}</ul>
+                            <h3 style="font-size:14px;">Trending topics</h3><ul>{topics_html or '<li>None</li>'}</ul>
+                            <div style="text-align:center;margin:20px 0;"><a href="https://dissekt.info/analyze" style="background:#0d9488;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;">Analyze something</a></div>
+                            <p style="font-size:11px;color:#aaa;text-align:center;">dissekt.info</p></div></div>"""
+                    })
+                sent += 1
+            except:
+                pass
+    
+    return {"sent": sent, "total_users": len(emails)}
+
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================
