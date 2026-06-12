@@ -6,9 +6,9 @@ interface Technique {
   explanation?: string;
 }
 
-export default function PrePublishCheck({ data }: { data: any }) {
+export default function Polish({ data }: { data: any }) {
   const techs: Technique[] = data?.prism?.techniques || [];
-  const score = data?.transparency_score ?? 100;
+  const score = data?.clarity_score ?? 100;
   
   if (techs.length === 0) return (
     <div style={{ background: '#f0fdf4', border: '0.5px solid #dcfce7', borderRadius: 14, padding: 20, marginTop: 16, textAlign: 'center' }}>
@@ -39,7 +39,7 @@ export default function PrePublishCheck({ data }: { data: any }) {
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 20, marginTop: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{ fontSize: 16 }}>✍️</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Pre-publish check</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Polish</span>
         <span style={{ fontSize: 12, color: '#888' }}>How your draft reads to others</span>
       </div>
 

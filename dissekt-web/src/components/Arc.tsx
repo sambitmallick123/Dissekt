@@ -1,6 +1,6 @@
 'use client';
 
-export default function NarrativeArc({ analyses, topic }: { analyses: any[]; topic: string }) {
+export default function Arc({ analyses, topic }: { analyses: any[]; topic: string }) {
   if (!analyses || analyses.length < 2) return null;
 
   // Group by week
@@ -37,7 +37,7 @@ export default function NarrativeArc({ analyses, topic }: { analyses: any[]; top
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 20, marginTop: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{ fontSize: 16 }}>📈</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Narrative arc</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Arc</span>
         <span style={{ fontSize: 12, color: '#888' }}>How "{topic}" coverage evolved</span>
       </div>
 

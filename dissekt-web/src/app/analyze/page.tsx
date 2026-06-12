@@ -7,10 +7,10 @@ import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
 import ScanHistory, { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
-import ReaderMemory from '@/components/ReaderMemory';
-import DecisionJournalView from '@/components/DecisionJournal';
-import BiasProfile from '@/components/BiasProfile';
-import RadarFeed from '@/components/RadarFeed';
+import Recall from '@/components/Recall';
+import LedgerView from '@/components/Ledger';
+import Reflect from '@/components/Reflect';
+import Scope from '@/components/Scope';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
 import { fetchConfig, isFeatureEnabled } from '@/lib/config';
 
@@ -139,11 +139,11 @@ export default function ScanApp() {
 
         {!result && !loading && (
           <>
-            <ReaderMemory onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-            <BiasProfile />
-            <DecisionJournalView />
+            <Recall onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <Reflect />
+            <LedgerView />
             <ScanHistory onReanalyze={(input) => handleScan(input, 'brief')} />
-            <RadarFeed onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <Scope onAnalyze={(text) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </>
         )}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-export default function CounterfactualCard({ counterfactuals }: { counterfactuals: any[] }) {
+export default function Mirror({ counterfactuals }: { counterfactuals: any[] }) {
   if (!counterfactuals || counterfactuals.length === 0) return null;
 
   return (

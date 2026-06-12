@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ExtractedClaims({ claims }: { claims: any[] }) {
+export default function FacetCard({ claims }: { claims: any[] }) {
   const [expanded, setExpanded] = useState(false);
   if (!claims || claims.length === 0) return null;
 

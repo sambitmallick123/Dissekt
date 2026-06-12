@@ -67,7 +67,7 @@ export default function BulkAnalysis() {
   };
 
   const downloadCSV = () => {
-    const header = 'Input,Transparency Score,Techniques,Technique Names,Fact Checks,Toxicity,Sentiment,Language\n';
+    const header = 'Input,Clarity Score,Techniques,Technique Names,Fact Checks,Toxicity,Sentiment,Language\n';
     const rows = items.filter(i => i.result).map(i => {
       const r = i.result;
       const techs = r.prism?.techniques || [];

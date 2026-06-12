@@ -16,7 +16,7 @@ export async function getDailyUsage(): Promise<number> {
 export async function logScan(data: {
   content_preview: string;
   mode: string;
-  transparency_score: number;
+  clarity_score: number;
   techniques_count: number;
   analysis_time_ms: number;
 }) {

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function Annotations({ reportId }: { reportId: string }) {
+export default function Marginalia({ reportId }: { reportId: string }) {
   const [annotations, setAnnotations] = useState<any[]>([]);
   const [newText, setNewText] = useState('');
   const [author, setAuthor] = useState('');
@@ -43,7 +43,7 @@ export default function Annotations({ reportId }: { reportId: string }) {
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 18, marginTop: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 16 }}>💬</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Community notes</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Marginalia</span>
         <span style={{ fontSize: 12, color: '#888' }}>{annotations.length} annotation{annotations.length !== 1 ? 's' : ''}</span>
       </div>
 

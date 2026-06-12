@@ -392,16 +392,16 @@ function SettingsTab({ adminKey }: { adminKey: string }) {
     { key: 'bulk', label: 'Bulk CSV analysis' },
     { key: 'compare', label: 'Compare sources' },
     { key: 'topics', label: 'Topic tracking' },
-    { key: 'radar', label: 'Radar feeds' },
+    { key: 'radar', label: 'Scope feeds' },
     { key: 'detailed_mode', label: 'Detailed mode' },
     { key: 'image_upload', label: 'Image upload' },
     { key: 'camera_upload', label: 'Camera upload' },
-    { key: 'memory', label: 'Reader memory' },
-    { key: 'journal', label: 'Decision journal' },
-    { key: 'compass', label: 'Compass (political)' },
-    { key: 'pulse', label: 'Pulse (coordination)' },
-    { key: 'counterfactual', label: 'Counterfactual view' },
-    { key: 'claims', label: 'Claim extraction' },
+    { key: 'memory', label: 'Recall' },
+    { key: 'journal', label: 'Ledger' },
+    { key: 'compass', label: 'Meridian (political)' },
+    { key: 'pulse', label: 'Flare (coordination)' },
+    { key: 'counterfactual', label: 'Mirror view' },
+    { key: 'claims', label: 'Facet extraction' },
   ];
 
   const inp: React.CSSProperties = { padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none', width: 80, textAlign: 'center' as const };

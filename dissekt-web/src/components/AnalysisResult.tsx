@@ -1,19 +1,19 @@
 'use client';
-import ThreatScore from './ThreatScore';
+import ClarityScore from './ClarityScore';
 import PrismCard from './PrismCard';
-import SignalCard from './SignalCard';
-import TraceCard from './TraceCard';
+import SpectrumCard from './SpectrumCard';
+import LensCard from './LensCard';
 import MetaCard from './MetaCard';
-import SimilarClaims from './SimilarClaims';
-import ExtractedClaims from './ExtractedClaims';
-import CounterfactualCard from './CounterfactualCard';
-import ReadingMode from './ReadingMode';
-import Annotations from './Annotations';
-import TrustNetwork from './TrustNetwork';
-import PrePublishCheck from './PrePublishCheck';
-import { DecisionButtons } from './DecisionJournal';
-import CompassCard from './CompassCard';
-import PulseCard from './PulseCard';
+import LatticeCard from './LatticeCard';
+import FacetCard from './FacetCard';
+import Mirror from './Mirror';
+import Loupe from './Loupe';
+import Marginalia from './Marginalia';
+import Chorus from './Chorus';
+import Polish from './Polish';
+import { LedgerButtons } from './Ledger';
+import MeridianCard from './MeridianCard';
+import FlareCard from './FlareCard';
 
 const LANG_NAMES: Record<string, string> = { en: 'English', hi: 'Hindi', de: 'German', es: 'Spanish', fr: 'French' };
 
@@ -40,44 +40,44 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         )}
       </div>
 
-      <div className="anim-fade"><ThreatScore data={data} /></div>
+      <div className="anim-fade"><ClarityScore data={data} /></div>
 
       <div className="result-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
         <div className="anim-fade anim-d1"><PrismCard prism={data.prism} analysisId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ""} /></div>
-        <div className="anim-fade anim-d2"><TraceCard trace={data.trace} /></div>
-        <div className="anim-fade anim-d3"><SignalCard signal={data.signal} /></div>
+        <div className="anim-fade anim-d2"><LensCard trace={data.trace} /></div>
+        <div className="anim-fade anim-d3"><SpectrumCard signal={data.signal} /></div>
         <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
       </div>
 
-      {/* Decision Journal */}
+      {/* Ledger */}
       <div className="anim-fade" style={{ marginTop: 12 }}>
-        <DecisionButtons analysisId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} inputPreview={data.input_content || data.extracted_text?.slice(0, 200) || ''} />
+        <LedgerButtons analysisId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} inputPreview={data.input_content || data.extracted_text?.slice(0, 200) || ''} />
       </div>
 
       {data.counterfactuals?.length > 0 && (
-        <div className="anim-fade anim-d2"><CounterfactualCard counterfactuals={data.counterfactuals} /></div>
+        <div className="anim-fade anim-d2"><Mirror counterfactuals={data.counterfactuals} /></div>
       )}
 
       {data.extracted_claims?.length > 0 && (
-        <div className="anim-fade anim-d3"><ExtractedClaims claims={data.extracted_claims} /></div>
+        <div className="anim-fade anim-d3"><FacetCard claims={data.extracted_claims} /></div>
       )}
 
       {data.similar_claims?.length > 0 && (
-        <div className="anim-fade anim-d4"><SimilarClaims claims={data.similar_claims} /></div>
+        <div className="anim-fade anim-d4"><LatticeCard claims={data.similar_claims} /></div>
       )}
 
       {data.compass?.politicians?.length > 0 && (
-        <div className="anim-fade anim-d3"><CompassCard compass={data.compass} /></div>
+        <div className="anim-fade anim-d3"><MeridianCard compass={data.compass} /></div>
       )}
 
       {data.pulse?.detected && (
-        <div className="anim-fade anim-d4"><PulseCard pulse={data.pulse} /></div>
+        <div className="anim-fade anim-d4"><FlareCard pulse={data.pulse} /></div>
       )}
-      {/* Trust network */}
-      <TrustNetwork reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
+      {/* Chorus */}
+      <Chorus reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
 
-      {/* Community notes */}
-      <Annotations reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
+      {/* Marginalia */}
+      <Marginalia reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
     </div>
   );
 }

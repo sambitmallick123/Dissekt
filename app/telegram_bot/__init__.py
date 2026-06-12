@@ -27,9 +27,9 @@ def format_result(data: dict) -> str:
     label = "LOW TRANSPARENCY" if score <= 30 else "MODERATE" if score <= 60 else "HIGH TRANSPARENCY"
 
     lines = [
-        f"🛡 <b>DISSEKT — INFORMATION TRANSPARENCY</b>",
+        f"🛡 <b>DISSEKT — CLARITY REPORT</b>",
         f"",
-        f"{emoji} <b>Transparency Score: {score}/100 — {label}</b>",
+        f"{emoji} <b>Clarity Score: {score}/100 — {label}</b>",
     ]
 
     if techs:

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ReaderMemory({ onAnalyze }: { onAnalyze: (text: string) => void }) {
+export default function Recall({ onAnalyze }: { onAnalyze: (text: string) => void }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

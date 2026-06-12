@@ -7,7 +7,7 @@ const DECISIONS = [
   { key: 'reject', emoji: '❌', label: 'Reject', color: '#dc2626', bg: '#fef2f2' },
 ];
 
-export function DecisionButtons({ analysisId, inputPreview }: { analysisId: string; inputPreview: string }) {
+export function LedgerButtons({ analysisId, inputPreview }: { analysisId: string; inputPreview: string }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [saved, setSaved] = useState(false);
@@ -70,7 +70,7 @@ export function DecisionButtons({ analysisId, inputPreview }: { analysisId: stri
   );
 }
 
-export default function DecisionJournalView() {
+export default function LedgerView() {
   const [decisions, setDecisions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -96,7 +96,7 @@ export default function DecisionJournalView() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 16 }}>📓</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#404040' }}>Decision Journal</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#404040' }}>Ledger</span>
           <span style={{ fontSize: 12, color: '#888' }}>Your past verdicts</span>
         </div>
         {!loaded && (

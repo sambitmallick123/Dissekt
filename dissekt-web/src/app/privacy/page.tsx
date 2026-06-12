@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           <p><strong>Content you submit for analysis:</strong> When you paste text, a URL, or upload an image, that content is sent to our analysis servers for processing. We do not store the full content permanently. A short preview (first 200 characters) may be stored alongside the analysis result for shareable reports.</p>
           <p><strong>Analysis results:</strong> The output of each analysis (techniques detected, cross-references found, scores) is stored in our database to enable shareable report links and the knowledge graph feature.</p>
           <p><strong>Feedback and corrections:</strong> If you submit feedback or use the 👍/👎 correction buttons, your input is stored to improve future analysis accuracy.</p>
-          <p><strong>Decision journal:</strong> If you mark content as Trust/Unsure/Reject, this is stored to enable the journal feature.</p>
+          <p><strong>Ledger:</strong> If you mark content as Trust/Unsure/Reject, this is stored to enable the journal feature.</p>
           <p><strong>Usage data:</strong> We track the number of scans per day for rate limiting. No personal identifying information is collected.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, marginTop: 20 }}>3. Chrome extension</h2>

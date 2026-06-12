@@ -12,7 +12,7 @@ export default function SiteHeader({ active }: { active?: string }) {
 
   const links = [
     { href: '/analyze', label: 'Analyze' },
-    { href: '/topics', label: 'Topics' },
+    { href: '/observatory', label: 'Observatory' },
     { href: '/compare', label: 'Compare' },
     { href: '/help', label: 'Help' },
     { href: '/feedback', label: 'Feedback' },

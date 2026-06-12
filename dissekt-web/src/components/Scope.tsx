@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 type Market = 'all' | 'india' | 'us' | 'germany' | 'uk';
 
-export default function RadarFeed({ onAnalyze }: { onAnalyze?: (text: string) => void }) {
+export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => void }) {
   const [items, setItems] = useState<any[]>([]);
   const [market, setMarket] = useState<Market>('all');
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export default function RadarFeed({ onAnalyze }: { onAnalyze?: (text: string) =>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 16 }}>📡</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Radar</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Scope</span>
           <span style={{ fontSize: 12, color: '#888' }}>Latest news to analyze</span>
         </div>
         <button onClick={() => loadFeed(market)} style={{ fontSize: 10, padding: '3px 10px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600 }}>Refresh</button>
@@ -47,7 +47,7 @@ export default function RadarFeed({ onAnalyze }: { onAnalyze?: (text: string) =>
 
       {loading && <div style={{ textAlign: 'center', padding: 16, color: '#888', fontSize: 12 }}>Loading feeds...</div>}
 
-      {!loading && items.length === 0 && <div style={{ textAlign: 'center', padding: 16, color: '#888', fontSize: 12 }}>No items. Radar feeds update every 6 hours.</div>}
+      {!loading && items.length === 0 && <div style={{ textAlign: 'center', padding: 16, color: '#888', fontSize: 12 }}>No items. Scope feeds update every 6 hours.</div>}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {items.slice(0, 8).map((item, i) => (

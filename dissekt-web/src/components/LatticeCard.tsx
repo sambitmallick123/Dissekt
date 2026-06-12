@@ -1,6 +1,6 @@
 'use client';
 
-export default function SimilarClaims({ claims }: { claims: any[] }) {
+export default function LatticeCard({ claims }: { claims: any[] }) {
   if (!claims || claims.length === 0) return null;
 
   return (

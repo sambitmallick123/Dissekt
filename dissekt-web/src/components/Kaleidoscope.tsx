@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function SourceMatrix() {
+export default function Kaleidoscope() {
   const [claim, setClaim] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function SourceMatrix() {
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{ fontSize: 16 }}>📊</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Source comparison matrix</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Kaleidoscope</span>
         <span style={{ fontSize: 12, color: '#888' }}>How would different outlets frame this?</span>
       </div>
 

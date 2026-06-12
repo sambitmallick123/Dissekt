@@ -37,7 +37,7 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
             {[
               { n: '1', t: 'You paste content', d: 'A URL, article text, screenshot, or claim. Dissekt accepts any format.' },
-              { n: '2', t: 'Engines analyze it', d: 'Prism identifies techniques. Trace finds cross-references. Signal scores evidence. Compass checks political context.' },
+              { n: '2', t: 'Engines analyze it', d: 'Prism identifies techniques. Lens finds cross-references. Spectrum scores evidence. Meridian checks political context.' },
               { n: '3', t: 'You see the framing', d: 'Transparency score, alternative framings, extracted claims — everything you need to think critically.' },
             ].map(s => (
               <div key={s.n} style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 12, padding: '20px' }}>
@@ -58,15 +58,15 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
             {[
               { icon: '🔍', name: 'Prism', desc: '20 manipulation techniques detected with confidence scores — loaded language, cherry-picking, appeal to fear, and more.' },
-              { icon: '🌐', name: 'Trace', desc: 'Cross-references 100+ fact-checking organizations automatically. Shows what others have verified.' },
-              { icon: '📊', name: 'Signal', desc: 'Evidence provenance — toxicity, sentiment, source credibility from 231 outlets.' },
-              { icon: '🏛️', name: 'Compass', desc: 'Political context for 30+ Indian and 10+ US politicians. Voting records, promises, accountability.' },
-              { icon: '📡', name: 'Radar', desc: '16 RSS feeds across India, US, Germany, UK. Risk-scored headlines updated every 6 hours.' },
-              { icon: '🔗', name: 'Claim Graph', desc: 'Every analysis builds a knowledge graph. Find similar claims across your analysis history.' },
-              { icon: '🔄', name: 'Counterfactual', desc: 'Shows alternative framings — "as stated" vs "with more context" vs "what\'s omitted".' },
-              { icon: '⚡', name: 'Pulse', desc: 'Coordination detection — volume spikes, near-duplicates, temporal bursts, technique patterns.' },
-              { icon: '📝', name: 'Claims', desc: 'Extracts individual verifiable claims with types (statistic, quote, event, prediction, causal).' },
-              { icon: '🔒', name: 'Anchor', desc: 'SHA-256 + OpenTimestamps blockchain proof. Immutable record of what was analyzed and when.' },
+              { icon: '🌐', name: 'Lens', desc: 'Focuses on cross-references 100+ fact-checking organizations automatically. Shows what others have verified.' },
+              { icon: '📊', name: 'Spectrum', desc: 'Evidence provenance — toxicity, sentiment, source credibility from 231 outlets.' },
+              { icon: '🏛️', name: 'Meridian', desc: 'Political context for 30+ Indian and 10+ US politicians. Voting records, promises, accountability.' },
+              { icon: '📡', name: 'Scope', desc: '16 RSS feeds across India, US, Germany, UK. Risk-scored headlines updated every 6 hours.' },
+              { icon: '🔗', name: 'Lattice', desc: 'Every analysis builds a knowledge graph. Find similar claims across your analysis history.' },
+              { icon: '🔄', name: 'Mirror', desc: 'Shows alternative framings — "as stated" vs "with more context" vs "what\'s omitted".' },
+              { icon: '⚡', name: 'Flare', desc: 'Coordination detection — volume spikes, near-duplicates, temporal bursts, technique patterns.' },
+              { icon: '📝', name: 'Facet', desc: 'Extracts individual verifiable claims with types (statistic, quote, event, prediction, causal).' },
+              { icon: '🔒', name: 'Crystal', desc: 'SHA-256 + OpenTimestamps blockchain proof. Immutable record of what was analyzed and when.' },
             ].map(e => (
               <div key={e.name} style={{ display: 'flex', gap: 12, padding: '12px 14px', borderRadius: 10, border: '0.5px solid #e5eaea' }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{e.icon}</span>
@@ -92,7 +92,7 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
                 3 brief scans/day<br />
                 1 detailed scan/day<br />
                 Single analysis<br />
-                Radar feeds<br />
+                Scope feeds<br />
                 Resets 00:00 GMT
               </div>
               <button onClick={onTryFree} style={{ marginTop: 16, width: '100%', padding: '8px 0', background: '#f0fdfa', color: '#0d9488', border: '0.5px solid #ccfbf1', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>

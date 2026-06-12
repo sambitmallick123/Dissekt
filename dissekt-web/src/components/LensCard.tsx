@@ -20,7 +20,7 @@ const dotColor = (p: string) => {
   return '#aaa';
 };
 
-export default function TraceCard({ trace }: { trace: any }) {
+export default function LensCard({ trace }: { trace: any }) {
   const [showAllFC, setShowAllFC] = useState(false);
   const [showAllTL, setShowAllTL] = useState(false);
   const hasFC = trace.fact_checks?.length > 0;
@@ -34,7 +34,7 @@ export default function TraceCard({ trace }: { trace: any }) {
         <div style={{ width: 30, height: 30, borderRadius: 8, background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
         </div>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Trace — cross-references</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#404040', flex: 1 }}>Lens — cross-references</span>
         <span style={{ fontSize: 12, color: '#aaa' }}>
           {hasFC && `${trace.fact_checks.length} checks`}{hasFC && hasTL && ' · '}{hasTL && `${trace.spread_timeline.length} sources`}
         </span>

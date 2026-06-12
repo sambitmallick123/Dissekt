@@ -34,7 +34,7 @@ function getColor(name: string) {
   return TECHNIQUE_COLORS[name] || TECHNIQUE_COLORS.default;
 }
 
-export default function ReadingMode({ text, techniques, counterfactuals }: {
+export default function Loupe({ text, techniques, counterfactuals }: {
   text: string;
   techniques: Technique[];
   counterfactuals?: any[];
@@ -89,7 +89,7 @@ export default function ReadingMode({ text, techniques, counterfactuals }: {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 16 }}>📖</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Reading mode</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Loupe</span>
           <span style={{ fontSize: 12, color: '#888' }}>Highlighted annotations</span>
         </div>
         <button onClick={() => setShowLegend(!showLegend)}

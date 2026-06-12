@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function TrustNetwork({ reportId }: { reportId: string }) {
+export default function Chorus({ reportId }: { reportId: string }) {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function TrustNetwork({ reportId }: { reportId: string }) {
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 16, marginTop: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 14 }}>🌐</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>Community signal</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>Chorus</span>
         <span style={{ fontSize: 11, color: '#888' }}>{data.total_votes} user{data.total_votes !== 1 ? 's' : ''} evaluated this</span>
       </div>
 

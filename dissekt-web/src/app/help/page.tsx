@@ -5,7 +5,7 @@ import SiteFooter from '@/components/SiteFooter';
 const components = [
   {
     icon: '🎯',
-    name: 'Transparency Score',
+    name: 'Clarity Score',
     color: '#dc2626',
     desc: 'An overall risk score from 0 to 100 based on the combination of manipulation techniques found, existing cross-references, and toxicity level.',
     details: [
@@ -123,7 +123,7 @@ const components = [
   },
   {
     icon: '📡',
-    name: 'Radar',
+    name: 'Scope',
     color: '#ea580c',
     desc: 'Live RSS feeds from fact-checkers and news sources across 4 markets, with risk badges.',
     details: [
@@ -132,7 +132,7 @@ const components = [
       '🟡 Medium risk: headlines with "fact-check", "debunk", "misleading"',
       '🟢 Low risk: standard news headlines',
       'Cached in Redis for 6 hours, with manual refresh option',
-      'Click "Analyze" on any Radar item to scan it instantly',
+      'Click "Analyze" on any Scope item to scan it instantly',
     ]
   },
 ];

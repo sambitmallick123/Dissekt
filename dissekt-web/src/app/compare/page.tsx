@@ -1,11 +1,11 @@
 'use client';
-import SourceMatrix from '@/components/SourceMatrix';
+import Kaleidoscope from '@/components/Kaleidoscope';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
-import ThreatScore from '@/components/ThreatScore';
+import ClarityScore from '@/components/ClarityScore';
 import PrismCard from '@/components/PrismCard';
-import TraceCard from '@/components/TraceCard';
+import LensCard from '@/components/LensCard';
 
 export default function ComparePage() {
   const [contentA, setContentA] = useState('');
@@ -87,22 +87,22 @@ export default function ComparePage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#0d9488', marginBottom: 8, padding: '6px 12px', background: '#f0fdfa', borderRadius: 8, textAlign: 'center' }}>Source A</div>
-                <ThreatScore data={result.result_a} />
+                <ClarityScore data={result.result_a} />
                 <div style={{ marginTop: 12 }}><PrismCard prism={result.result_a?.prism} /></div>
-                <div style={{ marginTop: 12 }}><TraceCard trace={result.result_a?.trace} /></div>
+                <div style={{ marginTop: 12 }}><LensCard trace={result.result_a?.trace} /></div>
               </div>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#2563eb', marginBottom: 8, padding: '6px 12px', background: '#eff6ff', borderRadius: 8, textAlign: 'center' }}>Source B</div>
-                <ThreatScore data={result.result_b} />
+                <ClarityScore data={result.result_b} />
                 <div style={{ marginTop: 12 }}><PrismCard prism={result.result_b?.prism} /></div>
-                <div style={{ marginTop: 12 }}><TraceCard trace={result.result_b?.trace} /></div>
+                <div style={{ marginTop: 12 }}><LensCard trace={result.result_b?.trace} /></div>
               </div>
             </div>
           </>
         )}
       </div>
             <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 32px' }}>
-          <SourceMatrix />
+          <Kaleidoscope />
         </div>
         <SiteFooter />
     </main>

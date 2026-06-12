@@ -6,7 +6,7 @@ const SEVERITY_STYLE: Record<string, { bg: string; color: string; icon: string }
   low: { bg: '#f0fdf4', color: '#065f46', icon: '🟢' },
 };
 
-export default function PulseCard({ pulse }: { pulse: any }) {
+export default function FlareCard({ pulse }: { pulse: any }) {
   if (!pulse?.detected) return null;
 
   const riskStyle = SEVERITY_STYLE[pulse.risk_level] || SEVERITY_STYLE.low;

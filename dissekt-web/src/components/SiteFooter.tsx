@@ -20,11 +20,11 @@ export default function SiteFooter() {
             <div style={{ fontSize: 11, fontWeight: 600, color: '#404040', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Product</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <a href="/analyze" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Analyze</a>
-              <a href="/topics" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Topics</a>
+              <a href="/observatory" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Observatory</a>
               <a href="/compare" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Compare</a>
               <a href="/docs" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>API</a>
-              <a href="/fingerprint" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Fingerprint</a>
-              <a href="/lifecycle" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Claim lifecycle</a>
+              <a href="/imprint" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Imprint</a>
+              <a href="/thread" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Thread</a>
             </div>
           </div>
           <div>
@@ -33,8 +33,8 @@ export default function SiteFooter() {
               <a href="/help" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>How it works</a>
               <a href="/invite" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Get access</a>
               <a href="/feedback" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Feedback</a>
-              <a href="/bookmarklet" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Bookmarklet</a>
-              <a href="/badge" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Embed badge</a>
+              <a href="/aperture" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Aperture</a>
+              <a href="/seal" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Seal</a>
               <a href="/contact" style={{ fontSize: 12, color: '#888', textDecoration: 'none' }}>Contact</a>
             </div>
           </div>

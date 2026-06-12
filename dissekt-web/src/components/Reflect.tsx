@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-export default function BiasProfile() {
+export default function Reflect() {
   const [decisions, setDecisions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -22,7 +22,7 @@ export default function BiasProfile() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 16 }}>🪞</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Your bias profile</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Your Reflect</span>
             <span style={{ fontSize: 12, color: '#888' }}>Based on your decisions</span>
           </div>
           <button onClick={load} disabled={loading} style={{ fontSize: 11, padding: '4px 12px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>
@@ -79,7 +79,7 @@ export default function BiasProfile() {
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 20, marginBottom: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{ fontSize: 16 }}>🪞</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Your bias profile</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Your Reflect</span>
         <span style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions</span>
       </div>
 

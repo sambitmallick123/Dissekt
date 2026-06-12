@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ThreatScore({ data }: { data: any }) {
+export default function ClarityScore({ data }: { data: any }) {
   const [showFormula, setShowFormula] = useState(false);
 
   const techs = data.prism?.techniques || [];
@@ -16,9 +16,9 @@ export default function ThreatScore({ data }: { data: any }) {
   const rawScore = Math.min(techScore + fcScore + toxScore + bonusScore, 100);
 
   // Invert: high raw = low transparency
-  const transparencyScore = 100 - rawScore;
-  const scoreColor = transparencyScore <= 30 ? '#dc2626' : transparencyScore <= 60 ? '#d97706' : '#16a34a';
-  const scoreLabel = transparencyScore <= 30 ? 'LOW TRANSPARENCY' : transparencyScore <= 60 ? 'MODERATE' : 'HIGH TRANSPARENCY';
+  const clarityScore = 100 - rawScore;
+  const scoreColor = clarityScore <= 30 ? '#dc2626' : clarityScore <= 60 ? '#d97706' : '#16a34a';
+  const scoreLabel = clarityScore <= 30 ? 'LOW TRANSPARENCY' : clarityScore <= 60 ? 'MODERATE' : 'HIGH TRANSPARENCY';
 
   const avgConf = techs.length > 0
     ? techs.reduce((sum: number, t: any) => sum + (t.confidence || 0), 0) / techs.length
@@ -27,7 +27,7 @@ export default function ThreatScore({ data }: { data: any }) {
   const confColor = avgConf >= 0.8 ? '#dc2626' : avgConf >= 0.5 ? '#d97706' : '#16a34a';
 
   const circumference = 2 * Math.PI * 54;
-  const dashOffset = circumference - (transparencyScore / 100) * circumference;
+  const dashOffset = circumference - (clarityScore / 100) * circumference;
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18 }}>
@@ -41,7 +41,7 @@ export default function ThreatScore({ data }: { data: any }) {
               style={{ transition: 'stroke-dashoffset 0.8s ease' }} />
           </svg>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: 28, fontWeight: 700, color: scoreColor, lineHeight: 1 }}>{transparencyScore}</span>
+            <span style={{ fontSize: 28, fontWeight: 700, color: scoreColor, lineHeight: 1 }}>{clarityScore}</span>
             <span style={{ fontSize: 8, fontWeight: 600, color: scoreColor, textAlign: 'center', maxWidth: 80 }}>{scoreLabel}</span>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function ThreatScore({ data }: { data: any }) {
             <span style={{ fontWeight: 600 }}>−{bonusScore}</span>
           </div>
           <div style={{ marginTop: 6, fontSize: 10, color: '#888' }}>
-            100 − ({techScore} + {fcScore} + {toxScore} + {bonusScore}) = <strong style={{ color: scoreColor }}>{transparencyScore}/100</strong>
+            100 − ({techScore} + {fcScore} + {toxScore} + {bonusScore}) = <strong style={{ color: scoreColor }}>{clarityScore}/100</strong>
           </div>
         </div>
       )}

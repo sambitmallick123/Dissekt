@@ -7,7 +7,7 @@ const PARTY_COLORS: Record<string, { bg: string; color: string }> = {
   TMC: { bg: '#f0fdf4', color: '#15803d' },
 };
 
-export default function CompassCard({ compass }: { compass: any }) {
+export default function MeridianCard({ compass }: { compass: any }) {
   if (!compass?.politicians?.length) return null;
 
   const wikiUrl = (name: string) => `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g, '_'))}`;
