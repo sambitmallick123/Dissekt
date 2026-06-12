@@ -3,12 +3,42 @@ import { useEffect, useState } from 'react';
 
 export default function SiteHeader({ active }: { active?: string }) {
   const [tier, setTier] = useState('free');
-  
+  const [expiryText, setExpiryText] = useState('');
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined') {
       setTier(localStorage.getItem('dissekt_tier') || 'free');
+      
+      const expiry = localStorage.getItem('dissekt_access_expires');
+      if (expiry) {
+        const d = new Date(expiry);
+        const now = new Date();
+        const days = Math.round((d.getTime() - now.getTime()) / 86400000);
+        if (days > 0) {
+          setExpiryText(`${days}d left`);
+        } else {
+          setExpiryText('Expired');
+          localStorage.removeItem('dissekt_tier');
+          localStorage.removeItem('dissekt_access_expires');
+          setTier('free');
+        }
+      }
     }
   }, []);
+
+  const signOut = () => {
+    localStorage.removeItem('dissekt_tier');
+    localStorage.removeItem('dissekt_invite_code');
+    localStorage.removeItem('dissekt_invite_name');
+    localStorage.removeItem('dissekt_access_expires');
+    localStorage.removeItem('dissekt_token');
+    localStorage.removeItem('dissekt_email');
+    localStorage.removeItem('dissekt_name');
+    localStorage.removeItem('dissekt_usage');
+    window.location.href = '/';
+  };
 
   const links = [
     { href: '/analyze', label: 'Analyze' },
@@ -17,6 +47,8 @@ export default function SiteHeader({ active }: { active?: string }) {
     { href: '/help', label: 'Help' },
     { href: '/feedback', label: 'Feedback' },
   ];
+
+  if (!mounted) return null;
 
   return (
     <nav style={{ position: 'sticky', top: 0, zIndex: 30 }}>
@@ -38,8 +70,22 @@ export default function SiteHeader({ active }: { active?: string }) {
                 {l.label}
               </a>
             ))}
+
             {tier === 'invited' ? (
-              <span style={{ fontSize: 11, color: '#0d9488', background: '#f0fdfa', padding: '4px 12px', borderRadius: 6, fontWeight: 600 }}>🎫 Invited</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <span style={{ fontSize: 11, color: '#0d9488', fontWeight: 600 }}>🎫 Invited</span>
+                  {expiryText && (
+                    <span style={{ fontSize: 9, color: expiryText === 'Expired' ? '#dc2626' : '#888' }}>
+                      {expiryText === 'Expired' ? '⚠️ Access expired' : `Access ends in ${expiryText}`}
+                    </span>
+                  )}
+                </div>
+                <button onClick={signOut}
+                  style={{ fontSize: 11, padding: '4px 10px', background: '#f8fafa', color: '#888', border: '0.5px solid #e5eaea', borderRadius: 5, cursor: 'pointer', fontWeight: 500 }}>
+                  Sign out
+                </button>
+              </div>
             ) : (
               <a href="/invite" style={{ fontSize: 13, color: '#fff', textDecoration: 'none', borderRadius: 8, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>
                 Get access
