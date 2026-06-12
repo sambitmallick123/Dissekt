@@ -1,0 +1,364 @@
+{
+  "keir starmer": {
+    "name": "Keir Starmer",
+    "party": "Labour",
+    "position": "Prime Minister",
+    "constituency": "Holborn and St Pancras",
+    "state": "England",
+    "terms": "PM since Jul 2024, Labour leader since 2020",
+    "key_votes": [
+      "Workers Rights Bill",
+      "Rwanda scheme cancellation",
+      "GB Energy creation"
+    ],
+    "key_promises": [
+      "5 missions for government",
+      "Clean energy by 2030",
+      "NHS waiting list reduction"
+    ],
+    "controversies": [
+      "Freebie/donations row",
+      "Winter fuel payment cut",
+      "Beer and curry Beergate"
+    ],
+    "factual_notes": [
+      "Labour won 411 seats in 2024 (landslide)",
+      "Former Director of Public Prosecutions"
+    ]
+  },
+  "rishi sunak": {
+    "name": "Rishi Sunak",
+    "party": "Conservative",
+    "position": "Former Prime Minister",
+    "constituency": "Richmond and Northallerton",
+    "state": "England",
+    "terms": "PM Oct 2022-Jul 2024, Chancellor 2020-2022",
+    "key_votes": [
+      "Rwanda deportation scheme",
+      "Furlough scheme",
+      "Eat Out to Help Out"
+    ],
+    "key_promises": [
+      "Stop the boats",
+      "Halve inflation",
+      "Grow the economy",
+      "Cut NHS waiting lists",
+      "Stop debt rising"
+    ],
+    "controversies": [
+      "Non-dom wife tax status",
+      "Green card while Chancellor",
+      "D-Day early departure"
+    ],
+    "factual_notes": [
+      "First British Asian PM",
+      "Conservatives won only 121 seats in 2024"
+    ]
+  },
+  "boris johnson": {
+    "name": "Boris Johnson",
+    "party": "Conservative",
+    "position": "Former Prime Minister",
+    "constituency": "Uxbridge (until 2024)",
+    "state": "England",
+    "terms": "PM 2019-2022, Mayor of London 2008-2016",
+    "key_votes": [
+      "Brexit deal",
+      "COVID lockdowns",
+      "Ukraine military support"
+    ],
+    "key_promises": [
+      "Get Brexit Done",
+      "Level up the UK",
+      "40 new hospitals"
+    ],
+    "controversies": [
+      "Partygate",
+      "Owen Paterson lobbying",
+      "Chris Pincher affair",
+      "Prorogation ruled unlawful"
+    ],
+    "factual_notes": [
+      "Won 80-seat majority 2019",
+      "Resigned after cabinet revolt Jul 2022",
+      "Referred to privileges committee, found to have misled Parliament"
+    ]
+  },
+  "nigel farage": {
+    "name": "Nigel Farage",
+    "party": "Reform UK",
+    "position": "MP Clacton, Reform UK leader",
+    "constituency": "Clacton",
+    "state": "England",
+    "terms": "MP since 2024, MEP 1999-2020",
+    "key_votes": [
+      "Brexit campaign leader",
+      "Anti-immigration"
+    ],
+    "key_promises": [
+      "Immigration freeze",
+      "Reform the state",
+      "Net zero repeal"
+    ],
+    "controversies": [
+      "Russia/Putin comments",
+      "Banking debanking row",
+      "Multiple failed parliamentary bids"
+    ],
+    "factual_notes": [
+      "Reform UK won 5 seats + 14% vote share in 2024",
+      "Won seat on 8th attempt"
+    ]
+  },
+  "angela rayner": {
+    "name": "Angela Rayner",
+    "party": "Labour",
+    "position": "Deputy Prime Minister",
+    "constituency": "Ashton-under-Lyne",
+    "state": "England",
+    "terms": "Deputy PM since 2024, Deputy Labour leader since 2020",
+    "key_votes": [
+      "Workers rights expansion",
+      "Housing reform"
+    ],
+    "key_promises": [
+      "Workers rights",
+      "Council housing",
+      "Levelling up"
+    ],
+    "controversies": [
+      "Council house sale tax investigation (cleared)",
+      "Dancing at Ibiza"
+    ],
+    "factual_notes": [
+      "Left school at 16 with no qualifications",
+      "Youngest grandmother in Parliament"
+    ]
+  },
+  "rachel reeves": {
+    "name": "Rachel Reeves",
+    "party": "Labour",
+    "position": "Chancellor of the Exchequer",
+    "constituency": "Leeds West and Pudsey",
+    "state": "England",
+    "terms": "Chancellor since Jul 2024",
+    "key_votes": [
+      "Autumn Budget 2024",
+      "National Insurance employer rise",
+      "£40B tax rises"
+    ],
+    "key_promises": [
+      "Economic stability",
+      "Growth",
+      "Fiscal rules"
+    ],
+    "controversies": [
+      "£22B black hole claim",
+      "NI employer tax increase",
+      "CV embellishment"
+    ],
+    "factual_notes": [
+      "First female Chancellor in UK history",
+      "Former Bank of England economist"
+    ]
+  },
+  "jeremy corbyn": {
+    "name": "Jeremy Corbyn",
+    "party": "Independent",
+    "position": "MP Islington North",
+    "constituency": "Islington North",
+    "state": "England",
+    "terms": "MP since 1983, Labour leader 2015-2020",
+    "key_votes": [
+      "Anti-Iraq War",
+      "Anti-austerity",
+      "Anti-nuclear weapons"
+    ],
+    "key_promises": [
+      "Public ownership",
+      "Green New Deal",
+      "End austerity"
+    ],
+    "controversies": [
+      "Antisemitism crisis in Labour",
+      "Suspended from Labour",
+      "Wreath controversy"
+    ],
+    "factual_notes": [
+      "Won seat as independent 2024 after Labour deselection",
+      "Longest continuous backbench service before leadership"
+    ]
+  },
+  "suella braverman": {
+    "name": "Suella Braverman",
+    "party": "Conservative",
+    "position": "MP Fareham and Waterlooville",
+    "constituency": "Fareham and Waterlooville",
+    "state": "England",
+    "terms": "Home Secretary 2022-2023",
+    "key_votes": [
+      "Rwanda scheme",
+      "Illegal Migration Act"
+    ],
+    "key_promises": [
+      "Stop illegal immigration",
+      "Multiculturalism has failed"
+    ],
+    "controversies": [
+      "Fired twice as Home Secretary",
+      "Pro-Palestine march comments",
+      "Speeding course row"
+    ],
+    "factual_notes": [
+      "First Indian-heritage Home Secretary",
+      "Sacked by Sunak Nov 2023"
+    ]
+  },
+  "wes streeting": {
+    "name": "Wes Streeting",
+    "party": "Labour",
+    "position": "Health Secretary",
+    "constituency": "Ilford North",
+    "state": "England",
+    "terms": "Health Secretary since Jul 2024",
+    "key_votes": [
+      "NHS reform",
+      "Private sector involvement in NHS"
+    ],
+    "key_promises": [
+      "Cut NHS waiting lists",
+      "Preventive care shift",
+      "AI in healthcare"
+    ],
+    "controversies": [
+      "Pro-private sector NHS stance",
+      "Kidney cancer survivor"
+    ],
+    "factual_notes": [
+      "Grew up in social housing",
+      "Cancer survivor who credits NHS with saving his life"
+    ]
+  },
+  "david lammy": {
+    "name": "David Lammy",
+    "party": "Labour",
+    "position": "Foreign Secretary",
+    "constituency": "Tottenham",
+    "state": "England",
+    "terms": "Foreign Secretary since Jul 2024, MP since 2000",
+    "key_votes": [
+      "Progressive realism foreign policy",
+      "Ukraine support"
+    ],
+    "key_promises": [
+      "Climate diplomacy",
+      "Reconnect with EU"
+    ],
+    "controversies": [
+      "Previous Trump criticism before diplomatic reset",
+      "Chagos Islands deal"
+    ],
+    "factual_notes": [
+      "First Black British Foreign Secretary",
+      "Harvard Law graduate"
+    ]
+  },
+  "ed davey": {
+    "name": "Ed Davey",
+    "party": "Liberal Democrats",
+    "position": "Liberal Democrat leader",
+    "constituency": "Kingston and Surbiton",
+    "state": "England",
+    "terms": "Lib Dem leader since 2020, MP since 1997",
+    "key_votes": [
+      "Coalition energy policy 2010-15",
+      "Social care focus"
+    ],
+    "key_promises": [
+      "Fix social care",
+      "Sewage in rivers",
+      "NHS dental reform"
+    ],
+    "controversies": [
+      "Post Office Horizon scandal responsibility as minister"
+    ],
+    "factual_notes": [
+      "Lib Dems won record 72 seats in 2024",
+      "Viral stunts during election campaign"
+    ]
+  },
+  "john swinney": {
+    "name": "John Swinney",
+    "party": "SNP",
+    "position": "First Minister of Scotland",
+    "constituency": "Perthshire North",
+    "state": "Scotland",
+    "terms": "First Minister since May 2024",
+    "key_votes": [
+      "Independence referendum push",
+      "Scottish budget"
+    ],
+    "key_promises": [
+      "Independence",
+      "Public services",
+      "Cost of living"
+    ],
+    "controversies": [
+      "Succeeded Humza Yousaf after Sturgeon era",
+      "SNP finances investigation"
+    ],
+    "factual_notes": [
+      "SNP dropped from 48 to 9 seats in 2024 UK election",
+      "Second time as SNP leader"
+    ]
+  },
+  "penny mordaunt": {
+    "name": "Penny Mordaunt",
+    "party": "Conservative",
+    "position": "Former Leader of the Commons",
+    "constituency": "Portsmouth North (lost 2024)",
+    "state": "England",
+    "terms": "Leader of the Commons 2022-2024",
+    "key_votes": [
+      "Defended government in debates",
+      "Naval reserve officer"
+    ],
+    "key_promises": [
+      "One Nation conservatism"
+    ],
+    "controversies": [
+      "Leadership bid losses 2022",
+      "Viral debate performance"
+    ],
+    "factual_notes": [
+      "Lost seat in 2024 election",
+      "First female Defence Secretary (briefly)"
+    ]
+  },
+  "kemi badenoch": {
+    "name": "Kemi Badenoch",
+    "party": "Conservative",
+    "position": "Leader of the Opposition",
+    "constituency": "North West Essex",
+    "state": "England",
+    "terms": "Conservative leader since Nov 2024",
+    "key_votes": [
+      "Anti-woke agenda",
+      "Gender Recognition Act opposition"
+    ],
+    "key_promises": [
+      "Conservative renewal",
+      "Small state",
+      "Honest politics"
+    ],
+    "controversies": [
+      "Maternity pay comments",
+      "Civil service clashes",
+      "Cass Review stance"
+    ],
+    "factual_notes": [
+      "First Black leader of the Conservative Party",
+      "Born in Nigeria, raised in UK and US"
+    ]
+  }
+}

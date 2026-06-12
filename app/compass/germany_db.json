@@ -1,0 +1,373 @@
+{
+  "friedrich merz": {
+    "name": "Friedrich Merz",
+    "party": "CDU",
+    "position": "Bundeskanzler",
+    "constituency": "Hochsauerlandkreis",
+    "state": "NRW",
+    "terms": "Chancellor since 2025, MdB since 2002",
+    "key_votes": [
+      "Ukraine military aid expansion",
+      "Migration reform",
+      "Economic reform package"
+    ],
+    "key_promises": [
+      "Economic renewal",
+      "Stricter migration policy",
+      "Bundeswehr modernization"
+    ],
+    "controversies": [
+      "BlackRock ties",
+      "U-turn on firewall against AfD"
+    ],
+    "factual_notes": [
+      "Elected Chancellor Feb 2025 after snap election",
+      "CDU/CSU won 28.5% in 2025 federal election"
+    ]
+  },
+  "olaf scholz": {
+    "name": "Olaf Scholz",
+    "party": "SPD",
+    "position": "Former Bundeskanzler",
+    "constituency": "Potsdam",
+    "state": "Brandenburg",
+    "terms": "Chancellor 2021-2025, Finance Minister 2018-2021",
+    "key_votes": [
+      "Zeitenwende speech",
+      "€100B Bundeswehr fund",
+      "Energy price cap"
+    ],
+    "key_promises": [
+      "Zeitenwende",
+      "Climate neutrality 2045",
+      "€12 minimum wage"
+    ],
+    "controversies": [
+      "Cum-Ex scandal",
+      "Warburg Bank meetings",
+      "Scholzomat communication style"
+    ],
+    "factual_notes": [
+      "SPD lost to CDU in 2025 snap election",
+      "Presided over energy crisis response"
+    ]
+  },
+  "robert habeck": {
+    "name": "Robert Habeck",
+    "party": "Grüne",
+    "position": "Former Vice Chancellor",
+    "constituency": "Flensburg",
+    "state": "Schleswig-Holstein",
+    "terms": "Vice Chancellor + Economy Minister 2021-2025",
+    "key_votes": [
+      "Nuclear phase-out",
+      "Heating law (GEG)",
+      "LNG terminals"
+    ],
+    "key_promises": [
+      "Green transformation",
+      "Climate-neutral economy"
+    ],
+    "controversies": [
+      "Heating law backlash",
+      "Graichen affair",
+      "Nuclear plant shutdown timing"
+    ],
+    "factual_notes": [
+      "Greens dropped to ~12% in 2025 election",
+      "Led Germany through energy crisis"
+    ]
+  },
+  "christian lindner": {
+    "name": "Christian Lindner",
+    "party": "FDP",
+    "position": "Former Finance Minister",
+    "constituency": "NRW",
+    "state": "NRW",
+    "terms": "Finance Minister 2021-2024, FDP Chair since 2013",
+    "key_votes": [
+      "Debt brake defense",
+      "Blocked climate fund"
+    ],
+    "key_promises": [
+      "Fiscal discipline",
+      "Tax reform",
+      "Digital transformation"
+    ],
+    "controversies": [
+      "Fired by Scholz Nov 2024",
+      "Coalition break memo leak"
+    ],
+    "factual_notes": [
+      "FDP fell below 5% threshold in 2025 election",
+      "Firing triggered snap election"
+    ]
+  },
+  "alice weidel": {
+    "name": "Alice Weidel",
+    "party": "AfD",
+    "position": "AfD Bundestag faction leader",
+    "constituency": "Bodensee",
+    "state": "Baden-Württemberg",
+    "terms": "MdB since 2017, AfD co-chair",
+    "key_votes": [
+      "Opposed all migration laws as too weak",
+      "Anti-EU positions"
+    ],
+    "key_promises": [
+      "Dexit referendum",
+      "Zero asylum",
+      "Anti-gender ideology"
+    ],
+    "controversies": [
+      "Classified as suspected extremist by BfV",
+      "Correctiv Potsdam meeting report",
+      "Campaign donations"
+    ],
+    "factual_notes": [
+      "AfD reached ~20-22% in 2025 election",
+      "Party under domestic intelligence observation"
+    ]
+  },
+  "sahra wagenknecht": {
+    "name": "Sahra Wagenknecht",
+    "party": "BSW",
+    "position": "BSW founder and leader",
+    "constituency": "NRW",
+    "state": "NRW",
+    "terms": "MdB since 2009, left Die Linke 2024",
+    "key_votes": [
+      "Anti-Ukraine arms delivery",
+      "Anti-NATO expansion"
+    ],
+    "key_promises": [
+      "Economic justice",
+      "Diplomatic solution to Ukraine",
+      "Migration limits"
+    ],
+    "controversies": [
+      "Left Die Linke to found BSW",
+      "Pro-Russia positioning"
+    ],
+    "factual_notes": [
+      "BSW won ~6% in 2025 federal election in first attempt",
+      "Drew voters from both left and right"
+    ]
+  },
+  "markus soeder": {
+    "name": "Markus Söder",
+    "party": "CSU",
+    "position": "Ministerpräsident Bayern",
+    "constituency": "Nürnberg",
+    "state": "Bavaria",
+    "terms": "Minister-President since 2018",
+    "key_votes": [
+      "Bavarian asylum policy",
+      "Kruzifix decree",
+      "Anti-Greens positioning"
+    ],
+    "key_promises": [
+      "Bavaria first",
+      "Tough migration",
+      "Tech hub Bavaria"
+    ],
+    "controversies": [
+      "Chancellor ambition 2021 loss to Laschet",
+      "COVID mask deals"
+    ],
+    "factual_notes": [
+      "CSU won absolute majority-adjacent in Bavaria 2023",
+      "Key CDU/CSU coalition partner"
+    ]
+  },
+  "annalena baerbock": {
+    "name": "Annalena Baerbock",
+    "party": "Grüne",
+    "position": "Former Foreign Minister",
+    "constituency": "Potsdam",
+    "state": "Brandenburg",
+    "terms": "Foreign Minister 2021-2025",
+    "key_votes": [
+      "Feminist foreign policy",
+      "China strategy",
+      "Ukraine support"
+    ],
+    "key_promises": [
+      "Values-based foreign policy",
+      "Climate diplomacy"
+    ],
+    "controversies": [
+      "CV plagiarism 2021",
+      "Book plagiarism allegations"
+    ],
+    "factual_notes": [
+      "First female German Foreign Minister",
+      "Led hardline stance on Russia"
+    ]
+  },
+  "karl lauterbach": {
+    "name": "Karl Lauterbach",
+    "party": "SPD",
+    "position": "Former Health Minister",
+    "constituency": "Leverkusen",
+    "state": "NRW",
+    "terms": "Health Minister 2021-2025, MdB since 2005",
+    "key_votes": [
+      "Cannabis legalization",
+      "Hospital reform",
+      "COVID measures"
+    ],
+    "key_promises": [
+      "Hospital reform",
+      "Digital health",
+      "Prevention focus"
+    ],
+    "controversies": [
+      "COVID restrictions criticism",
+      "Cannabis law debate"
+    ],
+    "factual_notes": [
+      "Epidemiologist by training, Harvard SPH",
+      "Became prominent during COVID pandemic"
+    ]
+  },
+  "boris pistorius": {
+    "name": "Boris Pistorius",
+    "party": "SPD",
+    "position": "Former Defence Minister",
+    "constituency": "Osnabrück",
+    "state": "Niedersachsen",
+    "terms": "Defence Minister 2023-2025",
+    "key_votes": [
+      "Bundeswehr readiness",
+      "Lithuania brigade",
+      "Conscription debate"
+    ],
+    "key_promises": [
+      "War-ready Bundeswehr",
+      "Conscription reform"
+    ],
+    "controversies": [
+      "Equipment shortfalls",
+      "Recruitment crisis"
+    ],
+    "factual_notes": [
+      "Most popular minister in Scholz cabinet",
+      "Briefly considered as SPD chancellor candidate"
+    ]
+  },
+  "nancy faeser": {
+    "name": "Nancy Faeser",
+    "party": "SPD",
+    "position": "Former Interior Minister",
+    "constituency": "Hessen",
+    "state": "Hessen",
+    "terms": "Interior Minister 2021-2025",
+    "key_votes": [
+      "Migration policy reform",
+      "AfD ban proceedings",
+      "Border controls"
+    ],
+    "key_promises": [
+      "Fight right-wing extremism",
+      "Digitize government"
+    ],
+    "controversies": [
+      "Hessen election campaign while minister",
+      "Migration policy criticism"
+    ],
+    "factual_notes": [
+      "First female Federal Interior Minister"
+    ]
+  },
+  "alexander dobrindt": {
+    "name": "Alexander Dobrindt",
+    "party": "CSU",
+    "position": "CSU Landesgruppenchef",
+    "constituency": "Peißenberg",
+    "state": "Bavaria",
+    "terms": "MdB since 2002",
+    "key_votes": [
+      "Transport Minister 2013-17",
+      "Anti-migration hardliner"
+    ],
+    "key_promises": [
+      "Conservative values",
+      "Infrastructure"
+    ],
+    "controversies": [
+      "PKW-Maut failure",
+      "Anti-asylum rhetoric"
+    ],
+    "factual_notes": [
+      "Key CSU voice in Bundestag"
+    ]
+  },
+  "ricarda lang": {
+    "name": "Ricarda Lang",
+    "party": "Grüne",
+    "position": "Former Grüne co-chair",
+    "constituency": "Stuttgart",
+    "state": "Baden-Württemberg",
+    "terms": "Co-chair 2022-2024",
+    "key_votes": [
+      "Social-ecological transformation"
+    ],
+    "key_promises": [
+      "Social justice + climate"
+    ],
+    "controversies": [
+      "Resigned after poor election results"
+    ],
+    "factual_notes": [
+      "Youngest major party leader at election",
+      "Stepped down 2024"
+    ]
+  },
+  "janine wissler": {
+    "name": "Janine Wissler",
+    "party": "Die Linke",
+    "position": "Former Die Linke co-chair",
+    "constituency": "Hessen",
+    "state": "Hessen",
+    "terms": "Co-chair 2021-2024",
+    "key_votes": [
+      "Anti-NATO",
+      "Social housing",
+      "Wealth tax"
+    ],
+    "key_promises": [
+      "Social justice",
+      "Anti-militarism"
+    ],
+    "controversies": [
+      "Party split with Wagenknecht departure"
+    ],
+    "factual_notes": [
+      "Die Linke fell below 5% in 2025",
+      "Party in existential crisis after BSW split"
+    ]
+  },
+  "winfried kretschmann": {
+    "name": "Winfried Kretschmann",
+    "party": "Grüne",
+    "position": "Ministerpräsident Baden-Württemberg",
+    "constituency": "Sigmaringen",
+    "state": "Baden-Württemberg",
+    "terms": "Minister-President since 2011",
+    "key_votes": [
+      "Auto industry transition",
+      "Stuttgart 21 mediation"
+    ],
+    "key_promises": [
+      "Green-conservative politics"
+    ],
+    "controversies": [
+      "Pro-auto industry stance"
+    ],
+    "factual_notes": [
+      "Only Green Minister-President in Germany",
+      "Longest-serving current state leader"
+    ]
+  }
+}

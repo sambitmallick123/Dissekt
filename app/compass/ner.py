@@ -20,6 +20,7 @@ def _load_db(country: str):
 
 # Common aliases
 ALIASES = {
+    # India
     "aoc": "alexandria ocasio-cortez",
     "raga": "rahul gandhi",
     "pappu": "rahul gandhi",
@@ -28,11 +29,33 @@ ALIASES = {
     "kcr": "k chandrashekar rao",
     "cbn": "chandrababu naidu",
     "mbs": "mamata banerjee",
+    # Germany
+    "scholz": "olaf scholz",
+    "habeck": "robert habeck",
+    "lindner": "christian lindner",
+    "weidel": "alice weidel",
+    "wagenknecht": "sahra wagenknecht",
+    "soeder": "markus soeder",
+    "söder": "markus soeder",
+    "baerbock": "annalena baerbock",
+    "lauterbach": "karl lauterbach",
+    "pistorius": "boris pistorius",
+    "kretschmann": "winfried kretschmann",
+    # UK
+    "starmer": "keir starmer",
+    "sunak": "rishi sunak",
+    "bojo": "boris johnson",
+    "farage": "nigel farage",
+    "rayner": "angela rayner",
+    "reeves": "rachel reeves",
+    "corbyn": "jeremy corbyn",
+    "braverman": "suella braverman",
+    "badenoch": "kemi badenoch",
 }
 
 def detect_politicians(text: str, country: str = "all") -> list[dict]:
     """Find politician mentions in text. Searches all country databases."""
-    countries = ["india", "us"] if country == "all" else [country]
+    countries = ["india", "us", "germany", "uk"] if country == "all" else [country]
     
     found = []
     seen = set()
