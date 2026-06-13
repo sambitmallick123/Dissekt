@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+import './responsive.css';
 import './globals.css';
 
 export const metadata: Metadata = {
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
   title: 'Dissekt — See how information is constructed',
   description: 'Information transparency tool. Inspect how articles frame claims, what evidence supports them, and what context is missing.',
 };

@@ -1,0 +1,39 @@
+/* Dissekt responsive breakpoints */
+
+/* Viewport meta should be in layout.tsx */
+
+/* Mobile-first responsive utilities */
+@media (max-width: 768px) {
+  /* Global */
+  body { -webkit-text-size-adjust: 100%; }
+  
+  /* Header */
+  .dissekt-nav-links { display: none !important; }
+  .dissekt-nav-mobile { display: flex !important; }
+  .dissekt-nav-container { padding: 8px 16px !important; }
+  
+  /* Footer */
+  .dissekt-footer-inner { flex-direction: column !important; gap: 8px !important; text-align: center !important; }
+  .dissekt-footer-links { justify-content: center !important; flex-wrap: wrap !important; gap: 10px !important; }
+  
+  /* Content containers */
+  .dissekt-content { padding: 16px !important; }
+  
+  /* Grids → single column */
+  .dissekt-grid-2, .dissekt-grid-3, .dissekt-grid-4 { grid-template-columns: 1fr !important; }
+  
+  /* Hide on mobile */
+  .dissekt-hide-mobile { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  .dissekt-nav-mobile { display: none !important; }
+  .dissekt-hide-desktop { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .dissekt-hero-title { font-size: 24px !important; }
+  .dissekt-hero-subtitle { font-size: 14px !important; }
+  .dissekt-hero-buttons { flex-direction: column !important; }
+}

@@ -65,7 +65,7 @@ export default function FeedbackPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>Feedback</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Help us improve Dissekt. Your feedback shapes the product.</p>
 

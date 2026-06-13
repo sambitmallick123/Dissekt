@@ -9,7 +9,7 @@ export default function BadgePage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🏷️ Embeddable Transparency Badge</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Add a live Dissekt transparency score to any article on your site.</p>
 

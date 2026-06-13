@@ -23,7 +23,7 @@ export default function LifecyclePage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🔄 Claim Lifecycle</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>Track how a claim spread, evolved, and was addressed over time.</p>
 
@@ -40,7 +40,7 @@ export default function LifecyclePage() {
         {data && (
           <div>
             {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 16 }}>
               <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: '14px 16px', textAlign: 'center' }}>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#0d9488' }}>{data.total_appearances}</div>
                 <div style={{ fontSize: 11, color: '#888' }}>Appearances</div>

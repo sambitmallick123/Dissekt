@@ -64,7 +64,7 @@ export default function ComparePage() {
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>📝 Comparison Summary</div>
               <p style={{ fontSize: 13, color: '#404040', lineHeight: 1.6 }}>{result.comparison?.summary}</p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginTop: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginTop: 12 }}>
                 <div style={{ padding: '8px 10px', background: '#f0fdfa', borderRadius: 8 }}>
                   <div style={{ fontSize: 10, color: '#0d9488', fontWeight: 600 }}>SHARED TECHNIQUES</div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginTop: 2 }}>{result.comparison?.shared_techniques?.length || 0}</div>

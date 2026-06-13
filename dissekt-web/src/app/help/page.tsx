@@ -62,7 +62,7 @@ export default function HelpPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader active="Help" />
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>How Dissekt works</h1>
         <p style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>Every engine, feature, and score explained — with the science behind it.</p>
 

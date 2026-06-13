@@ -30,7 +30,7 @@ export default function FingerprintPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🔬 Source Fingerprinting</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>Compare how different outlets use manipulation techniques. Based on all past Dissekt analyses.</p>
 

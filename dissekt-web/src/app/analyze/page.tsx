@@ -115,8 +115,8 @@ export default function ScanApp() {
 
       {/* Scan input area */}
       <div style={{ background: '#fff', borderBottom: '0.5px solid #e5eaea' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
             <div style={{ display: 'flex', gap: 6 }}>
               <button onClick={() => setScanTab('single')}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
@@ -142,7 +142,7 @@ export default function ScanApp() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 16px' }}>
         {error && (
           <div style={{ marginBottom: 16, padding: 12, background: '#fef2f2', border: '0.5px solid #fecaca', borderRadius: 10, color: '#b91c1c', fontSize: 13 }}>{error}</div>
         )}

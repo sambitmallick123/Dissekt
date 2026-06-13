@@ -48,7 +48,7 @@ export default function InvitePage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 440, margin: '40px auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: 440, margin: '40px auto', padding: '0 16px' }}>
         <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 28 }}>
           <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
             <button onClick={() => { setTab('request'); setStatus('idle'); }}

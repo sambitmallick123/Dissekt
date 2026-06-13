@@ -40,7 +40,7 @@ export default function ContactPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>Contact us</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Questions, partnerships, or just want to say hi? We'll get back to you.</p>
 

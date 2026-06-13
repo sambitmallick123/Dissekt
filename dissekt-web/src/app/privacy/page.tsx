@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
 
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Privacy Policy</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Last updated: June 9, 2026</p>
 

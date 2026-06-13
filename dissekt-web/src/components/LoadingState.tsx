@@ -12,7 +12,7 @@ export default function LoadingState() {
     <div>
       <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 24, display: 'flex', alignItems: 'center', gap: 24 }}>
         <div style={{ width: 110, height: 110, borderRadius: 55, ...shimmer, flexShrink: 0 }}/>
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
           {Array.from({length: 6}).map((_, i) => (
             <div key={i} style={{ background: '#f8f8f6', borderRadius: 10, padding: 14 }}>
               <div style={{ height: 8, width: 50, ...shimmer, marginBottom: 8 }}/>

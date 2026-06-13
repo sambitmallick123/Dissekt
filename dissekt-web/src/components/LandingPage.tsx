@@ -34,7 +34,7 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
           <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: 'center', marginBottom: 8, color: '#1a1a1a' }}>How Dissekt works</h2>
           <p style={{ fontSize: 14, color: '#888', textAlign: 'center', marginBottom: 32 }}>Not a fact-checker. Not an AI detector. An information debugger.</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
             {[
               { n: '1', t: 'You paste content', d: 'A URL, article text, screenshot, or claim. Dissekt accepts any format.' },
               { n: '2', t: 'Engines analyze it', d: 'Prism identifies techniques. Lens finds cross-references. Spectrum scores evidence. Meridian checks political context.' },
@@ -55,7 +55,7 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px' }}>
           <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: 'center', marginBottom: 32, color: '#1a1a1a' }}>10 analysis engines</h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
             {[
               { icon: '🔍', name: 'Prism', desc: '20 manipulation techniques detected with confidence scores — loaded language, cherry-picking, appeal to fear, and more.' },
               { icon: '🌐', name: 'Lens', desc: 'Focuses on cross-references 100+ fact-checking organizations automatically. Shows what others have verified.' },
