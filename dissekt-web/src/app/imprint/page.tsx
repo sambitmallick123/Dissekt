@@ -28,7 +28,7 @@ export default function FingerprintPage() {
   const barColors = ['#0d9488', '#2563eb', '#d97706', '#dc2626', '#7c3aed', '#ea580c'];
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🔬 Source Fingerprinting</h1>

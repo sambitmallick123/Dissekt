@@ -104,7 +104,7 @@ export default function ScanApp() {
   if (!mounted) return null;
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader active="Analyze" />
 
       {lockedFeature && <FeatureLockedPopup feature={lockedFeature} onClose={closePopup} />}

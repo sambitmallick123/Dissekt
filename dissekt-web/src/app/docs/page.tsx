@@ -16,7 +16,7 @@ export default function DocsPage() {
   const commentStyle: React.CSSProperties = { color: '#666' };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>

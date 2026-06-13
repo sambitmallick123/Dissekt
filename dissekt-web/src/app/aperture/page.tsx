@@ -6,7 +6,7 @@ export default function BookmarkletPage() {
   const bookmarkletCode = "javascript:void(window.open('https://dissekt.info/analyze?url='+encodeURIComponent(window.location.href),'_blank'))";
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔖</div>
@@ -35,7 +35,7 @@ export default function BookmarkletPage() {
             <strong>Mobile:</strong><br />
             1. Copy this URL and create a new bookmark with it:<br />
           </div>
-          <div style={{ marginTop: 8, padding: '8px 12px', background: '#f8fafa', borderRadius: 6, fontSize: 11, color: '#555', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+          <div style={{ marginTop: 8, padding: '8px 12px', background: '#fafaf8', borderRadius: 6, fontSize: 11, color: '#555', wordBreak: 'break-all', fontFamily: 'monospace' }}>
             {bookmarkletCode}
           </div>
         </div>

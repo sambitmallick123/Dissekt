@@ -1,4 +1,6 @@
 'use client';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 import { useState, useEffect, use } from 'react';
 import AnalysisResult from '@/components/AnalysisResult';
 
@@ -20,7 +22,8 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
   }, [id]);
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+      <SiteHeader />
       <nav style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', position: 'sticky', top: 0, zIndex: 20 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}>
@@ -67,6 +70,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
           </div>
         )}
       </div>
+    <SiteFooter />
     </main>
   );
 }

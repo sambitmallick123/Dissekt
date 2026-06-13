@@ -60,7 +60,7 @@ function EngineCard({ icon, name, tag, children }: { icon: string; name: string;
 
 export default function HelpPage() {
   return (
-    <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader active="Help" />
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>How Dissekt works</h1>
@@ -236,7 +236,7 @@ export default function HelpPage() {
                 ['False causation', 'Assuming correlation implies causation'],
                 ['Oversimplification', 'Reducing complex issues to simple narratives'],
               ].map(([name, desc], i) => (
-                <div key={i} style={{ padding: '6px 10px', background: '#f8fafa', borderRadius: 6 }}>
+                <div key={i} style={{ padding: '6px 10px', background: '#fafaf8', borderRadius: 6 }}>
                   <strong style={{ fontSize: 12, color: '#1a1a1a' }}>{name}</strong>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{desc}</div>
                 </div>

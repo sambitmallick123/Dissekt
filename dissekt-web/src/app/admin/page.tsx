@@ -24,7 +24,7 @@ export default function AdminPage() {
 
   if (!authenticated) {
     return (
-      <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
+      <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
         <SiteHeader />
         <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px' }}>
           <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 28 }}>
@@ -34,7 +34,7 @@ export default function AdminPage() {
               <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>Enter admin password</div>
             </div>
             <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
-              style={{ width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#f8fafa', marginBottom: 12, boxSizing: 'border-box' as any }} />
+              style={{ width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fafaf8', marginBottom: 12, boxSizing: 'border-box' as any }} />
             <button onClick={login} style={{ width: '100%', padding: '10px 0', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Sign in</button>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default function AdminPage() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#f8fafa' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>

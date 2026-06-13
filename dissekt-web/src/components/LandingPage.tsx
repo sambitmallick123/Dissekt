@@ -29,7 +29,7 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
       </section>
 
       {/* How it works */}
-      <section style={{ background: '#f8fafa' }}>
+      <section style={{ background: '#fafaf8' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px' }}>
           <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: 'center', marginBottom: 8, color: '#1a1a1a' }}>How Dissekt works</h2>
           <p style={{ fontSize: 14, color: '#888', textAlign: 'center', marginBottom: 32 }}>Not a fact-checker. Not an AI detector. An information debugger.</p>
@@ -81,7 +81,7 @@ export default function LandingPage({ onSignIn, onTryFree }: { onSignIn: () => v
       </section>
 
       {/* Access tiers */}
-      <section style={{ background: '#f8fafa', borderTop: '0.5px solid #e5eaea' }}>
+      <section style={{ background: '#fafaf8', borderTop: '0.5px solid #e5eaea' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 24px' }}>
           <h2 style={{ fontSize: 22, fontWeight: 700, textAlign: 'center', marginBottom: 32, color: '#1a1a1a' }}>Access tiers</h2>
 

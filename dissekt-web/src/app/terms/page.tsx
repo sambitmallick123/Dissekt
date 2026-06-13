@@ -4,7 +4,7 @@ import SiteFooter from '@/components/SiteFooter';
 
 export default function TermsPage() {
   return (
-    <main style={{ minHeight: '100vh', background: '#f5f5f4' }}>
+    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Terms of Service</h1>
