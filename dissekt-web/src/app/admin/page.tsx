@@ -5,6 +5,80 @@ import SiteFooter from '@/components/SiteFooter';
 
 type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings';
 
+
+
+function SourcesTab() {
+  const [sources, setSources] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+  const load = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/sources`);
+      const data = await res.json();
+      setSources(data.sources || []);
+    } catch {}
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const action = async (id: string, act: string) => {
+    await fetch(`${API_URL}/api/admin/sources/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action: act }),
+    });
+    load();
+  };
+
+  if (loading) return <div style={{ padding: 20, textAlign: 'center', color: '#888' }}>Loading...</div>;
+
+  return (
+    <div>
+      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Suggested sources ({sources.length})</div>
+      {sources.length === 0 && (
+        <div style={{ padding: 30, textAlign: 'center', color: '#888', fontSize: 13, background: '#fff', borderRadius: 10 }}>No source suggestions yet</div>
+      )}
+      {sources.map((s, i) => {
+        const lines = (s.message || '').split('  ');
+        const srcName = lines.find((l: string) => l.startsWith('Source:'))?.replace('Source:', '').trim() || '';
+        const srcUrl = lines.find((l: string) => l.startsWith('URL:'))?.replace('URL:', '').trim() || '';
+        const srcReason = lines.find((l: string) => l.startsWith('Reason:'))?.replace('Reason:', '').trim() || '';
+        const statusColor = s.status === 'approved' ? '#16a34a' : s.status === 'rejected' ? '#dc2626' : '#d97706';
+        return (
+          <div key={i} style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: '12px 16px', marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{srcName || 'Unknown source'}</div>
+                {srcUrl && <a href={srcUrl} target="_blank" rel="noopener" style={{ fontSize: 11, color: '#0d9488', textDecoration: 'none' }}>{srcUrl}</a>}
+                {s.email && <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>Suggested by: {s.email}</div>}
+              </div>
+              <span style={{ fontSize: 10, fontWeight: 600, color: statusColor, padding: '2px 8px', borderRadius: 4, background: s.status === 'approved' ? '#f0fdf4' : s.status === 'rejected' ? '#fef2f2' : '#fffbeb' }}>
+                {s.status || 'pending'}
+              </span>
+            </div>
+            {srcReason && <div style={{ fontSize: 12, color: '#555', lineHeight: 1.5, marginBottom: 8 }}>{srcReason}</div>}
+            {(!s.status || s.status === 'unread' || s.status === 'pending') && (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={() => action(s.id, 'approve')}
+                  style={{ padding: '5px 14px', background: '#f0fdf4', color: '#16a34a', border: '0.5px solid #dcfce7', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+                  ✅ Approve
+                </button>
+                <button onClick={() => action(s.id, 'reject')}
+                  style={{ padding: '5px 14px', background: '#fef2f2', color: '#dc2626', border: '0.5px solid #fecaca', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+                  ❌ Reject
+                </button>
+              </div>
+            )}
+            <div style={{ fontSize: 10, color: '#aaa', marginTop: 4 }}>{new Date(s.created_at).toLocaleDateString()}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
