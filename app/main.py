@@ -10,11 +10,13 @@ Endpoints:
 import logging
 import time
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.models import ScanRequest, FullAnalysis, AnalysisMode
 from app.beacon import scan
+from app.middleware import validate_and_rate_limit
+from app.factchecker_db import get_checker_info, tier_label
 from app.radar import get_radar_feed
 from fastapi.responses import JSONResponse
 from collections import defaultdict
@@ -112,13 +114,21 @@ async def health():
 
 
 @app.post("/api/scan", response_model=FullAnalysis)
-async def scan_content(request: ScanRequest):
+async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias="X-API-Key")):
     """Main analysis endpoint.
 
     Accepts a URL or text. Runs through Beacon → Prism + Trace + Signal.
     Returns full analysis with manipulation techniques, fact-checks,
     bias scores, and blockchain evidence hash.
     """
+    # API key rate limiting (if key provided)
+    if x_api_key:
+        settings = get_settings()
+        auth = await validate_and_rate_limit(x_api_key, settings.supabase_url, settings.supabase_key)
+        if not auth["valid"]:
+            from fastapi.responses import JSONResponse
+            return JSONResponse(status_code=429 if "Rate limit" in auth.get("error", "") else 401, content={"error": auth["error"], "limit": auth.get("limit"), "used": auth.get("used")})
+    
     try:
         result = await scan(
             content=request.content,

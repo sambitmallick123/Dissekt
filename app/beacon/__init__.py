@@ -11,6 +11,7 @@ import time
 from urllib.parse import urlparse
 import re
 import httpx
+from app.factchecker_db import get_checker_info, tier_label, tier_color
 from app.social_scanner import detect_and_extract
 from readability import Document as ReadabilityDocument
 from app.config import get_settings
@@ -66,6 +67,7 @@ async def extract_from_url(url: str) -> tuple[str, str]:
             downloaded = trafilatura.fetch_url(url, config=config)
             if not downloaded:
                 import httpx
+from app.factchecker_db import get_checker_info, tier_label, tier_color
 from app.social_scanner import detect_and_extract
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
@@ -467,6 +469,20 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
         except Exception as e:
             logger.warning(f"Claim extraction failed: {e}")
 
+        # Enrich fact-checks with credibility info
+    try:
+        if hasattr(analysis, 'trace') and analysis.trace and hasattr(analysis.trace, 'fact_checks'):
+            for fc in analysis.trace.fact_checks:
+                domain = (fc.get('url', '') or '').split('/')[2] if fc.get('url') else ''
+                info = get_checker_info(domain)
+                fc['checker_tier'] = info.get('tier', 'U')
+                fc['checker_tier_label'] = tier_label(info.get('tier', 'U'))
+                fc['checker_ifcn'] = info.get('ifcn', False)
+                fc['checker_region'] = info.get('region', '')
+                fc['checker_notes'] = info.get('notes', '')
+    except Exception:
+        pass
+    
     return analysis
 
 
