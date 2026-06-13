@@ -10,6 +10,12 @@ import httpx
 logger = logging.getLogger("dissekt.radar")
 
 FEEDS = {
+    "intl": [
+        "https://feeds.propublica.org/propublica/main",
+        "https://www.bellingcat.com/feed/",
+        "https://www.aljazeera.com/xml/rss/all.xml",
+        "https://feeds.arstechnica.com/arstechnica/index",
+    ],
     "india": [
         "https://scroll.in/rss/feed",
         "https://www.thehindu.com/news/national/feeder/default.rss",

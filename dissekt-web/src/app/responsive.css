@@ -37,3 +37,8 @@
   .dissekt-hero-subtitle { font-size: 14px !important; }
   .dissekt-hero-buttons { flex-direction: column !important; }
 }
+
+/* Sticky footer — always at bottom */
+html, body { min-height: 100vh; }
+body { display: flex; flex-direction: column; }
+main { flex: 1; }

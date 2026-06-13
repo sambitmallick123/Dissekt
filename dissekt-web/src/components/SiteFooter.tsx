@@ -16,6 +16,7 @@ export default function SiteFooter() {
           <a href="/contact" style={{ color: '#5f8a84', textDecoration: 'none' }}>Contact</a>
           <a href="/docs" style={{ color: '#5f8a84', textDecoration: 'none' }}>API</a>
           <a href="/privacy" style={{ color: '#5f8a84', textDecoration: 'none' }}>Privacy</a>
+          <a href="/suggest" style={{ color: "#5f8a84", textDecoration: "none" }}>Suggest source</a>
           <a href="/terms" style={{ color: '#5f8a84', textDecoration: 'none' }}>Terms</a>
         </div>
       </div>

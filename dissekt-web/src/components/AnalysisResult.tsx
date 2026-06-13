@@ -10,6 +10,7 @@ import Mirror from './Mirror';
 import Loupe from './Loupe';
 import Marginalia from './Marginalia';
 import Chorus from './Chorus';
+import FactCheckSection from './FactCheckSection';
 import Polish from './Polish';
 import { LedgerButtons } from './Ledger';
 import MeridianCard from './MeridianCard';
