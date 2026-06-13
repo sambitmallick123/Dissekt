@@ -1007,6 +1007,76 @@ async def dispatch_cron(body: dict = {}):
     return {"sent": sent, "total_users": len(emails)}
 
 
+
+
+@app.post("/api/admin/user-access")
+async def set_user_access(body: dict):
+    """Set/revoke per-user component access."""
+    settings = get_settings()
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+    
+    user_id = body.get("id")
+    custom_features = body.get("custom_features")  # list of feature keys or null
+    custom_limits = body.get("custom_limits")  # {"brief": N, "detailed": N} or null
+    
+    update = {}
+    if custom_features is not None:
+        update["custom_features"] = custom_features
+    if custom_limits is not None:
+        update["custom_limits"] = custom_limits
+    
+    if not update:
+        return {"error": "Nothing to update"}
+    
+    result = sb.table("invitations").update(update).eq("id", user_id).execute()
+    return {"success": True}
+
+
+@app.post("/api/admin/send-message")
+async def admin_send_message(body: dict):
+    """Admin sends email to a user."""
+    settings = get_settings()
+    to_email = body.get("to")
+    subject = body.get("subject", "Message from Dissekt")
+    message = body.get("message", "")
+    
+    if not to_email or not message:
+        from fastapi import HTTPException
+        raise HTTPException(400, "Email and message required")
+    
+    import httpx
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post("https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {settings.resend_api_key}"},
+                json={
+                    "from": "Dissekt <onboarding@resend.dev>",
+                    "to": to_email,
+                    "subject": subject,
+                    "html": f"""<div style="font-family:-apple-system,sans-serif;max-width:500px;margin:0 auto;">
+                        <div style="background:#0d9488;padding:14px 20px;border-radius:10px 10px 0 0;">
+                            <h2 style="color:white;margin:0;font-size:16px;">Message from Dissekt</h2>
+                        </div>
+                        <div style="background:#fff;padding:20px;border:1px solid #e5eaea;border-top:none;border-radius:0 0 10px 10px;">
+                            <p style="font-size:14px;color:#333;line-height:1.7;">{message.replace(chr(10), '<br/>')}</p>
+                            <hr style="border:none;border-top:0.5px solid #e5eaea;margin:16px 0;"/>
+                            <p style="font-size:11px;color:#aaa;">This message was sent by the Dissekt team.<br/>
+                            <a href="https://dissekt.info" style="color:#0d9488;">dissekt.info</a></p>
+                        </div>
+                    </div>"""
+                })
+        
+        # Log the message
+        from supabase import create_client
+        sb = create_client(settings.supabase_url, settings.supabase_key)
+        sb.table("admin_messages").insert({"to_email": to_email, "subject": subject, "body": message}).execute()
+        
+        return {"success": res.status_code == 200}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 # ============================================
 # Run with: uvicorn app.main:app --reload
 # ============================================
