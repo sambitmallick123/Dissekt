@@ -4,7 +4,7 @@ WORKDIR /app
 
 # System dependencies + Playwright browser deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+    build-essential ffmpeg \
     libgbm1 libxkbcommon0 libgtk-3-0 libnss3 libatk-bridge2.0-0 \
     libdrm2 libxcomposite1 libxdamage1 libxrandr2 libatspi2.0-0 \
     libasound2 libpango-1.0-0 libcairo2 libcups2 libxshmfence1 \

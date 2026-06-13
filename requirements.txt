@@ -45,3 +45,5 @@ uvicorn[standard]==0.34.0
 vaderSentiment==3.3.2
 feedparser==6.0.12
 python-telegram-bot==22.7
+yt-dlp
+bcrypt

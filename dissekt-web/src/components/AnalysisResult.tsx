@@ -11,6 +11,7 @@ import Loupe from './Loupe';
 import Marginalia from './Marginalia';
 import Chorus from './Chorus';
 import FactCheckSection from './FactCheckSection';
+import ShareButton from './ShareButton';
 import Polish from './Polish';
 import { LedgerButtons } from './Ledger';
 import MeridianCard from './MeridianCard';

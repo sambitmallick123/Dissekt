@@ -10,6 +10,11 @@ import httpx
 logger = logging.getLogger("dissekt.radar")
 
 FEEDS = {
+    "substack": [
+        "https://on.substack.com/feed",
+        "https://www.slowboring.com/feed",
+        "https://heathercoxrichardson.substack.com/feed",
+    ],
     "intl": [
         "https://feeds.propublica.org/propublica/main",
         "https://www.bellingcat.com/feed/",

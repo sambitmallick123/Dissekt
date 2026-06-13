@@ -10,6 +10,7 @@ import BulkAnalysis from '@/components/BulkAnalysis';
 import Recall from '@/components/Recall';
 import LedgerView from '@/components/Ledger';
 import Reflect from '@/components/Reflect';
+import TrustGraph from '@/components/TrustGraph';
 import Scope from '@/components/Scope';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
 import { fetchConfig } from '@/lib/config';
@@ -153,6 +154,7 @@ export default function ScanApp() {
 
         {!result && !loading && (
           <>
+            <TrustGraph />
             <Reflect />
             <LedgerView />
             <Recall onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />

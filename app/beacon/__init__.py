@@ -11,6 +11,7 @@ import time
 from urllib.parse import urlparse
 import re
 import httpx
+from app.social_scanner import detect_and_extract
 from readability import Document as ReadabilityDocument
 from app.config import get_settings
 from app.models import (
@@ -65,6 +66,7 @@ async def extract_from_url(url: str) -> tuple[str, str]:
             downloaded = trafilatura.fetch_url(url, config=config)
             if not downloaded:
                 import httpx
+from app.social_scanner import detect_and_extract
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -309,6 +311,13 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     """
     start_time = time.time()
 
+    # Step 0: Check if social media URL
+    if content.startswith('http'):
+        social = await detect_and_extract(content)
+        if social.get('text') and not social.get('use_beacon'):
+            content = social['text']
+            # Continue with text analysis (skip URL extraction)
+    
     # Step 1: Detect input type
     input_type = detect_input_type(content)
     source_url = ""
