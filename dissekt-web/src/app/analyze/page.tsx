@@ -82,7 +82,7 @@ export default function ScanApp() {
       addToHistory({
         id: data.id,
         input: content.slice(0, 100),
-        score: 100 - Math.min((data.prism?.techniques?.length || 0) * 30, 100),
+        score: data.scoring?.clarity_score || data.clarity_score || 50,
         techniques: data.prism?.techniques?.length || 0,
         mode,
         time: new Date().toISOString(),

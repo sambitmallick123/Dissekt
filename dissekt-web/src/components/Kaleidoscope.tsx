@@ -83,7 +83,7 @@ export default function Kaleidoscope() {
               {results.map((r, i) => {
                 const techs = r?.prism?.techniques || [];
                 const techScore = techs.length > 0
-                  ? 100 - Math.min(Math.round(Math.max(...techs.map((t: any) => t.confidence || 0)) * 40) + Math.min(techs.length * 10, 30), 100)
+                  ? (r?.scoring?.clarity_score || r?.clarity_score || 50)
                   : 100;
                 const scoreColor = techScore >= 70 ? '#16a34a' : techScore >= 40 ? '#d97706' : '#dc2626';
                 return (

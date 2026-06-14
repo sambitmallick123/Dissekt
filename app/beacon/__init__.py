@@ -11,6 +11,7 @@ import time
 from urllib.parse import urlparse
 import re
 import httpx
+from app.scoring import compute_full_score
 from app.factchecker_db import get_checker_info, tier_label, tier_color
 from app.social_scanner import detect_and_extract
 from readability import Document as ReadabilityDocument
@@ -67,6 +68,7 @@ async def extract_from_url(url: str) -> tuple[str, str]:
             downloaded = trafilatura.fetch_url(url, config=config)
             if not downloaded:
                 import httpx
+from app.scoring import compute_full_score
 from app.factchecker_db import get_checker_info, tier_label, tier_color
 from app.social_scanner import detect_and_extract
                 headers = {
@@ -469,7 +471,42 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
         except Exception as e:
             logger.warning(f"Claim extraction failed: {e}")
 
-        # Enrich fact-checks with credibility info
+        # Compute System F Clarity Score
+    try:
+        techs_raw = []
+        if hasattr(analysis, 'prism') and analysis.prism:
+            techs_raw = [{'name': t.name, 'confidence': t.confidence} for t in analysis.prism.techniques] if hasattr(analysis.prism, 'techniques') else analysis.prism.get('techniques', []) if isinstance(analysis.prism, dict) else []
+        fcs_raw = []
+        if hasattr(analysis, 'trace') and analysis.trace:
+            fcs_raw = analysis.trace.fact_checks if hasattr(analysis.trace, 'fact_checks') else analysis.trace.get('fact_checks', []) if isinstance(analysis.trace, dict) else []
+        tox_raw = 0.0
+        sent_raw = 0.0
+        src_fact = None
+        src_bias = None
+        if hasattr(analysis, 'signal') and analysis.signal:
+            sig = analysis.signal if isinstance(analysis.signal, dict) else analysis.signal.__dict__ if hasattr(analysis.signal, '__dict__') else {}
+            tox_raw = sig.get('toxicity_score', 0.0)
+            sent_raw = sig.get('sentiment_score', 0.0)
+            src_fact = sig.get('source_factuality')
+            src_bias = sig.get('source_bias')
+        
+        score_result = compute_full_score(
+            techniques=techs_raw, fact_checks=fcs_raw,
+            toxicity_score=tox_raw, sentiment_compound=sent_raw,
+            source_factuality=src_fact, source_bias=src_bias,
+            text=content[:5000], source_name="",
+        )
+        
+        if isinstance(analysis, dict):
+            analysis['scoring'] = score_result
+            analysis['clarity_score'] = score_result['clarity_score']
+        else:
+            analysis.scoring = score_result
+            analysis.clarity_score = score_result['clarity_score']
+    except Exception as e:
+        logger.warning(f"Scoring failed: {e}")
+
+    # Enrich fact-checks with credibility info
     try:
         if hasattr(analysis, 'trace') and analysis.trace and hasattr(analysis.trace, 'fact_checks'):
             for fc in analysis.trace.fact_checks:

@@ -14,14 +14,14 @@ def format_result(data: dict) -> str:
     claims = data.get("extracted_claims", [])
     report_id = data.get("id", "")
 
-    max_conf = max((t.get("confidence", 0) for t in techs), default=0)
-    raw = min(100, (
-        (round(max_conf * 40) if techs else 0) +
-        min(len(fcs) * 4, 30) +
-        round(tox * 20) +
-        (10 if len(fcs) >= 3 else 0)
-    ))
-    score = 100 - raw
+    # Use System F score if available, fallback to legacy
+    scoring = data.get("scoring", {})
+    if scoring:
+        score = scoring.get("clarity_score", 50)
+    else:
+        max_conf = max((t.get("confidence", 0) for t in techs), default=0)
+        raw = min(100, (round(max_conf * 40) if techs else 0) + min(len(fcs) * 4, 30) + round(tox * 20) + (10 if len(fcs) >= 3 else 0))
+        score = 100 - raw
 
     emoji = "🔴" if score <= 30 else "🟡" if score <= 60 else "🟢"
     label = "LOW TRANSPARENCY" if score <= 30 else "MODERATE" if score <= 60 else "HIGH TRANSPARENCY"

@@ -73,7 +73,7 @@ export default function BulkAnalysis() {
       const techs = r.prism?.techniques || [];
       const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
       const fcs = r.trace?.fact_checks?.length || 0;
-      const tox = r.signal?.toxicity_score || 0;
+      const tox = r.signal?.toxicity_score || 0; const bulkScore = r.scoring?.clarity_score || r.clarity_score || 50;
       let score = (techs.length > 0 ? Math.round(maxConf * 40) : 0) + Math.min(fcs * 4, 30) + Math.round(tox * 20) + (fcs >= 3 ? 10 : 0);
       score = Math.min(score, 100);
       const names = techs.map((t: any) => t.name?.replace(/_/g, ' ')).join('; ');
@@ -89,7 +89,7 @@ export default function BulkAnalysis() {
     const techs = r.prism?.techniques || [];
     const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
     const fcs = r.trace?.fact_checks?.length || 0;
-    const tox = r.signal?.toxicity_score || 0;
+    const tox = r.signal?.toxicity_score || 0; const bulkScore = r.scoring?.clarity_score || r.clarity_score || 50;
     let s = (techs.length > 0 ? Math.round(maxConf * 40) : 0) + Math.min(fcs * 4, 30) + Math.round(tox * 20) + (fcs >= 3 ? 10 : 0);
     return Math.min(s, 100);
   };

@@ -21,8 +21,8 @@ export default function EmbedPage({ params }: { params: Promise<{ id: string }> 
   const fcs = a.trace?.fact_checks || [];
   const tox = a.signal?.toxicity_score || 0;
   const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
-  const raw = Math.min((techs.length > 0 ? Math.round(maxConf * 40) : 0) + Math.min(fcs.length * 4, 30) + Math.round(tox * 20) + (fcs.length >= 3 ? 10 : 0), 100);
-  const score = 100 - raw;
+  const raw = 0; // Legacy — using scoring object
+  const score = a.scoring?.clarity_score || a.clarity_score || 50;
   const scoreColor = score <= 30 ? '#dc2626' : score <= 60 ? '#d97706' : '#16a34a';
   const label = score <= 30 ? 'Low transparency' : score <= 60 ? 'Moderate' : 'High transparency';
 
