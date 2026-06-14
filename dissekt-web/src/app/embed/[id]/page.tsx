@@ -22,7 +22,7 @@ export default function EmbedPage({ params }: { params: Promise<{ id: string }> 
   const tox = a.signal?.toxicity_score || 0;
   const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
   const raw = 0; // Legacy — using scoring object
-  const score = a.scoring?.clarity_score || a.clarity_score || 50;
+  const score = a.scoring?.clarity_score || a.clarity_score || 0.5;
   const scoreColor = score <= 30 ? '#dc2626' : score <= 60 ? '#d97706' : '#16a34a';
   const label = score <= 30 ? 'Low transparency' : score <= 60 ? 'Moderate' : 'High transparency';
 
@@ -31,7 +31,7 @@ export default function EmbedPage({ params }: { params: Promise<{ id: string }> 
       {/* Score bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, marginBottom: 10 }}>
         <div style={{ width: 44, height: 44, borderRadius: 22, border: `3px solid ${scoreColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 16, fontWeight: 700, color: scoreColor }}>{score}</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: scoreColor }}>{typeof score === "number" && score <= 1 ? score.toFixed(2) : score}</span>
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: scoreColor }}>{label}</div>

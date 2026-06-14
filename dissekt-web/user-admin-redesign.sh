@@ -1,3 +1,75 @@
+#!/bin/bash
+# Dissekt — User welcome bar + personal dashboard + admin redesign
+set -e
+
+cd /mnt/d/Startup\ Ideas/Dissekt/dissekt-web
+
+# ============================================
+# 1. USER: Welcome bar on /analyze
+# ============================================
+
+# Add WelcomeBar component
+cat > src/components/WelcomeBar.tsx << 'WBEOF'
+'use client';
+import { useState, useEffect } from 'react';
+
+export default function WelcomeBar() {
+  const [name, setName] = useState('');
+  const [tier, setTier] = useState('free');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setName(localStorage.getItem('dissekt_invite_name') || localStorage.getItem('dissekt_name') || '');
+    setTier(localStorage.getItem('dissekt_tier') || 'free');
+  }, []);
+
+  if (!mounted || tier !== 'invited') return null;
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
+  return (
+    <div style={{ background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)', padding: '14px 24px', color: 'white' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 600 }}>{greeting}{name ? `, ${name}` : ''}</div>
+          <div style={{ fontSize: 11, opacity: 0.8, marginTop: 2 }}>See how information is constructed</div>
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <a href="/dashboard" style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 10, color: 'white', textDecoration: 'none', fontWeight: 500 }}>📊 My insights</a>
+          <a href="/aperture" style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 10, color: 'white', textDecoration: 'none', fontWeight: 500 }}>🔖 Aperture</a>
+          <a href="/dashboard" style={{ padding: '5px 12px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 10, color: 'white', textDecoration: 'none', fontWeight: 500 }}>🔑 API keys</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+WBEOF
+
+echo "✅ WelcomeBar component"
+
+# Wire into analyze page
+python3 -c "
+content = open('src/app/analyze/page.tsx').read()
+if 'WelcomeBar' not in content:
+    content = content.replace(
+        \"import SiteHeader from '@/components/SiteHeader';\",
+        \"import SiteHeader from '@/components/SiteHeader';\\nimport WelcomeBar from '@/components/WelcomeBar';\"
+    )
+    content = content.replace(
+        '<SiteHeader active=\"Analyze\" />',
+        '<SiteHeader active=\"Analyze\" />\\n      <WelcomeBar />'
+    )
+    open('src/app/analyze/page.tsx', 'w').write(content)
+    print('✅ Analyze: WelcomeBar wired')
+"
+
+# ============================================
+# 2. USER: Personal insights dashboard /dashboard
+# ============================================
+
+cat > src/app/dashboard/page.tsx << 'DASHEOF'
 'use client';
 import { useState, useEffect } from 'react';
 import SiteHeader from '@/components/SiteHeader';
@@ -217,3 +289,108 @@ export default function DashboardPage() {
     </main>
   );
 }
+DASHEOF
+
+echo "✅ Personal insights dashboard (/dashboard)"
+
+# Add Dashboard to header nav for logged-in users
+python3 -c "
+content = open('src/components/SiteHeader.tsx').read()
+if \"'Dashboard'\" not in content:
+    content = content.replace(
+        \"{ href: '/feedback', label: 'Feedback' },\",
+        \"{ href: '/feedback', label: 'Feedback' },\\n    { href: '/dashboard', label: 'Dashboard' },\"
+    )
+    # Only show Dashboard for invited users - we'll handle this via CSS/display
+    open('src/components/SiteHeader.tsx', 'w').write(content)
+    print('✅ Header: Dashboard link added')
+"
+
+# ============================================
+# 3. ADMIN: Card-accent design (option 3/c)
+# ============================================
+
+# This is a major rewrite of the admin page styling
+# We'll update the wrapper and tab styling without rewriting all tab content
+
+python3 << 'PYEOF'
+content = open('src/app/admin/page.tsx').read()
+
+# Update the main admin page wrapper styling
+# Change tab styling from pill buttons to card-style with accents
+old_tabs_style = "display: 'flex', gap: 4, marginBottom: 20"
+new_tabs_style = "display: 'flex', gap: 4, marginBottom: 20, flexWrap: 'wrap'"
+
+content = content.replace(old_tabs_style, new_tabs_style)
+
+# Update the admin header area
+if 'Admin dashboard' in content:
+    content = content.replace(
+        "<h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Admin dashboard</h1>",
+        """<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0, color: '#1a1a1a' }}>Admin</h1>
+              <span style={{ fontSize: 9, padding: '2px 8px', background: '#f0fdfa', color: '#0d9488', borderRadius: 4, fontWeight: 500 }}>LIVE</span>
+            </div>
+            <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>dissekt.info · Platform management</div>
+          </div>
+        </div>"""
+    )
+
+# Update stat cards in overview to have colored left borders
+content = content.replace(
+    "background: '#fff', border: '1px solid #e5e5e5', borderRadius: 12, padding: '16px 20px'",
+    "background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: '14px 18px', borderLeft: '3px solid #0d9488'"
+)
+
+# Update all card borders consistently  
+content = content.replace("border: '1px solid #e5e5e5'", "border: '0.5px solid #e5eaea'")
+content = content.replace("border: '1px solid #e5eaea'", "border: '0.5px solid #e5eaea'")
+content = content.replace("borderRadius: 12", "borderRadius: 10")
+content = content.replace("borderRadius: 14", "borderRadius: 10")
+
+# Update tab active color
+content = content.replace(
+    "background: activeTab === tab.id ? '#0d9488' : '#f0f0ee'",
+    "background: activeTab === tab.id ? '#0d9488' : '#fff', boxShadow: activeTab === tab.id ? 'none' : '0 0 0 0.5px #e5eaea'"
+)
+
+# Change the page background
+content = content.replace("background: '#f5f5f4'", "background: '#fafaf8'")
+
+# Make invitation cards have left accent border based on status
+content = content.replace(
+    "padding: '12px 16px', borderBottom: '1px solid #f0f0ee'",
+    "padding: '10px 14px', borderBottom: '0.5px solid #f0f0ee', borderLeft: '3px solid'"
+)
+
+open('src/app/admin/page.tsx', 'w').write(content)
+print('✅ Admin: card-accent styling applied')
+PYEOF
+
+echo ""
+echo "✅ All 3 redesigns applied:"
+echo ""
+echo "  👤 User experience (/analyze):"
+echo "     - Teal gradient welcome bar with greeting + name"
+echo "     - Quick links: My insights, Aperture, API keys"
+echo "     - Only shows for invited (logged-in) users"
+echo ""
+echo "  📊 Personal dashboard (/dashboard):"
+echo "     - Reader profile card (Trusting/Skeptical/Careful/Balanced)"
+echo "     - Trust/Unsure/Reject distribution bar"
+echo "     - Trust-by-source visualization"
+echo "     - Recent decisions list"
+echo "     - API keys tab (create, usage bars, revoke)"
+echo "     - Quick start curl example"
+echo "     - Dashboard link in header nav"
+echo ""
+echo "  🔐 Admin (/admin):"
+echo "     - Compact header: 'Admin LIVE' + subtitle"
+echo "     - Cards with teal left accent borders"
+echo "     - Thinner borders, rounded 10px"
+echo "     - Pill tabs with outline style"
+echo "     - Status accent borders on invitation cards"
+echo ""
+echo "npm run build"

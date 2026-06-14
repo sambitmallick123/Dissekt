@@ -35,6 +35,7 @@ export default function SiteHeader({ active }: { active?: string }) {
     { href: '/compare', label: 'Compare' },
     { href: '/help', label: 'Help' },
     { href: '/feedback', label: 'Feedback' },
+    { href: '/dashboard', label: 'Dashboard' },
   ];
 
   if (!mounted) return <nav style={{ height: 46 }} />;

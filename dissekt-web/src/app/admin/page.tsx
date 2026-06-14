@@ -101,9 +101,9 @@ export default function AdminPage() {
       <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
         <SiteHeader />
         <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px' }}>
-          <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 28 }}>
+          <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 28 }}>
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <div style={{ width: 48, height: 48, background: '#f0fdfa', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 22 }}>🔐</div>
+              <div style={{ width: 48, height: 48, background: '#f0fdfa', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 22 }}>🔐</div>
               <div style={{ fontSize: 18, fontWeight: 600 }}>Admin access</div>
               <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>Enter admin password</div>
             </div>
@@ -130,7 +130,7 @@ export default function AdminPage() {
           <h1 style={{ fontSize: 22, fontWeight: 700 }}>Admin dashboard</h1>
           <button onClick={() => { setAuthenticated(false); setAdminKey(''); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 20, overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 20, flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 4 }}>
           {(Object.keys(tabLabels) as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: '7px 16px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === t ? '#0d9488' : '#fff', color: tab === t ? '#fff' : '#555', boxShadow: tab !== t ? '0 0 0 0.5px #e5eaea' : 'none', whiteSpace: 'nowrap' }}>
               {tabLabels[t]}
@@ -337,7 +337,7 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
       {editUser && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setEditUser(null)}>
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }} />
-          <div style={{ position: 'relative', background: '#fff', borderRadius: 14, padding: 24, maxWidth: 480, width: '90%' }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'relative', background: '#fff', borderRadius: 10, padding: 24, maxWidth: 480, width: '90%' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div><div style={{ fontSize: 15, fontWeight: 600 }}>{editUser.name || 'User'}</div><div style={{ fontSize: 12, color: '#888' }}>{editUser.email}</div></div>
               <button onClick={() => setEditUser(null)} style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: '#888' }}>✕</button>
@@ -370,7 +370,7 @@ function InvitationsTab({ adminKey }: { adminKey: string }) {
       {emailUser && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setEmailUser(null)}>
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }} />
-          <div style={{ position: 'relative', background: '#fff', borderRadius: 14, padding: 24, maxWidth: 480, width: '90%' }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'relative', background: '#fff', borderRadius: 10, padding: 24, maxWidth: 480, width: '90%' }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div><div style={{ fontSize: 15, fontWeight: 600 }}>Message to {emailUser.name || emailUser.email}</div></div>
               <button onClick={() => setEmailUser(null)} style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: '#888' }}>✕</button>

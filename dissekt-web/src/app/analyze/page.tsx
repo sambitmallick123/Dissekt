@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import SiteHeader from '@/components/SiteHeader';
+import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 import ScanInput from '@/components/ScanInput';
 import AnalysisResult from '@/components/AnalysisResult';
@@ -82,7 +83,7 @@ export default function ScanApp() {
       addToHistory({
         id: data.id,
         input: content.slice(0, 100),
-        score: data.scoring?.clarity_score || data.clarity_score || 50,
+        score: data.scoring?.clarity_score || data.clarity_score || 0.5,
         techniques: data.prism?.techniques?.length || 0,
         mode,
         time: new Date().toISOString(),
@@ -107,6 +108,7 @@ export default function ScanApp() {
   return (
     <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader active="Analyze" />
+      <WelcomeBar />
 
       {lockedFeature && <FeatureLockedPopup feature={lockedFeature} onClose={closePopup} />}
 

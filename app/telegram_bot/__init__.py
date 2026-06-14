@@ -23,13 +23,13 @@ def format_result(data: dict) -> str:
         raw = min(100, (round(max_conf * 40) if techs else 0) + min(len(fcs) * 4, 30) + round(tox * 20) + (10 if len(fcs) >= 3 else 0))
         score = 100 - raw
 
-    emoji = "🔴" if score <= 30 else "🟡" if score <= 60 else "🟢"
-    label = "LOW TRANSPARENCY" if score <= 30 else "MODERATE" if score <= 60 else "HIGH TRANSPARENCY"
+    emoji = "🔴" if score <= 0.35 else "🟡" if score <= 0.65 else "🟢"
+    label = "LOW TRANSPARENCY" if score <= 0.35 else "MODERATE" if score <= 0.65 else "HIGH TRANSPARENCY"
 
     lines = [
         f"🛡 <b>DISSEKT — CLARITY REPORT</b>",
         f"",
-        f"{emoji} <b>Clarity Score: {score}/100 — {label}</b>",
+        f"{emoji} <b>Clarity Score: {score:.2f} — {label}</b>",
     ]
 
     if techs:
