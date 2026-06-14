@@ -22,8 +22,8 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
 
   useEffect(() => { loadFeed(market); }, [market]);
 
-  const riskColor = (score: number) => score >= 7 ? '#dc2626' : score >= 4 ? '#d97706' : '#16a34a';
-  const riskBadge = (score: number) => score >= 7 ? '🔴' : score >= 4 ? '🟡' : '🟢';
+  const riskColor = (level: string) => level === 'high' ? '#dc2626' : level === 'medium' ? '#d97706' : level === 'low' ? '#2563eb' : '#16a34a';
+  const riskBadge = (level: string) => level === 'high' ? '🔴' : level === 'medium' ? '🟡' : level === 'low' ? '🔵' : '🟢';
 
   return (
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 18, marginTop: 16 }}>
@@ -52,11 +52,11 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {items.slice(0, 8).map((item, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 8, padding: '8px 10px', borderRadius: 8, border: '0.5px solid #f0f0ee' }}>
-            <span style={{ fontSize: 12, marginTop: 2 }}>{riskBadge(item.risk_score || 0)}</span>
+            <span style={{ fontSize: 12, marginTop: 2 }}>{riskBadge(item.risk || 'none')}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 12, color: '#404040', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>{item.title}</div>
               <div style={{ display: 'flex', gap: 8, marginTop: 3, fontSize: 10, color: '#aaa' }}>
-                <span>{item.source}</span>
+                <span>{item.risk_label && item.risk_label !== 'Clear' && <span style={{ fontSize: 9, fontWeight: 600, color: riskColor(item.risk || 'none'), padding: '1px 5px', borderRadius: 3, background: item.risk === 'high' ? '#fef2f2' : item.risk === 'medium' ? '#fffbeb' : '#eff6ff' }}>{item.risk_label}</span>}{item.source}</span>
                 {item.published && <span>{new Date(item.published).toLocaleDateString()}</span>}
               </div>
             </div>
