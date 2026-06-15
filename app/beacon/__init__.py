@@ -68,7 +68,6 @@ async def extract_from_url(url: str) -> tuple[str, str]:
             downloaded = trafilatura.fetch_url(url, config=config)
             if not downloaded:
                 import httpx
-from app.scoring import compute_full_score
 from app.factchecker_db import get_checker_info, tier_label, tier_color
 from app.social_scanner import detect_and_extract
                 headers = {

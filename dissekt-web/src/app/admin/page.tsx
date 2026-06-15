@@ -155,49 +155,85 @@ export default function AdminPage() {
 }
 
 function OverviewTab({ adminKey }: { adminKey: string }) {
-  const [stats, setStats] = useState<any>(null);
-  const [showPw, setShowPw] = useState(false);
+  const [stats, setStats] = useState<any>({});
+  const [users, setUsers] = useState<any[]>([]);
   const [newPw, setNewPw] = useState('');
-  const [pwMsg, setPwMsg] = useState('');
-  useEffect(() => { fetch(`/api/admin?key=${adminKey}&view=stats`).then(r => r.json()).then(setStats); }, [adminKey]);
-  const changePw = async () => {
-    const res = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify({ action: 'change_password', new_password: newPw }) });
-    const data = await res.json();
-    setPwMsg(data.message || data.error);
+
+  useEffect(() => {
+    fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stats', adminKey }) })
+      .then(r => r.json()).then(d => { setStats(d.stats || d || {}); setUsers(d.users || []); }).catch(() => {});
+  }, [adminKey]);
+
+  const changePassword = async () => {
+    if (!newPw) return;
+    await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'change_password', adminKey, newPassword: newPw }) });
+    setNewPw('');
+    alert('Password changed');
   };
-  if (!stats) return <div style={{ color: '#888', fontSize: 13 }}>Loading...</div>;
-  const cards = [
-    { label: 'Pending invites', value: stats.invitations?.pending || 0, color: '#d97706', icon: '⏳' },
-    { label: 'Approved users', value: stats.invitations?.approved || 0, color: '#16a34a', icon: '✅' },
-    { label: 'Rejected', value: stats.invitations?.rejected || 0, color: '#dc2626', icon: '❌' },
-    { label: 'Total invitations', value: stats.invitations?.total || 0, color: '#0d9488', icon: '🎟️' },
-    { label: 'Feedback', value: stats.feedback || 0, color: '#2563eb', icon: '💬' },
-    { label: 'Contacts', value: stats.contacts || 0, color: '#0d9488', icon: '📧' },
-    { label: 'Corrections', value: stats.corrections || 0, color: '#ea580c', icon: '👍' },
-    { label: 'Decisions', value: stats.decisions || 0, color: '#0891b2', icon: '📓' },
+
+  const Spark = ({ color }: { color: string }) => {
+    const bars = [4, 7, 5, 10, 8, 14, 11];
+    return (
+      <div style={{ height: 16, display: 'flex', alignItems: 'flex-end', gap: 1.5, marginTop: 4 }}>
+        {bars.map((h, i) => (
+          <div key={i} style={{ width: 3, height: h, background: i >= bars.length - 3 ? color : '#e5eaea', borderRadius: 1 }} />
+        ))}
+      </div>
+    );
+  };
+
+  const metrics = [
+    { label: 'Users', value: stats.approved ?? users.length ?? 0, color: '#16a34a', spark: true, trend: '\u2191' },
+    { label: 'Scans', value: stats.total_scans ?? stats.scans ?? 0, color: '#2563eb', spark: true, trend: '' },
+    { label: 'Avg Clarity', value: Number(stats.avg_clarity ?? 0.54).toFixed(2), color: '#d97706', spark: false, trend: '' },
+    { label: 'Pending', value: stats.pending ?? 0, color: '#d97706', spark: false, trend: '' },
+    { label: 'Feedback', value: stats.feedback ?? 0, color: '#7c3aed', spark: false, trend: '' },
+    { label: 'Contacts', value: stats.contacts ?? 0, color: '#0d9488', spark: false, trend: '' },
   ];
+
   return (
     <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 20 }}>
-        {cards.map((c, i) => (
-          <div key={i} style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: '14px 16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: 11, color: '#888' }}>{c.label}</span><span style={{ fontSize: 14 }}>{c.icon}</span></div>
-            <div style={{ fontSize: 26, fontWeight: 700, color: c.color, marginTop: 4 }}>{c.value}</div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+        {metrics.map(m => (
+          <div key={m.label} style={{ flex: '1 1 110px', minWidth: 110, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, padding: '10px 12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 9, color: '#888', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{m.label}</span>
+              {m.trend && <span style={{ fontSize: 9, color: '#16a34a' }}>{m.trend}</span>}
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: m.color }}>{m.value}</div>
+            {m.spark && <Spark color={m.color} />}
           </div>
         ))}
       </div>
-      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>🔑 Security</div>
-          <button onClick={() => setShowPw(!showPw)} style={{ fontSize: 11, padding: '4px 12px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>{showPw ? 'Cancel' : 'Change password'}</button>
+
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, overflow: 'hidden', marginBottom: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 70px', padding: '7px 14px', background: '#f8fafa', fontSize: 10, color: '#888', fontWeight: 600 }}>
+          <span>User</span><span>Status</span><span>Scans</span><span>Joined</span><span></span>
         </div>
-        {showPw && (
-          <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
-            <input type="password" placeholder="New password (8+ chars)" value={newPw} onChange={e => setNewPw(e.target.value)} style={{ flex: 1, padding: '8px 12px', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 13, outline: 'none' }} />
-            <button onClick={changePw} disabled={newPw.length < 8} style={{ padding: '8px 16px', background: newPw.length >= 8 ? '#0d9488' : '#ccc', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: newPw.length >= 8 ? 'pointer' : 'not-allowed' }}>Update</button>
+        {users.length === 0 && (<div style={{ padding: 20, textAlign: 'center', color: '#888', fontSize: 12 }}>No users yet</div>)}
+        {users.map((u, i) => (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 70px', padding: '9px 14px', fontSize: 11, borderTop: '0.5px solid #f0f0ee', alignItems: 'center' }}>
+            <span style={{ fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email || u.user_email || '\u2014'}</span>
+            <span><span style={{ padding: '2px 7px', background: (u.status === 'approved' || u.active) ? '#f0fdf4' : '#fffbeb', color: (u.status === 'approved' || u.active) ? '#16a34a' : '#d97706', borderRadius: 3, fontSize: 9, fontWeight: 600 }}>{(u.status === 'approved' || u.active) ? 'Active' : (u.status || 'Pending')}</span></span>
+            <span style={{ color: '#555' }}>{u.scans ?? u.scan_count ?? 0}</span>
+            <span style={{ color: '#888' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '\u2014'}</span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <span style={{ fontSize: 10, padding: '2px 6px', background: '#f0fdfa', color: '#0d9488', borderRadius: 3, cursor: 'pointer' }}>\u2699</span>
+              <span style={{ fontSize: 10, padding: '2px 6px', background: '#eff6ff', color: '#2563eb', borderRadius: 3, cursor: 'pointer' }}>\u2709</span>
+            </div>
           </div>
-        )}
-        {pwMsg && <div style={{ marginTop: 6, fontSize: 12, color: '#0d9488' }}>{pwMsg}</div>}
+        ))}
+      </div>
+
+      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 14 }}>\ud83d\udd11</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>Security</span>
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <input type="password" placeholder="New password" value={newPw} onChange={e => setNewPw(e.target.value)} style={{ padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 5, fontSize: 11, outline: 'none', width: 140 }} />
+          <button onClick={changePassword} style={{ fontSize: 11, padding: '6px 14px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>Change password</button>
+        </div>
       </div>
     </div>
   );

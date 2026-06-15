@@ -123,7 +123,7 @@ def compute_rhetoric(techniques: list) -> dict:
         pen = sev * conf
         total_penalty += pen
         weighted.append({"name": name, "confidence": _round(conf), "severity": sev, "penalty": _round(pen, 1)})
-    capped = min(total_penalty / 90.0, 1.0)
+    capped = min(total_penalty / 30.0, 1.0)
     score = _clamp(1.0 - capped, 0.05)
     return {"score": _round(score), "penalty": _round(capped), "weighted": sorted(weighted, key=lambda x: -x["penalty"])}
 
@@ -137,7 +137,7 @@ def compute_argumentation(text: str, techniques: list, claims: list = None) -> d
     supported = sum(1 for c in claims if c.get("evidence") or c.get("type") == "statistic")
     claim_support = supported / total_claims if claims else 0.5
     fallacy_count = sum(1 for t in techniques if t.get("name") in ("circular_reasoning", "straw_man", "false_dilemma", "false_causation", "hasty_generalization"))
-    coherence = max(1.0 - (fallacy_count / max(len(techniques), 1)), 0.0) if techniques else 0.7
+    coherence = max(1.0 - (fallacy_count / max(len(techniques), 1)) * 1.3, 0.0) if techniques else 0.65
     has_conclusion = any(w in text[-200:].lower() for w in ("therefore", "thus", "in conclusion", "this shows", "this means", "ultimately"))
     conclusion = 0.8 if has_conclusion else 0.5
     score = _clamp(claim_support * 0.4 + coherence * 0.35 + conclusion * 0.25, 0.05)
@@ -173,7 +173,7 @@ def compute_construction(rhetoric: dict, argumentation: dict, completeness: dict
 
 def compute_evidence(fact_checks: list) -> dict:
     if not fact_checks:
-        return {"score": 0.50, "status": "no_checks", "checks": 0}
+        return {"score": 0.65, "status": "no_checks", "checks": 0, "has_data": False}
     total_weight = 0
     weighted_sum = 0
     for fc in fact_checks:
@@ -188,7 +188,7 @@ def compute_evidence(fact_checks: list) -> dict:
         weighted_sum += tw * verdict
         total_weight += tw
     if total_weight == 0:
-        return {"score": 0.50, "status": "unrated", "checks": len(fact_checks)}
+        return {"score": 0.60, "status": "unrated", "checks": len(fact_checks), "has_data": False}
     avg = weighted_sum / total_weight
     score = _clamp(0.50 + avg * 0.50, 0.0)
     status = "confirmed" if score >= 0.65 else "disputed" if score <= 0.35 else "mixed"
@@ -197,7 +197,7 @@ def compute_evidence(fact_checks: list) -> dict:
 
 def compute_source(factuality: str = None, bias: str = None) -> dict:
     if not factuality:
-        return {"score": 0.50, "factuality": "unknown", "bias": bias or "unknown"}
+        return {"score": 0.60, "factuality": "unknown", "bias": bias or "unknown", "has_data": False}
     s = FACTUALITY_MAP.get(factuality.lower(), 0.50)
     return {"score": _round(s), "factuality": factuality, "bias": bias or "unknown"}
 
@@ -221,12 +221,26 @@ def compute_diversity(text: str) -> dict:
 
 
 def compute_temporal() -> dict:
-    return {"score": 0.50, "status": "insufficient_data", "note": "Requires accumulated analysis history"}
+    return {"score": 0.60, "status": "insufficient_data", "has_data": False, "note": "Requires accumulated analysis history"}
 
 
 def compute_verification(evidence: dict, source: dict, diversity: dict, temporal: dict) -> dict:
-    e, s, d, t = max(evidence["score"], 0.01), max(source["score"], 0.01), max(diversity["score"], 0.01), max(temporal["score"], 0.01)
-    score = _clamp((e ** 0.35) * (s ** 0.25) * (d ** 0.20) * (t ** 0.20), 0.01)
+    # Weight only axes that have actual data — don't dilute with 0.5/0.6 placeholders
+    axes = [
+        (evidence["score"], 0.40, evidence.get("has_data", True)),
+        (source["score"], 0.25, source.get("has_data", True)),
+        (diversity["score"], 0.20, diversity.get("has_data", True)),
+        (temporal["score"], 0.15, temporal.get("has_data", True)),
+    ]
+    active = [(s, w) for s, w, has in axes if has]
+    if not active:
+        # No real data at all — use evidence default only
+        score = evidence["score"]
+    else:
+        total_w = sum(w for _, w in active)
+        # Weighted geometric mean over active axes only
+        log_sum = sum((w / total_w) * math.log(max(s, 0.01)) for s, w in active)
+        score = _clamp(math.exp(log_sum), 0.01)
     return {"score": _round(score), "evidence": evidence, "source": source, "diversity": diversity, "temporal": temporal}
 
 
@@ -290,7 +304,11 @@ def compute_manipulation(text: str) -> dict:
         escalation = 0.0
     binary = sum(1 for p in ("either you", "you're either", "with us or", "no middle ground", "only two", "us vs them", "us versus them") if p in lower)
     binary_score = min(binary * 0.3, 1.0)
-    raw = urgency * 0.25 + cta * 0.20 + escalation * 0.25 + binary_score * 0.15 + min(emo_words / max(len(words), 1) * 10, 1.0) * 0.15
+    # Aggression density — hostile framing IS manipulation pressure
+    agg_count = sum(1 for w in words if w.strip(".,!?;:") in AGGRESSION_WORDS)
+    agg_density = min(agg_count / max(len(words), 1) * 15, 1.0)
+    raw = (urgency * 0.20 + cta * 0.15 + escalation * 0.20 + binary_score * 0.10
+           + min(emo_words / max(len(words), 1) * 10, 1.0) * 0.15 + agg_density * 0.20)
     pressure = _clamp(raw, 0, 1.0)
     score = _clamp(1.0 - pressure, 0.05)
     return {"score": _round(score), "pressure": _round(pressure), "urgency": _round(urgency), "cta": cta > 0, "escalation": _round(escalation), "binary_framing": _round(binary_score)}
@@ -305,7 +323,7 @@ def compute_narrative_direction(text: str, sentiment_compound: float) -> dict:
     horizontal = _clamp((trust_words - skeptic_words) / 5.0, -1.0, 1.0)
     vertical = _clamp((hope_words - fear_words) / 5.0, -1.0, 1.0)
     magnitude = min(math.sqrt(horizontal**2 + vertical**2), 1.414) / 1.414
-    score = _clamp(1.0 - magnitude, 0.05)
+    score = _clamp(1.0 - magnitude * 1.5, 0.05)
     direction = ""
     if abs(horizontal) > 0.2 or abs(vertical) > 0.2:
         h_label = "trusting" if horizontal > 0.2 else "skeptical" if horizontal < -0.2 else ""
