@@ -46,7 +46,7 @@ export default function InvitePage() {
   const inp: React.CSSProperties = { width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fafaf8', fontFamily: 'inherit', boxSizing: 'border-box' as any, marginBottom: 10 };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 440, margin: '40px auto', padding: '0 16px' }}>
         <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 28 }}>

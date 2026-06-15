@@ -6,7 +6,7 @@ export default function BookmarkletPage() {
   const bookmarkletCode = "javascript:void(window.open('https://dissekt.info/analyze?url='+encodeURIComponent(window.location.href),'_blank'))";
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔖</div>

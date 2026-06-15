@@ -32,7 +32,7 @@ export default function ComparePage() {
   const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, outline: 'none', background: '#f8f8f6', fontFamily: 'inherit', resize: 'vertical' };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px' }}>

@@ -21,7 +21,7 @@ export default function LifecyclePage() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🔄 Claim Lifecycle</h1>

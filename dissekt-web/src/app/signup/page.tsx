@@ -41,7 +41,7 @@ export default function SignupPage() {
   const inp: React.CSSProperties = { width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fafaf8', marginBottom: 10, boxSizing: 'border-box' as any };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 400, margin: '60px auto', padding: '0 24px' }}>
         <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 28 }}>

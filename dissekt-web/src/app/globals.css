@@ -83,8 +83,26 @@ body {
   .stats-grid { grid-template-columns: 1fr 1fr !important; }
 }
 
-/* Sticky footer — always at page bottom */
-html { height: 100%; }
-body { min-height: 100vh; display: flex; flex-direction: column; margin: 0; }
-main { flex: 1 0 auto; }
-footer { flex-shrink: 0; }
+
+
+
+/* ===== STICKY FOOTER (bulletproof) ===== */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body > * {
+  flex-shrink: 0;
+}
+main {
+  flex: 1 0 auto;
+}
+footer {
+  margin-top: auto;
+  flex-shrink: 0;
+}

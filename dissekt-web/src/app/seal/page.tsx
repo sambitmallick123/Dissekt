@@ -7,7 +7,7 @@ export default function BadgePage() {
   const autoCode = '<script src="https://dissekt.info/badge.js"></script>';
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🏷️ Embeddable Transparency Badge</h1>

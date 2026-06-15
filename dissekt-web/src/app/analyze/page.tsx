@@ -106,7 +106,7 @@ export default function ScanApp() {
   if (!mounted) return null;
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader active="Analyze" />
       <WelcomeBar />
 

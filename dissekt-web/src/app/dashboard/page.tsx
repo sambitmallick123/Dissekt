@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   if (tier !== 'invited') {
     return (
-      <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+      <main style={{ flex: 1, background: '#fafaf8' }}>
         <SiteHeader />
         <div style={{ maxWidth: 440, margin: '80px auto', padding: '0 16px', textAlign: 'center' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
@@ -83,7 +83,7 @@ export default function DashboardPage() {
   const topSources = Object.entries(sourceMap).sort((a, b) => (b[1].trust + b[1].unsure + b[1].reject) - (a[1].trust + a[1].unsure + a[1].reject)).slice(0, 5);
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader active="Dashboard" />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>

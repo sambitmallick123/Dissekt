@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 
-type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings';
+type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources';
 
 
 
@@ -98,7 +98,7 @@ export default function AdminPage() {
 
   if (!authenticated) {
     return (
-      <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+      <main style={{ flex: 1, background: '#fafaf8' }}>
         <SiteHeader />
         <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px' }}>
           <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 28 }}>
@@ -119,20 +119,23 @@ export default function AdminPage() {
 
   const tabLabels: Record<Tab, string> = {
     overview: '📊 Overview', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
-    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', settings: '⚙️ Settings',
+    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', settings: '⚙️ Settings', sources: '📡 Sources',
   };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Admin dashboard</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Admin</span>
+              <span style={{ fontSize: 9, padding: '2px 8px', background: '#f0fdfa', color: '#0d9488', borderRadius: 4, fontWeight: 600 }}>LIVE</span>
+            </div>
           <button onClick={() => { setAuthenticated(false); setAdminKey(''); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
-        <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '0.5px solid #e5eaea', flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '0.5px solid #e5eaea', flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 0 }}>
           {(Object.keys(tabLabels) as Tab[]).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ padding: '7px 16px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === t ? '#0d9488' : '#fff', color: tab === t ? '#fff' : '#555', boxShadow: tab !== t ? '0 0 0 0.5px #e5eaea' : 'none', whiteSpace: 'nowrap' }}>
+            <button key={t} onClick={() => setTab(t)} style={{ padding: '8px 14px', borderRadius: 0, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: 'transparent', color: tab === t ? '#0d9488' : '#888', borderBottom: tab === t ? '2px solid #0d9488' : '2px solid transparent', whiteSpace: 'nowrap' }}>
               {tabLabels[t]}
             </button>
           ))}
@@ -143,6 +146,7 @@ export default function AdminPage() {
         {tab === 'contacts' && <ContactsTab adminKey={adminKey} />}
         {tab === 'corrections' && <CorrectionsTab adminKey={adminKey} />}
         {tab === 'decisions' && <DecisionsTab adminKey={adminKey} />}
+        {tab === 'sources' && <SourcesTab />}
         {tab === 'settings' && <SettingsTab adminKey={adminKey} />}
       </div>
       <SiteFooter />

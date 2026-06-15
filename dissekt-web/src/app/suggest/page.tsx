@@ -25,7 +25,7 @@ export default function SuggestSourcePage() {
   const inp: React.CSSProperties = { width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fff', fontFamily: 'inherit', boxSizing: 'border-box' as any, marginBottom: 10 };
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 520, margin: '40px auto', padding: '0 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Suggest a source</h1>

@@ -4,7 +4,7 @@ import SiteFooter from '@/components/SiteFooter';
 
 export default function DisclaimerPage() {
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Data & Analysis Disclaimer</h1>
