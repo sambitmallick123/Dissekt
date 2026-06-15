@@ -1,3 +1,9 @@
+#!/bin/bash
+# Run from: /mnt/d/Startup Ideas/Dissekt/dissekt-web
+set -e
+
+# ═══ 1. WelcomeBar: add a clear-cache migration + make reusable ═══
+cat > src/components/WelcomeBar.tsx << 'WBEOF'
 'use client';
 import { useState, useEffect } from 'react';
 
@@ -50,3 +56,50 @@ export default function WelcomeBar() {
     </div>
   );
 }
+WBEOF
+echo "✅ WelcomeBar with cache migration"
+
+# ═══ 2. Add <WelcomeBar /> to every logged-in-relevant page ═══
+python3 << 'PYEOF'
+import re, glob
+
+# Pages where logged-in users land
+target_pages = [
+    'src/app/observatory/page.tsx',
+    'src/app/compare/page.tsx',
+    'src/app/dashboard/page.tsx',
+    'src/app/thread/page.tsx',
+    'src/app/imprint/page.tsx',
+    'src/app/aperture/page.tsx',
+    'src/app/seal/page.tsx',
+    'src/app/suggest/page.tsx',
+]
+
+done = []
+for path in target_pages:
+    try:
+        c = open(path).read()
+    except FileNotFoundError:
+        continue
+    orig = c
+    # Add import if missing
+    if 'WelcomeBar' not in c:
+        if "import SiteHeader from '@/components/SiteHeader';" in c:
+            c = c.replace(
+                "import SiteHeader from '@/components/SiteHeader';",
+                "import SiteHeader from '@/components/SiteHeader';\nimport WelcomeBar from '@/components/WelcomeBar';"
+            )
+        else:
+            # add at top after 'use client'
+            c = c.replace("'use client';", "'use client';\nimport WelcomeBar from '@/components/WelcomeBar';", 1)
+    # Insert <WelcomeBar /> right after <SiteHeader ... />
+    c = re.sub(r'(<SiteHeader[^/]*/>)', r'\1\n      <WelcomeBar />', c, count=1)
+    if c != orig:
+        open(path, 'w').write(c)
+        done.append(path.split('/')[-2])
+
+print('✅ WelcomeBar added to:', ', '.join(done) if done else 'none (already present or pages missing)')
+PYEOF
+
+echo ""
+echo "Run: rm -rf .next && npm run dev"

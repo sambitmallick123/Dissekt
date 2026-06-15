@@ -47,6 +47,25 @@ FEEDS = {
 }
 
 
+def _load_feeds_from_db():
+    """Load active feeds from Supabase, fall back to hardcoded FEEDS."""
+    try:
+        from app.config import get_settings
+        from supabase import create_client
+        s = get_settings()
+        sb = create_client(s.supabase_url, s.supabase_key)
+        res = sb.table("scope_feeds").select("*").eq("active", True).execute()
+        if res.data:
+            by_market = {}
+            for row in res.data:
+                by_market.setdefault(row["market"], []).append((row["name"], row["url"]))
+            return by_market
+    except Exception:
+        pass
+    return FEEDS
+
+
+
 def _parse_date(entry) -> str:
     """Extract a consistent ISO datetime string from an RSS entry."""
     # feedparser provides parsed time tuples

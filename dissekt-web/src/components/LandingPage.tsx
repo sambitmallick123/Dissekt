@@ -4,7 +4,7 @@ import SiteFooter from '@/components/SiteFooter';
 
 export default function LandingPage() {
   return (
-    <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+    <main style={{ flex: 1, minHeight: '100vh', background: '#fafaf8' }}>
       <SiteHeader />
 
       {/* HERO */}

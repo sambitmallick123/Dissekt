@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import SiteHeader from '@/components/SiteHeader';
+import FeedsTab from '@/components/FeedsTab';
 import SiteFooter from '@/components/SiteFooter';
 
-type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources';
+type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources' | 'feeds';
 
 
 
@@ -119,7 +120,7 @@ export default function AdminPage() {
 
   const tabLabels: Record<Tab, string> = {
     overview: '📊 Overview', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
-    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', settings: '⚙️ Settings', sources: '📡 Sources',
+    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', settings: '⚙️ Settings', sources: '📡 Sources', feeds: '📰 Feeds',
   };
 
   return (
@@ -146,6 +147,7 @@ export default function AdminPage() {
         {tab === 'contacts' && <ContactsTab adminKey={adminKey} />}
         {tab === 'corrections' && <CorrectionsTab adminKey={adminKey} />}
         {tab === 'decisions' && <DecisionsTab adminKey={adminKey} />}
+        {tab === 'feeds' && <FeedsTab />}
         {tab === 'sources' && <SourcesTab />}
         {tab === 'settings' && <SettingsTab adminKey={adminKey} />}
       </div>
@@ -183,9 +185,9 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
   };
 
   const metrics = [
-    { label: 'Users', value: stats.approved ?? users.length ?? 0, color: '#16a34a', spark: true, trend: '\u2191' },
+    { label: 'Users', value: stats.approved ?? users.length ?? 0, color: '#16a34a', spark: true, trend: '↑' },
     { label: 'Scans', value: stats.total_scans ?? stats.scans ?? 0, color: '#2563eb', spark: true, trend: '' },
-    { label: 'Avg Clarity', value: Number(stats.avg_clarity ?? 0.54).toFixed(2), color: '#d97706', spark: false, trend: '' },
+    { label: 'Avg Clarity', value: stats.avg_clarity != null ? Number(stats.avg_clarity).toFixed(2) : '—', color: '#d97706', spark: false, trend: '' },
     { label: 'Pending', value: stats.pending ?? 0, color: '#d97706', spark: false, trend: '' },
     { label: 'Feedback', value: stats.feedback ?? 0, color: '#7c3aed', spark: false, trend: '' },
     { label: 'Contacts', value: stats.contacts ?? 0, color: '#0d9488', spark: false, trend: '' },
@@ -213,13 +215,13 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
         {users.length === 0 && (<div style={{ padding: 20, textAlign: 'center', color: '#888', fontSize: 12 }}>No users yet</div>)}
         {users.map((u, i) => (
           <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 70px', padding: '9px 14px', fontSize: 11, borderTop: '0.5px solid #f0f0ee', alignItems: 'center' }}>
-            <span style={{ fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email || u.user_email || '\u2014'}</span>
+            <span style={{ fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email || u.user_email || '—'}</span>
             <span><span style={{ padding: '2px 7px', background: (u.status === 'approved' || u.active) ? '#f0fdf4' : '#fffbeb', color: (u.status === 'approved' || u.active) ? '#16a34a' : '#d97706', borderRadius: 3, fontSize: 9, fontWeight: 600 }}>{(u.status === 'approved' || u.active) ? 'Active' : (u.status || 'Pending')}</span></span>
             <span style={{ color: '#555' }}>{u.scans ?? u.scan_count ?? 0}</span>
-            <span style={{ color: '#888' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '\u2014'}</span>
+            <span style={{ color: '#888' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '—'}</span>
             <div style={{ display: 'flex', gap: 4 }}>
-              <span style={{ fontSize: 10, padding: '2px 6px', background: '#f0fdfa', color: '#0d9488', borderRadius: 3, cursor: 'pointer' }}>\u2699</span>
-              <span style={{ fontSize: 10, padding: '2px 6px', background: '#eff6ff', color: '#2563eb', borderRadius: 3, cursor: 'pointer' }}>\u2709</span>
+              <span style={{ fontSize: 10, padding: '2px 6px', background: '#f0fdfa', color: '#0d9488', borderRadius: 3, cursor: 'pointer' }}>⚙</span>
+              <span style={{ fontSize: 10, padding: '2px 6px', background: '#eff6ff', color: '#2563eb', borderRadius: 3, cursor: 'pointer' }}>✉</span>
             </div>
           </div>
         ))}
@@ -227,7 +229,7 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
 
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 14 }}>\ud83d\udd11</span>
+          <span style={{ fontSize: 14 }}>🔑</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>Security</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
