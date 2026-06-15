@@ -17,7 +17,7 @@ from app.models import ScanRequest, FullAnalysis, AnalysisMode
 from app.beacon import scan
 from app.middleware import validate_and_rate_limit
 from app.factchecker_db import get_checker_info, tier_label
-from app.radar import get_radar_feed
+from app.scope import get_scope_feed
 from fastapi.responses import JSONResponse
 from collections import defaultdict
 import time as _time
@@ -152,14 +152,14 @@ async def list_techniques():
         "techniques": TECHNIQUES,
     }
 
-@app.get("/api/radar")
-async def radar_feed(market: str = "all", limit: int = 20, refresh: bool = False):
-    """Radar feed with 6-hour Redis cache."""
+@app.get("/api/scope")
+async def scope_feed(market: str = "all", limit: int = 20, refresh: bool = False):
+    """Scope feed with 6-hour Redis cache."""
     import json
     from datetime import datetime, timezone
 
-    cache_key = f"radar:{market}"
-    RADAR_TTL = 21600  # 6 hours in seconds
+    cache_key = f"scope:{market}"
+    SCOPE_TTL = 21600  # 6 hours in seconds
 
     # Check Redis cache (unless force refresh)
     if not refresh:
@@ -177,20 +177,20 @@ async def radar_feed(market: str = "all", limit: int = 20, refresh: bool = False
                         "last_refreshed": data.get("timestamp", None),
                     }
         except Exception as e:
-            logger.warning(f"Radar cache read failed: {e}")
+            logger.warning(f"Scope cache read failed: {e}")
 
     # Fetch fresh RSS feeds
-    items = await get_radar_feed(market, limit=100)  # fetch more, cache all
+    items = await get_scope_feed(market, limit=100)  # fetch more, cache all
     now = datetime.now(timezone.utc).isoformat()
 
     # Store in Redis with 6-hour TTL
     try:
         from app.cache import redis_client
-        if redis_client:
+        if redis_client and items:  # never cache an empty result
             cache_data = json.dumps({"items": items, "timestamp": now})
-            await redis_client.set(cache_key, cache_data, ex=RADAR_TTL)
+            await redis_client.set(cache_key, cache_data, ex=SCOPE_TTL)
     except Exception as e:
-        logger.warning(f"Radar cache write failed: {e}")
+        logger.warning(f"Scope cache write failed: {e}")
 
     return {
         "items": items[:limit],

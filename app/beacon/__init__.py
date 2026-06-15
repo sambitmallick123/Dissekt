@@ -22,8 +22,8 @@ from app.models import (
 )
 from app.prism.heuristics import run_all_heuristics
 from app.prism.llm import route_and_analyze
-from app.trace import run_trace
-from app.signal import run_signal
+from app.lens import run_lens
+from app.spectrum import run_spectrum
 from app.cache import get_cached, set_cached
 
 logger = logging.getLogger("dissekt.beacon")
@@ -350,8 +350,8 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     detected_lang = detect_language(extracted_text)
     prism_task = route_and_analyze(extracted_text, mode, heuristics, detected_language=detected_lang)
     trace_query = re.split(r'[.!?\n]', extracted_text)[0].strip()[:150]
-    trace_task = run_trace(trace_query if len(trace_query) > 20 else extracted_text[:200])
-    signal_task = asyncio.to_thread(run_signal, extracted_text, source_url)
+    trace_task = run_lens(trace_query if len(trace_query) > 20 else extracted_text[:200])
+    signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
 
     prism_raw, trace_raw, signal_raw = await asyncio.gather(
         prism_task, trace_task, signal_task,
@@ -435,7 +435,7 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
 
     # Step 10: Political context (Compass)
     try:
-        from app.compass import analyze_political_context
+        from app.meridian import analyze_political_context
         compass_data = await analyze_political_context(extracted_text)
         analysis.compass = compass_data
     except Exception as e:
@@ -443,7 +443,7 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
 
     # Step 10b: Coordination detection (Pulse)
     try:
-        from app.pulse import detect_coordination
+        from app.flare import detect_coordination
         pulse_data = await detect_coordination(extracted_text, analysis.similar_claims)
         analysis.pulse = pulse_data
     except Exception as e:

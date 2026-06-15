@@ -51,7 +51,7 @@ def analyze_toxicity(text: str) -> dict:
         }
 
 
-def run_signal(text: str, source_url: str = "") -> dict:
+def run_spectrum(text: str, source_url: str = "") -> dict:
     """Run the full Signal pipeline.
 
     Returns: toxicity, source bias, sentiment, emotion.

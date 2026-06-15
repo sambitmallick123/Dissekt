@@ -1,3 +1,15 @@
+#!/bin/bash
+# Run from: /mnt/d/Startup Ideas/Dissekt/dissekt-web
+# Replaces the Aperture/bookmarklet page with a "coming soon" state
+set -e
+
+# Back up the existing page so we can restore it later
+if [ -f src/app/aperture/page.tsx ]; then
+  cp src/app/aperture/page.tsx src/app/aperture/page.tsx.bak
+  echo "✅ Backed up existing page → page.tsx.bak (restore later)"
+fi
+
+cat > src/app/aperture/page.tsx << 'PAGEEOF'
 'use client';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
@@ -27,3 +39,27 @@ export default function AperturePage() {
     </main>
   );
 }
+PAGEEOF
+echo "✅ Aperture page replaced with 'coming soon' state"
+
+# Remove the Bookmarklet link from the WelcomeBar so users don't land on a dead feature
+python3 << 'PYEOF'
+import os
+path = 'src/components/WelcomeBar.tsx'
+if os.path.exists(path):
+    c = open(path).read()
+    orig = c
+    # Remove the Bookmarklet link line
+    import re
+    c = re.sub(r'\s*<a href="/aperture"[^>]*>🔖 Bookmarklet</a>', '', c)
+    if c != orig:
+        open(path, 'w').write(c)
+        print('✅ Removed Bookmarklet link from WelcomeBar')
+    else:
+        print('  (Bookmarklet link not found in WelcomeBar — may use different text)')
+else:
+    print('  WelcomeBar not found')
+PYEOF
+
+echo ""
+echo "Run: rm -rf .next && npm run build"

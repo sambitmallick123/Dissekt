@@ -4,7 +4,7 @@ Detects politicians in content and cross-references claims
 against voting records, promises, and factual data.
 """
 import logging
-from app.compass.ner import detect_politicians
+from app.meridian.ner import detect_politicians
 
 logger = logging.getLogger("dissekt.compass")
 

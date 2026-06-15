@@ -47,7 +47,6 @@ export default function WelcomeBar() {
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <a href="/dashboard" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: 'white', textDecoration: 'none', fontWeight: 500 }}>📊 My insights</a>
-          <a href="/aperture" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: 'white', textDecoration: 'none', fontWeight: 500 }}>🔖 Bookmarklet</a>
           <a href="/dashboard" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: 'white', textDecoration: 'none', fontWeight: 500 }}>🔑 API keys</a>
         </div>
       </div>

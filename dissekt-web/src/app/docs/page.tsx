@@ -169,7 +169,7 @@ export default function DocsPage() {
 
         {tab === 'radar' && (
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>GET /api/radar</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>GET /api/scope</h2>
             <p style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>Live news intelligence feed from 16 sources across 4 markets.</p>
 
             <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Parameters</h3>
@@ -181,7 +181,7 @@ export default function DocsPage() {
 
             <h3 style={{ fontSize: 14, fontWeight: 600, marginTop: 16, marginBottom: 8 }}>Example</h3>
             <div style={codeStyle}>
-              curl "{apiUrl}/api/radar?market=india&limit=10"
+              curl "{apiUrl}/api/scope?market=india&limit=10"
             </div>
           </div>
         )}

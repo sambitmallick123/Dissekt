@@ -169,7 +169,7 @@ def _extract_platform(url: str) -> str:
     return "Web"
 
 
-async def run_trace(text: str) -> dict:
+async def run_lens(text: str) -> dict:
     """Run the full Trace pipeline on a text.
 
     Returns: fact_checks, spread_timeline, check_worthiness

@@ -123,7 +123,7 @@ def _quick_risk_score(title: str, summary: str) -> str:
         return "low"
     return "none"
 
-async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
+async def get_scope_feed(market: str = "all", limit: int = 20) -> list[dict]:
     """Fetch and merge RSS feeds for a market, sorted newest first."""
     feeds = []
     if market == "all":
@@ -145,6 +145,15 @@ async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
                 for entry in d.entries[:8]:
                     published = _parse_date(entry)
                     _rs = _quick_risk_score(entry.get("title", ""), (entry.get("summary", "") or "")[:200])
+                    # _quick_risk_score may return a dict or a plain level string — normalize
+                    if isinstance(_rs, dict):
+                        _level = _rs.get("level", "none")
+                        _score = _rs.get("score", 0)
+                        _label = _rs.get("label", "")
+                    else:
+                        _level = str(_rs) if _rs else "none"
+                        _score = 0
+                        _label = "" if _level in ("none", "low") else _level.capitalize()
                     items.append({
                         "title": entry.get("title", ""),
                         "url": entry.get("link", ""),
@@ -152,9 +161,9 @@ async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
                         "source": source_name,
                         "summary": (entry.get("summary", "") or "")[:200],
                         "market": feed_market,
-                        "risk": _rs["level"],
-                        "risk_score": _rs["score"],
-                        "risk_label": _rs["label"],
+                        "risk": _level,
+                        "risk_score": _score,
+                        "risk_label": _label,
                     })
         except Exception as e:
             logger.warning(f"Failed to fetch {feed_url}: {e}")
