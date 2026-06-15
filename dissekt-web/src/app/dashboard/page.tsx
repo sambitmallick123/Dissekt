@@ -45,6 +45,21 @@ export default function DashboardPage() {
 
   if (!mounted) return null;
 
+  if (tier !== 'invited') {
+    return (
+      <main style={{ minHeight: '100vh', background: '#fafaf8' }}>
+        <SiteHeader />
+        <div style={{ maxWidth: 440, margin: '80px auto', padding: '0 16px', textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Dashboard requires access</div>
+          <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Sign in with your invite code to view your personal insights, trust graph, and API keys.</div>
+          <a href="/invite" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
+        </div>
+        <SiteFooter />
+      </main>
+    );
+  }
+
   // Compute profile stats
   const total = decisions.length;
   const trust = decisions.filter(d => d.decision === 'trust').length;
