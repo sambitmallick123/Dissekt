@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -28,7 +27,6 @@ export default function SuggestSourcePage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <WelcomeBar />
       <div style={{ maxWidth: 520, margin: '40px auto', padding: '0 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Suggest a source</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Know a reliable independent outlet or journalist? Suggest it for our Scope feeds. We review every submission.</p>

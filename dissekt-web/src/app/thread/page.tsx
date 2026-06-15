@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -24,7 +23,6 @@ export default function LifecyclePage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <WelcomeBar />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🔄 Claim Lifecycle</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>Track how a claim spread, evolved, and was addressed over time.</p>

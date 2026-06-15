@@ -48,7 +48,7 @@ FEEDS = {
 
 
 def _load_feeds_from_db():
-    """Load active feeds from Supabase, fall back to hardcoded FEEDS."""
+    """Load active feeds from Supabase as {market: [url,...]}. Falls back to hardcoded FEEDS."""
     try:
         from app.config import get_settings
         from supabase import create_client
@@ -58,10 +58,10 @@ def _load_feeds_from_db():
         if res.data:
             by_market = {}
             for row in res.data:
-                by_market.setdefault(row["market"], []).append((row["name"], row["url"]))
+                by_market.setdefault(row["market"], []).append(row["url"])
             return by_market
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Feed DB load failed, using defaults: {e}")
     return FEEDS
 
 
@@ -125,12 +125,13 @@ def _quick_risk_score(title: str, summary: str) -> str:
 
 async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
     """Fetch and merge RSS feeds for a market, sorted newest first."""
+    active_feeds = _load_feeds_from_db()
     feeds = []
     if market == "all":
-        for m in FEEDS:
-            feeds.extend([(url, m) for url in FEEDS[m]])
-    elif market in FEEDS:
-        feeds = [(url, market) for url in FEEDS[market]]
+        for m in active_feeds:
+            feeds.extend([(url, m) for url in active_feeds[m]])
+    elif market in active_feeds:
+        feeds = [(url, market) for url in active_feeds[market]]
     else:
         return []
 

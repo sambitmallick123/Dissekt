@@ -1,6 +1,5 @@
 'use client';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 
 export default function BookmarkletPage() {
@@ -9,7 +8,6 @@ export default function BookmarkletPage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <WelcomeBar />
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔖</div>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8, color: '#1a1a1a' }}>One-click analyze</h1>

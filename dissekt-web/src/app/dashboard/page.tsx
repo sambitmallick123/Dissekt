@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -50,7 +49,6 @@ export default function DashboardPage() {
     return (
       <main style={{ flex: 1, background: '#fafaf8' }}>
         <SiteHeader />
-      <WelcomeBar />
         <div style={{ maxWidth: 440, margin: '80px auto', padding: '0 16px', textAlign: 'center' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
           <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Dashboard requires access</div>

@@ -1,7 +1,6 @@
 'use client';
 import Arc from '@/components/Arc';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
 
@@ -32,7 +31,6 @@ export default function TopicsPage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <WelcomeBar />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>📈 Topic Tracking</h1>

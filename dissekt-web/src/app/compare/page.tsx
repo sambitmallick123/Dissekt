@@ -1,7 +1,6 @@
 'use client';
 import Kaleidoscope from '@/components/Kaleidoscope';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 import { useState } from 'react';
 import ClarityScore from '@/components/ClarityScore';
@@ -35,7 +34,6 @@ export default function ComparePage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <WelcomeBar />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 24px' }}>
         <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>⚖️ Comparative Analysis</h1>

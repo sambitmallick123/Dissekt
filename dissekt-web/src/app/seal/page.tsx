@@ -1,6 +1,5 @@
 'use client';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 
 export default function BadgePage() {
@@ -10,7 +9,6 @@ export default function BadgePage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <WelcomeBar />
       <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>🏷️ Embeddable Transparency Badge</h1>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Add a live Dissekt transparency score to any article on your site.</p>

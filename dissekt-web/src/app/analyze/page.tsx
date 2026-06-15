@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import SiteHeader from '@/components/SiteHeader';
-import WelcomeBar from '@/components/WelcomeBar';
 import SiteFooter from '@/components/SiteFooter';
 import ScanInput from '@/components/ScanInput';
 import AnalysisResult from '@/components/AnalysisResult';
@@ -108,7 +107,6 @@ export default function ScanApp() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader active="Analyze" />
-      <WelcomeBar />
 
       {lockedFeature && <FeatureLockedPopup feature={lockedFeature} onClose={closePopup} />}
 

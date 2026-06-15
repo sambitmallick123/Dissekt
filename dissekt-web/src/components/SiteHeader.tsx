@@ -1,4 +1,5 @@
 'use client';
+import WelcomeBar from '@/components/WelcomeBar';
 import { useEffect, useState } from 'react';
 
 export default function SiteHeader({ active }: { active?: string }) {
@@ -95,6 +96,7 @@ export default function SiteHeader({ active }: { active?: string }) {
           </div>
         </div>
       </nav>
+      <WelcomeBar />
 
       {/* Mobile dropdown */}
       {menuOpen && (
