@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import ScanInput from '@/components/ScanInput';
@@ -18,7 +19,7 @@ import { FeatureLockedPopup, useFeatureGate } from '@/components/FeatureGate';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function ScanApp() {
+function ScanAppInner() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,6 +31,8 @@ export default function ScanApp() {
   const [mounted, setMounted] = useState(false);
   const [enabledFeatures, setEnabledFeatures] = useState<string[]>([]);
   const { lockedFeature, checkFeature, closePopup } = useFeatureGate();
+  const searchParams = useSearchParams();
+  const [urlHandled, setUrlHandled] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -43,6 +46,21 @@ export default function ScanApp() {
     const t = setInterval(() => setResetIn(getResetTime()), 60000);
     return () => clearInterval(t);
   }, []);
+
+  // Bookmarklet / shared-link support: read ?url= and auto-fill the scanner
+  useEffect(() => {
+    if (!mounted || urlHandled) return;
+    const incoming = searchParams.get('url') || searchParams.get('content');
+    if (incoming) {
+      setUrlHandled(true);
+      setInputContent(incoming);
+      // Auto-run a brief scan if we have a usable value
+      if (incoming.length >= 10) {
+        handleScan(incoming, 'brief');
+      }
+    }
+  }, [mounted, searchParams, urlHandled]);
+
 
   const handleScan = async (content: string, modeArg: string) => {
     const mode = (modeArg === 'detailed' ? 'detailed' : 'brief') as 'brief' | 'detailed';
@@ -165,5 +183,13 @@ export default function ScanApp() {
       </div>
       <SiteFooter />
     </main>
+  );
+}
+
+export default function ScanApp() {
+  return (
+    <Suspense fallback={null}>
+      <ScanAppInner />
+    </Suspense>
   );
 }

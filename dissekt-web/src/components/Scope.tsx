@@ -37,7 +37,7 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
       </div>
 
       <div style={{ display: 'flex', gap: 4, marginBottom: 12 }}>
-        {(['all', 'india', 'us', 'germany', 'uk', 'intl', 'substack'] as Market[]).map(m => (
+        {(['all', 'india', 'us', 'germany', 'uk'] as Market[]).map(m => (
           <button key={m} onClick={() => setMarket(m)}
             style={{ padding: '4px 12px', borderRadius: 5, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: market === m ? '#0d9488' : '#f0f0ee', color: market === m ? '#fff' : '#555', textTransform: 'capitalize' }}>
             {m === 'all' ? 'All' : m === 'us' ? 'US' : m === 'uk' ? 'UK' : m === 'intl' ? 'Intl' : m.charAt(0).toUpperCase() + m.slice(1)}

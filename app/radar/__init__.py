@@ -125,13 +125,12 @@ def _quick_risk_score(title: str, summary: str) -> str:
 
 async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
     """Fetch and merge RSS feeds for a market, sorted newest first."""
-    active_feeds = _load_feeds_from_db()
     feeds = []
     if market == "all":
-        for m in active_feeds:
-            feeds.extend([(url, m) for url in active_feeds[m]])
-    elif market in active_feeds:
-        feeds = [(url, market) for url in active_feeds[market]]
+        for m in FEEDS:
+            feeds.extend([(url, m) for url in FEEDS[m]])
+    elif market in FEEDS:
+        feeds = [(url, market) for url in FEEDS[market]]
     else:
         return []
 
