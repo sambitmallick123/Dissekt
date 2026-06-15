@@ -68,8 +68,6 @@ async def extract_from_url(url: str) -> tuple[str, str]:
             downloaded = trafilatura.fetch_url(url, config=config)
             if not downloaded:
                 import httpx
-from app.factchecker_db import get_checker_info, tier_label, tier_color
-from app.social_scanner import detect_and_extract
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -474,10 +472,28 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     try:
         techs_raw = []
         if hasattr(analysis, 'prism') and analysis.prism:
-            techs_raw = [{'name': t.name, 'confidence': t.confidence} for t in analysis.prism.techniques] if hasattr(analysis.prism, 'techniques') else analysis.prism.get('techniques', []) if isinstance(analysis.prism, dict) else []
+            raw_techs = analysis.prism.techniques if hasattr(analysis.prism, 'techniques') else (analysis.prism.get('techniques', []) if isinstance(analysis.prism, dict) else [])
+        techs_raw = []
+        for t in (raw_techs or []):
+            if isinstance(t, dict):
+                techs_raw.append({'name': t.get('name', ''), 'confidence': t.get('confidence', 0)})
+            else:
+                techs_raw.append({'name': getattr(t, 'name', ''), 'confidence': getattr(t, 'confidence', 0)})
         fcs_raw = []
         if hasattr(analysis, 'trace') and analysis.trace:
-            fcs_raw = analysis.trace.fact_checks if hasattr(analysis.trace, 'fact_checks') else analysis.trace.get('fact_checks', []) if isinstance(analysis.trace, dict) else []
+            raw_fcs = analysis.trace.fact_checks if hasattr(analysis.trace, 'fact_checks') else (analysis.trace.get('fact_checks', []) if isinstance(analysis.trace, dict) else [])
+        fcs_raw = []
+        for fc in (raw_fcs or []):
+            if isinstance(fc, dict):
+                fcs_raw.append(fc)
+            else:
+                fcs_raw.append({
+                    'rating': getattr(fc, 'rating', '') or getattr(fc, 'textualRating', ''),
+                    'textualRating': getattr(fc, 'textualRating', '') or getattr(fc, 'rating', ''),
+                    'checker_tier': getattr(fc, 'checker_tier', 'U'),
+                    'url': getattr(fc, 'url', ''),
+                    'publisher': getattr(fc, 'publisher', {}),
+                })
         tox_raw = 0.0
         sent_raw = 0.0
         src_fact = None
@@ -501,7 +517,6 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
             analysis['clarity_score'] = score_result['clarity_score']
         else:
             analysis.scoring = score_result
-            analysis.clarity_score = score_result['clarity_score']
     except Exception as e:
         logger.warning(f"Scoring failed: {e}")
 

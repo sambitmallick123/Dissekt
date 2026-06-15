@@ -125,6 +125,7 @@ async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
 
                 for entry in d.entries[:8]:
                     published = _parse_date(entry)
+                    _rs = _quick_risk_score(entry.get("title", ""), (entry.get("summary", "") or "")[:200])
                     items.append({
                         "title": entry.get("title", ""),
                         "url": entry.get("link", ""),
@@ -132,8 +133,9 @@ async def get_radar_feed(market: str = "all", limit: int = 20) -> list[dict]:
                         "source": source_name,
                         "summary": (entry.get("summary", "") or "")[:200],
                         "market": feed_market,
-                        _rs = _quick_risk_score(entry.get("title", ""), (entry.get("summary", "") or "")[:200])
-                        "risk": _rs["level"], "risk_score": _rs["score"], "risk_label": _rs["label"],
+                        "risk": _rs["level"],
+                        "risk_score": _rs["score"],
+                        "risk_label": _rs["label"],
                     })
         except Exception as e:
             logger.warning(f"Failed to fetch {feed_url}: {e}")
