@@ -67,7 +67,7 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
       )}
 
       {data.extracted_claims?.length > 0 && (
-        <div className="anim-fade anim-d3"><FacetCard claims={data.extracted_claims} /></div>
+        <div className="anim-fade anim-d3"><FacetCard claims={data.extracted_claims} sourceUrl={data.input_type === "url" ? data.input_content : (data.source_url || "")} /></div>
       )}
 
       {data.similar_claims?.length > 0 && (

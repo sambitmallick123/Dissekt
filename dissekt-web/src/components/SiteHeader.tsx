@@ -34,7 +34,6 @@ export default function SiteHeader({ active }: { active?: string }) {
     { href: '/analyze', label: 'Analyze' },
     { href: '/observatory', label: 'Observatory' },
     ...(isLoggedIn ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
-    { href: '/help', label: 'Help' },
   ];
 
   if (!mounted) return <nav style={{ height: 46 }} />;
@@ -63,6 +62,7 @@ export default function SiteHeader({ active }: { active?: string }) {
 
             {/* Desktop right side */}
             <div className="dissekt-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <a href="/help" style={{ fontSize: 12, color: active === 'Help' ? '#0d9488' : '#888780', textDecoration: 'none', fontWeight: active === 'Help' ? 600 : 500 }}>Help</a>
               {isLoggedIn ? (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -113,7 +113,8 @@ export default function SiteHeader({ active }: { active?: string }) {
               <a key={l.href} href={l.href} style={{ display: 'block', padding: '10px 24px', fontSize: 14, color: active === l.label ? '#0d9488' : '#555', textDecoration: 'none', fontWeight: active === l.label ? 600 : 400, borderBottom: '0.5px solid #f0efec' }}>{l.label}</a>
             ))}
             <div style={{ padding: '10px 24px' }}>
-              {isLoggedIn ? (
+              <a href="/help" style={{ display: 'block', padding: '10px 24px', fontSize: 14, color: active === 'Help' ? '#0d9488' : '#555', textDecoration: 'none', fontWeight: active === 'Help' ? 600 : 400, borderBottom: '0.5px solid #f0efec' }}>Help</a>
+                            {isLoggedIn ? (
                 <button onClick={signOut} style={{ padding: '8px 16px', background: '#f0f0ee', color: '#555', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer', width: '100%' }}>Sign out</button>
               ) : (
                 <a href="/invite" style={{ display: 'block', textAlign: 'center', padding: '8px 16px', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Get access</a>

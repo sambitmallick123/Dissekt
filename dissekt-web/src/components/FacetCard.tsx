@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function FacetCard({ claims }: { claims: any[] }) {
+export default function FacetCard({ claims, sourceUrl }: { claims: any[]; sourceUrl?: string }) {
   const [expanded, setExpanded] = useState(false);
   if (!claims || claims.length === 0) return null;
 
@@ -14,8 +14,6 @@ export default function FacetCard({ claims }: { claims: any[] }) {
     causal: { bg: '#f0fdf4', color: '#166534' },
   };
 
-  const searchUrl = (claim: string) =>
-    `https://www.google.com/search?q=${encodeURIComponent(claim + ' fact check')}`;
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18, marginTop: 16 }}>
@@ -41,10 +39,14 @@ export default function FacetCard({ claims }: { claims: any[] }) {
                 </span>
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 6, marginLeft: 20 }}>
-                <a href={searchUrl(c.claim)} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>🔍 Google fact-check</a>
-                <a href={`https://www.snopes.com/?s=${encodeURIComponent(c.claim)}`} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>Snopes</a>
-                <a href={`https://www.politifact.com/search/?q=${encodeURIComponent(c.claim)}`} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>PolitiFact</a>
-                <a href={`https://www.altnews.in/?s=${encodeURIComponent(c.claim)}`} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', fontWeight: 500 }}>Alt News</a>
+                {sourceUrl && sourceUrl.startsWith('http') ? (
+                  <a href={sourceUrl} target="_blank" rel="noopener" style={{ fontSize: 10, color: '#0d9488', textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 3 }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+                    View in source article
+                  </a>
+                ) : (
+                  <span style={{ fontSize: 10, color: '#aaa' }}>From analyzed text</span>
+                )}
               </div>
             </div>
           );

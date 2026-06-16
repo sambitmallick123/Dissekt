@@ -65,7 +65,7 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
           <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 8, padding: '8px 10px', borderRadius: 8, border: '0.5px solid #f0f0ee', borderLeft: `3px solid ${riskColor(item.risk || 'none')}` }}>
             <span style={{ fontSize: 11, marginTop: 2 }}>{riskBadge(item.risk || 'none')}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, color: '#404040', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>{item.title}</div>
+              <a href={item.url || item.link || '#'} target="_blank" rel="noopener" style={{ textDecoration: 'none' }}><div style={{ fontSize: 12, color: '#1a4d8f', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>{item.title}</div></a>
               <div style={{ display: 'flex', gap: 8, marginTop: 3, fontSize: 10, color: '#aaa', alignItems: 'center' }}>
                 {item.risk_label && item.risk_label !== 'Clear' && item.risk !== 'none' && (
                   <span style={{ fontSize: 9, fontWeight: 600, color: riskColor(item.risk || 'none'), padding: '1px 5px', borderRadius: 3, background: item.risk === 'high' ? '#fef2f2' : item.risk === 'medium' ? '#fffbeb' : '#eff6ff' }}>{item.risk_label}</span>
