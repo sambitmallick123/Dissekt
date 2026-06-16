@@ -31,9 +31,9 @@ export default function SiteFooter() {
           <a href="/help" style={{ color: '#5f8a84', textDecoration: 'none' }}>Help</a>
           <a href="/feedback" style={{ color: '#5f8a84', textDecoration: 'none' }}>Feedback</a>
           <a href="/contact" style={{ color: '#5f8a84', textDecoration: 'none' }}>Contact</a>
-          <a href="/docs" style={{ color: '#5f8a84', textDecoration: 'none' }}>API</a>
+          {isInvited && <a href="/docs" style={{ color: '#5f8a84', textDecoration: 'none' }}>API</a>}
           <a href="/privacy" style={{ color: '#5f8a84', textDecoration: 'none' }}>Privacy</a>
-          <a href="/suggest" style={{ color: '#5f8a84', textDecoration: 'none' }}>Suggest source</a>
+          {isInvited && <a href="/suggest" style={{ color: '#5f8a84', textDecoration: 'none' }}>Suggest source</a>}
           <a href="/terms" style={{ color: '#5f8a84', textDecoration: 'none' }}>Terms</a>
         </div>
       </div>
