@@ -9,7 +9,7 @@ import LoadingState from '@/components/LoadingState';
 import { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
 import Scope from '@/components/Scope';
-import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
+import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS, fetchLiveLimits } from '@/lib/tier';
 import { fetchConfig } from '@/lib/config';
 import { FeatureLockedPopup, useFeatureGate } from '@/components/FeatureGate';
 
@@ -39,6 +39,7 @@ function ScanAppInner() {
       const key = tier === 'invited' ? 'features_invited' : 'features_free';
       setEnabledFeatures(cfg[key] || ['single_scan', 'radar']);
     });
+    fetchLiveLimits().then(() => setRemaining(getRemaining()));
     setRemaining(getRemaining());
     setResetIn(getResetTime());
     const t = setInterval(() => setResetIn(getResetTime()), 60000);
