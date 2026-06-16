@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 export default function SiteFooter() {
   const [isInvited, setIsInvited] = useState(false);
   useEffect(() => {
-    setIsInvited((typeof window !== 'undefined' && localStorage.getItem('dissekt_tier')) === 'invited');
+    if (typeof window !== 'undefined') {
+      const invited = localStorage.getItem('dissekt_tier') === 'invited';
+      const admin = localStorage.getItem('dissekt_admin') === 'true';
+      setIsInvited(invited || admin);
+    }
   }, []);
   return (
     <footer style={{ background: '#f0fdfa', borderTop: '0.5px solid #ccfbf1', marginTop: 'auto' }}>

@@ -94,7 +94,7 @@ export default function AdminPage() {
       body: JSON.stringify({ action: 'login', password }),
     });
     const data = await res.json();
-    if (data.success) { setAuthenticated(true); setAdminKey(password); }
+    if (data.success) { setAuthenticated(true); setAdminKey(password); if (typeof window !== 'undefined') localStorage.setItem('dissekt_admin', 'true'); }
     else alert('Invalid password');
   };
 
@@ -133,7 +133,7 @@ export default function AdminPage() {
               <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Admin</span>
               <span style={{ fontSize: 9, padding: '2px 8px', background: '#f0fdfa', color: '#0d9488', borderRadius: 4, fontWeight: 600 }}>LIVE</span>
             </div>
-          <button onClick={() => { setAuthenticated(false); setAdminKey(''); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
+          <button onClick={() => { setAuthenticated(false); setAdminKey(''); if (typeof window !== 'undefined') localStorage.removeItem('dissekt_admin'); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
         <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '0.5px solid #e5eaea', flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 0 }}>
           {(Object.keys(tabLabels) as Tab[]).map(t => (
