@@ -133,6 +133,7 @@ async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias
         result = await scan(
             content=request.content,
             mode=request.mode.value,
+            image=request.image,
         )
         return result
 

@@ -6,12 +6,8 @@ import SiteFooter from '@/components/SiteFooter';
 import ScanInput from '@/components/ScanInput';
 import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
-import ScanHistory, { addToHistory } from '@/components/ScanHistory';
+import { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
-import Recall from '@/components/Recall';
-import LedgerView from '@/components/Ledger';
-import Reflect from '@/components/Reflect';
-import TrustGraph from '@/components/TrustGraph';
 import Scope from '@/components/Scope';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS } from '@/lib/tier';
 import { fetchConfig } from '@/lib/config';
@@ -31,11 +27,13 @@ function ScanAppInner() {
   const [mounted, setMounted] = useState(false);
   const [enabledFeatures, setEnabledFeatures] = useState<string[]>([]);
   const { lockedFeature, checkFeature, closePopup } = useFeatureGate();
+  const [isInvited, setIsInvited] = useState(false);
   const searchParams = useSearchParams();
   const [urlHandled, setUrlHandled] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    setIsInvited((typeof window !== 'undefined' && localStorage.getItem('dissekt_tier')) === 'invited');
     fetchConfig().then(cfg => {
       const tier = getTier();
       const key = tier === 'invited' ? 'features_invited' : 'features_free';
@@ -141,11 +139,14 @@ function ScanAppInner() {
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
                 Single scan
               </button>
-              <button onClick={() => { if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
-                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555' }}>
-                📊 Bulk CSV {!enabledFeatures.includes('bulk') && '🔒'}
+              <button onClick={() => { if (!isInvited) { window.location.href = '/invite'; return; } if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555', opacity: isInvited ? 1 : 0.6 }}>
+                📊 Bulk CSV {!isInvited && '🔒'}
               </button>
-              <a href="/compare" style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, background: '#f0f0ee', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>⚖️ Compare</a>
+              <button onClick={() => { window.location.href = isInvited ? '/compare' : '/invite'; }}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: '#f0f0ee', color: '#555', display: 'flex', alignItems: 'center', gap: 4, opacity: isInvited ? 1 : 0.6 }}>
+                ⚖️ Compare {!isInvited && '🔒'}
+              </button>
             </div>
             <div style={{ fontSize: 11, color: '#888', textAlign: 'right' }}>
               <span style={{ fontWeight: 600, color: remaining.tier === 'invited' ? '#0d9488' : '#888' }}>
@@ -172,11 +173,6 @@ function ScanAppInner() {
 
         {!result && !loading && (
           <>
-            <TrustGraph />
-            <Reflect />
-            <LedgerView />
-            <Recall onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-            <ScanHistory onReanalyze={(input: string) => handleScan(input, 'brief')} />
             <Scope onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </>
         )}
