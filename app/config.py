@@ -46,10 +46,13 @@ class Settings(BaseSettings):
     # Rate limiting
     rate_limit_free: int = 3
     rate_limit_pro: int = 100
+    # Admin
+    dissekt_admin_key: str = ""
 
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
 @lru_cache()

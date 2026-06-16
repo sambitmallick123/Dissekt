@@ -2,9 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import FeedsTab from '@/components/FeedsTab';
+import ModelsTab from '@/components/ModelsTab';
 import SiteFooter from '@/components/SiteFooter';
 
-type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources' | 'feeds';
+type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources' | 'feeds' | 'models';
 
 
 
@@ -120,7 +121,7 @@ export default function AdminPage() {
 
   const tabLabels: Record<Tab, string> = {
     overview: '📊 Overview', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
-    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', settings: '⚙️ Settings', sources: '📡 Sources', feeds: '📰 Feeds',
+    contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', models: '🤖 Models', settings: '⚙️ Settings', sources: '📡 Sources', feeds: '📰 Feeds',
   };
 
   return (
@@ -149,6 +150,7 @@ export default function AdminPage() {
         {tab === 'decisions' && <DecisionsTab adminKey={adminKey} />}
         {tab === 'feeds' && <FeedsTab adminKey={adminKey} />}
         {tab === 'sources' && <SourcesTab />}
+        {tab === 'models' && <ModelsTab adminKey={adminKey} />}
         {tab === 'settings' && <SettingsTab adminKey={adminKey} />}
       </div>
       <SiteFooter />

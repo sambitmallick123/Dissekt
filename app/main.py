@@ -1,5 +1,7 @@
 """Dissekt — Main FastAPI application.
 
+
+
 Endpoints:
   GET  /health          — Health check
   POST /api/scan        — Main analysis endpoint (Beacon)
@@ -57,6 +59,107 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+
+def _resolve_reframe_model() -> str:
+    """Resolve the reframe role model id for inline openai create() calls."""
+    try:
+        from app.models_registry import model_meta
+        from app.config import get_settings
+        from supabase import create_client
+        s = get_settings()
+        sb = create_client(s.supabase_url, s.supabase_key)
+        rows = sb.table("model_config").select("role, model").eq("role", "reframe").execute()
+        if rows.data:
+            mid = rows.data[0]["model"]
+            if model_meta(mid)["provider"] == "openai":
+                return mid
+    except Exception:
+        pass
+    return "gpt-4o-mini"
+
+
+@app.get("/api/admin/models")
+async def admin_get_models(adminKey: str = ""):
+    """Return the model registry + current role assignments (override vs default)."""
+    from fastapi import HTTPException
+    settings = get_settings()
+    if adminKey != settings.dissekt_admin_key:
+        raise HTTPException(401, "Unauthorized")
+
+    from app.models_registry import MODEL_REGISTRY, ROLE_DEFAULTS, ROLE_LABELS, ROLE_CAPABILITY, models_for_capability
+
+    # Load current overrides from DB
+    overrides = {}
+    try:
+        from supabase import create_client
+        sb = create_client(settings.supabase_url, settings.supabase_key)
+        rows = sb.table("model_config").select("role, model").execute()
+        for r in (rows.data or []):
+            overrides[r["role"]] = r["model"]
+    except Exception as e:
+        logger.warning(f"model_config read failed: {e}")
+
+    roles = []
+    for role, default in ROLE_DEFAULTS.items():
+        cap = ROLE_CAPABILITY.get(role, "text")
+        roles.append({
+            "role": role,
+            "label": ROLE_LABELS.get(role, role),
+            "capability": cap,
+            "default": default,
+            "current": overrides.get(role, default),
+            "is_override": role in overrides,
+            "options": [
+                {"id": mid, "label": MODEL_REGISTRY[mid]["label"], "cost": MODEL_REGISTRY[mid]["cost"], "provider": MODEL_REGISTRY[mid]["provider"]}
+                for mid in models_for_capability(cap)
+            ],
+        })
+
+    return {"roles": roles, "registry": MODEL_REGISTRY}
+
+
+@app.post("/api/admin/models")
+async def admin_set_model(body: dict):
+    """Admin sets (or clears) a role's model override."""
+    from fastapi import HTTPException
+    settings = get_settings()
+    if body.get("adminKey") != settings.dissekt_admin_key:
+        raise HTTPException(401, "Unauthorized")
+
+    role = body.get("role")
+    model = body.get("model")  # model id, or null/empty to reset to default
+    if not role:
+        raise HTTPException(400, "role required")
+
+    from supabase import create_client
+    sb = create_client(settings.supabase_url, settings.supabase_key)
+
+    try:
+        if not model:  # reset to default = delete the override row
+            sb.table("model_config").delete().eq("role", role).execute()
+            action = "reset"
+        else:
+            # upsert
+            existing = sb.table("model_config").select("role").eq("role", role).execute()
+            if existing.data:
+                sb.table("model_config").update({"model": model}).eq("role", role).execute()
+            else:
+                sb.table("model_config").insert({"role": role, "model": model}).execute()
+            action = "set"
+    except Exception as e:
+        raise HTTPException(500, f"DB error: {e}")
+
+    # Invalidate the dispatch cache so the change takes effect immediately
+    try:
+        from app.llm_dispatch import invalidate_model_config
+        invalidate_model_config()
+    except Exception:
+        pass
+
+    return {"success": True, "role": role, "model": model or None, "action": action}
+
+
 
 # CORS — allow all origins in development, restrict in production
 app.add_middleware(
@@ -327,7 +430,7 @@ Content B techniques: {', '.join(techs_b) or 'none'}
 Write a 2-3 sentence comparison of how these two pieces of content differ in their use of manipulation techniques, framing, and credibility. Be specific."""
 
         comp_response = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=_resolve_reframe_model(),
             max_tokens=200,
             messages=[
                 {"role": "system", "content": "You are a media analysis expert comparing two pieces of content."},

@@ -136,14 +136,16 @@ async def analyze_with_claude(
         system = SYSTEM_PROMPT_BRIEF.format(techniques=_format_techniques())
 
     try:
-        response = await client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000 if mode == "detailed" else 500,
+        from app.llm_dispatch import call_model, resolve_model, _load_model_config
+        _cfg = await _load_model_config()
+        _model_id = resolve_model("detailed_text", _cfg)
+        _disp = await call_model(
+            "detailed_text",
             system=system,
-            messages=[{"role": "user", "content": f"Analyze this content for manipulation techniques:\n\n{text[:4000]}"}],
+            user=f"Analyze this content for manipulation techniques:\n\n{text[:4000]}",
+            max_tokens=2000 if mode == "detailed" else 500,
         )
-
-        raw = response.content[0].text.strip()
+        raw = (_disp.get("text") or "").strip()
         # Strip markdown fences if present
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
@@ -151,12 +153,12 @@ async def analyze_with_claude(
                 raw = raw[:-3]
 
         result = json.loads(raw)
-        result["_model"] = "claude-sonnet-4"
+        result["_model"] = _disp.get("label", _model_id)
         return result
 
     except json.JSONDecodeError as e:
-        logger.error(f"Claude returned invalid JSON: {e}")
-        return {"brief": "Analysis failed — model returned invalid format.", "techniques": [], "_model": "claude-sonnet-4", "_error": str(e)}
+        logger.error(f"Detailed model returned invalid JSON: {e}")
+        return {"brief": "Analysis failed — model returned invalid format.", "techniques": [], "_model": _disp.get("label", "detailed"), "_error": str(e)}
     except Exception as e:
         logger.error(f"Claude API error: {e}")
         raise
@@ -180,25 +182,25 @@ async def analyze_with_gpt4o_mini(
     system = SYSTEM_PROMPT_BRIEF.format(techniques=_format_techniques())
 
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o-mini",
+        from app.llm_dispatch import call_model, resolve_model, _load_model_config
+        _cfg = await _load_model_config()
+        _model_id = resolve_model("brief_text", _cfg)
+        _disp = await call_model(
+            "brief_text",
+            system=system,
+            user=f"Analyze this content for manipulation techniques:\n\n{text[:3000]}",
             max_tokens=500,
             temperature=0.3,
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": f"Analyze this content for manipulation techniques:\n\n{text[:3000]}"},
-            ],
+            json_mode=True,
         )
-
-        raw = response.choices[0].message.content.strip()
+        raw = (_disp.get("text") or "").strip()
         result = json.loads(raw)
-        result["_model"] = "gpt-4o-mini"
+        result["_model"] = _disp.get("label", _model_id)
         return result
 
     except json.JSONDecodeError as e:
-        logger.error(f"GPT-4o mini returned invalid JSON: {e}")
-        return {"brief": "Analysis failed.", "techniques": [], "_model": "gpt-4o-mini", "_error": str(e)}
+        logger.error(f"Brief model returned invalid JSON: {e}")
+        return {"brief": "Analysis failed.", "techniques": [], "_model": _disp.get("label", "brief"), "_error": str(e)}
     except Exception as e:
         logger.error(f"OpenAI API error: {e}")
         raise

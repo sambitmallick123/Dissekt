@@ -52,6 +52,50 @@ async def scan_reddit(url: str) -> dict:
         return {"source": "reddit", "text": "", "error": str(e)}
 
 
+def _parse_json3_transcript(raw: str) -> str:
+    """Parse YouTube json3 captions correctly.
+
+    YouTube auto-captions use overlapping rolling windows: each event repeats
+    words from the previous one as new words stream in. Naive joining scrambles
+    word order and duplicates text. This walks events in time order, takes the
+    FULL text of each event (all segs joined), and de-duplicates the rolling
+    overlap by only keeping text that advances past what we've already seen.
+    """
+    import json as _json
+    try:
+        data = _json.loads(raw)
+    except Exception:
+        return ""
+
+    events = data.get("events", [])
+    # Sort by start time to guarantee order
+    events = sorted(events, key=lambda e: e.get("tStartMs", 0))
+
+    lines = []
+    for ev in events:
+        segs = ev.get("segs")
+        if not segs:
+            continue
+        # Join ALL segments in this event (not just segs[0])
+        text = "".join(s.get("utf8", "") for s in segs)
+        text = text.replace("\n", " ").strip()
+        if not text:
+            continue
+        # Skip pure music/noise markers if they duplicate
+        lines.append(text)
+
+    # De-duplicate consecutive identical lines (rolling-window repeats)
+    deduped = []
+    for line in lines:
+        if not deduped or deduped[-1] != line:
+            deduped.append(line)
+
+    full = " ".join(deduped)
+    # Collapse multiple spaces
+    full = re.sub(r"\s+", " ", full).strip()
+    return full
+
+
 async def scan_youtube(url: str) -> dict:
     """Extract YouTube video transcript using yt-dlp."""
     try:
@@ -64,6 +108,21 @@ async def scan_youtube(url: str) -> dict:
         elif "v=" in url:
             vid_id = url.split("v=")[1].split("&")[0]
         
+        # Duration cap: reject videos longer than 15 minutes
+        try:
+            dur_result = subprocess.run(
+                ["yt-dlp", "--skip-download", "--print", "%(duration)s", url],
+                capture_output=True, text=True, timeout=15
+            )
+            dur_str = dur_result.stdout.strip()
+            if dur_str and dur_str.isdigit():
+                duration_sec = int(dur_str)
+                if duration_sec > 900:  # 15 min
+                    mins = duration_sec // 60
+                    return {"source": "youtube", "text": "", "error": f"Video is {mins} min long. Maximum supported length is 15 minutes."}
+        except Exception:
+            pass  # if duration check fails, continue and let extraction proceed
+
         # Try to get subtitles via yt-dlp
         with tempfile.TemporaryDirectory() as tmp:
             sub_path = os.path.join(tmp, "subs")
@@ -76,24 +135,18 @@ async def scan_youtube(url: str) -> dict:
             transcript = ""
             for f in os.listdir(tmp):
                 if f.endswith(".json3") or f.endswith(".vtt") or f.endswith(".srt"):
-                    content = open(os.path.join(tmp, f)).read()
+                    raw = open(os.path.join(tmp, f)).read()
                     if f.endswith(".json3"):
-                        try:
-                            subs = json.loads(content)
-                            transcript = " ".join(
-                                seg.get("segs", [{}])[0].get("utf8", "")
-                                for seg in subs.get("events", [])
-                                if seg.get("segs")
-                            )
-                        except:
-                            transcript = content
+                        transcript = _parse_json3_transcript(raw)
                     else:
                         # Strip VTT/SRT timestamps
-                        lines = content.split("\n")
+                        lines = raw.split("\n")
                         transcript = " ".join(
                             l for l in lines
                             if l.strip() and not re.match(r'^\d', l) and '-->' not in l and l.strip() != 'WEBVTT'
                         )
+                    if transcript:
+                        break
             
             if not transcript:
                 # Fallback: get title + description

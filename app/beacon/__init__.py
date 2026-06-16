@@ -219,21 +219,17 @@ async def extract_claims(text: str, mode: str = "brief") -> list[dict]:
 
     client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
     try:
-        response = await client.chat.completions.create(
-            model="gpt-4o-mini",
-            max_tokens=500,
-            messages=[
-                {
-                    "role": "system",
-                    "content": """Extract verifiable factual claims from this text. Return ONLY a JSON array of objects.
+        from app.llm_dispatch import call_model
+        _disp = await call_model(
+            "router",
+            system="""Extract verifiable factual claims from this text. Return ONLY a JSON array of objects.
 Each object: {"claim": "the specific factual claim", "type": "statistic|quote|event|prediction|causal"}
-Only include claims that can be fact-checked. Max 7 claims. No explanations, just the JSON array."""
-                },
-                {"role": "user", "content": text[:1500]}
-            ],
+Only include claims that can be fact-checked. Max 7 claims. No explanations, just the JSON array.""",
+            user=text[:1500],
+            max_tokens=500,
         )
         import json
-        raw = response.choices[0].message.content.strip()
+        raw = (_disp.get("text") or "").strip()
         # Clean markdown fences if present
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
@@ -249,6 +245,24 @@ Only include claims that can be fact-checked. Max 7 claims. No explanations, jus
 # Counterfactual generation
 # ============================================
 
+
+def _resolve_reframe_model_beacon() -> str:
+    """Resolve 'reframe' role for inline openai create() calls in beacon."""
+    try:
+        from app.models_registry import model_meta
+        from app.config import get_settings
+        from supabase import create_client
+        s = get_settings()
+        sb = create_client(s.supabase_url, s.supabase_key)
+        rows = sb.table("model_config").select("role, model").eq("role", "reframe").execute()
+        if rows.data:
+            mid = rows.data[0]["model"]
+            if model_meta(mid)["provider"] == "openai":
+                return mid
+    except Exception:
+        pass
+    return "gpt-4o-mini"
+
 async def generate_counterfactuals(text: str, mode: str = "brief") -> list[dict]:
     """Generate alternative framings for claims in the text."""
     settings = get_settings()
@@ -257,7 +271,7 @@ async def generate_counterfactuals(text: str, mode: str = "brief") -> list[dict]
     client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
     try:
         response = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=_resolve_reframe_model_beacon(),
             max_tokens=600,
             messages=[
                 {
@@ -298,30 +312,26 @@ Rules:
 # ============================================
 
 
+_last_vision_model = None
+
+
 async def _extract_from_image(image_data_url: str) -> str:
-    """Use GPT-4o-mini vision to extract text + describe manipulation signals from an image."""
+    """Extract text + visual manipulation signals from an image using the admin-selected vision model."""
     try:
-        from openai import AsyncOpenAI
-        from app.config import get_settings
-        s = get_settings()
-        client = AsyncOpenAI(api_key=s.openai_api_key)
-        resp = await client.chat.completions.create(
-            model="gpt-4o-mini",
-            max_tokens=1000,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": (
-                        "Extract ALL text visible in this image verbatim (headlines, body, captions, overlaid text). "
-                        "Then on a new line after '---VISUAL---', briefly note any visual manipulation signals "
-                        "(misleading charts, emotional imagery, out-of-context or doctored photos, missing context). "
-                        "If there is no text, transcribe what the image depicts."
-                    )},
-                    {"type": "image_url", "image_url": {"url": image_data_url}},
-                ],
-            }],
+        from app.llm_dispatch import call_model
+        prompt = (
+            "Extract ALL text visible in this image verbatim (headlines, body, captions, overlaid text). "
+            "Then on a new line after '---VISUAL---', briefly note any visual manipulation signals "
+            "(misleading charts, emotional imagery, out-of-context or doctored photos, missing context). "
+            "If there is no text, transcribe what the image depicts."
         )
-        return resp.choices[0].message.content or ""
+        result = await call_model("vision", user=prompt, image_url=image_data_url, max_tokens=1000)
+        if result.get("error"):
+            logger.warning(f"Image vision extraction failed: {result['error']}")
+        # Stash which model was used so the report can show it
+        global _last_vision_model
+        _last_vision_model = result.get("label", result.get("model"))
+        return result.get("text", "")
     except Exception as e:
         logger.warning(f"Image vision extraction failed: {e}")
         return ""
