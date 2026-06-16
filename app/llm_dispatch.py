@@ -11,6 +11,37 @@ from app.models_registry import MODEL_REGISTRY, ROLE_DEFAULTS, model_meta
 
 logger = logging.getLogger(__name__)
 
+def extract_json(raw: str) -> str:
+    """Robustly extract a JSON object/array from a model response.
+
+    Handles: markdown fences, prose before/after, prefill continuation.
+    Returns the JSON substring (first { or [ to matching last } or ]).
+    """
+    if not raw:
+        return raw
+    s = raw.strip()
+    # Strip markdown fences
+    if s.startswith("```"):
+        # remove opening fence line
+        nl = s.find("\n")
+        if nl != -1:
+            s = s[nl+1:]
+        if s.rstrip().endswith("```"):
+            s = s.rstrip()[:-3]
+        s = s.strip()
+    # Find the JSON body: from first { or [ to the matching last } or ]
+    starts = [i for i in (s.find("{"), s.find("[")) if i != -1]
+    if not starts:
+        return s
+    start = min(starts)
+    # find last closing brace/bracket
+    end = max(s.rfind("}"), s.rfind("]"))
+    if end > start:
+        return s[start:end+1]
+    return s[start:]
+
+
+
 # Simple in-process cache of the DB model config (role -> model_id)
 _model_config_cache = None
 
@@ -73,13 +104,21 @@ async def call_model(role: str, *, system: str = None, user: str, messages: list
                     b64 = image_url.split(",", 1)[1]
                     content.append({"type": "image", "source": {"type": "base64", "media_type": media_type, "data": b64}})
             content.append({"type": "text", "text": user})
+            _msgs = messages or [{"role": "user", "content": content}]
+            if json_mode:
+                # Anthropic has no response_format; use the prefill trick:
+                # start the assistant turn with "{" so the model must continue valid JSON.
+                _msgs = list(_msgs) + [{"role": "assistant", "content": "{"}]
             resp = await client.messages.create(
                 model=model_id,
                 max_tokens=max_tokens,
-                system=system or "",
-                messages=messages or [{"role": "user", "content": content}],
+                system=(system or "") + ("\n\nRespond with ONLY a valid JSON object. No prose, no markdown fences." if json_mode else ""),
+                messages=_msgs,
             )
             text = resp.content[0].text
+            if json_mode:
+                # Re-add the "{" we prefilled, since the response continues from it
+                text = "{" + text if not text.lstrip().startswith("{") else text
         else:  # openai
             from openai import AsyncOpenAI
             client = AsyncOpenAI(api_key=settings.openai_api_key)

@@ -14,20 +14,19 @@ MODEL_REGISTRY = {
     "gpt-4.1":              {"provider": "openai",    "caps": ["text", "vision"], "cost": "$$$",  "label": "GPT-4.1"},
     "o4-mini":              {"provider": "openai",    "caps": ["text", "vision"], "cost": "$$",   "label": "o4-mini (reasoning)"},
 
-    # ─── Anthropic ───
-    "claude-sonnet-4-20250514":   {"provider": "anthropic", "caps": ["text", "vision"], "cost": "$$",  "label": "Claude Sonnet 4"},
-    "claude-3-5-haiku-20241022":  {"provider": "anthropic", "caps": ["text"],           "cost": "$",   "label": "Claude 3.5 Haiku"},
-    "claude-3-5-sonnet-20241022": {"provider": "anthropic", "caps": ["text", "vision"], "cost": "$$",  "label": "Claude 3.5 Sonnet"},
-    "claude-opus-4-20250514":     {"provider": "anthropic", "caps": ["text", "vision"], "cost": "$$$$", "label": "Claude Opus 4"},
+    # ─── Anthropic (current as of June 2026) ───
+    "claude-haiku-4-5-20251001":  {"provider": "anthropic", "caps": ["text", "vision"], "cost": "$",    "label": "Claude Haiku 4.5"},
+    "claude-sonnet-4-6":          {"provider": "anthropic", "caps": ["text", "vision"], "cost": "$$",   "label": "Claude Sonnet 4.6"},
+    "claude-opus-4-8":            {"provider": "anthropic", "caps": ["text", "vision"], "cost": "$$$$", "label": "Claude Opus 4.8"},
 }
 
 # Which roles exist in the pipeline + their safe defaults (current production behavior)
 ROLE_DEFAULTS = {
-    "brief_text":       "gpt-4o-mini",                 # fast brief analysis
-    "detailed_text":    "claude-sonnet-4-20250514",    # deep analysis
-    "vision":           "gpt-4o-mini",                 # image extraction
-    "router":           "gpt-4o-mini",                 # heuristic escalation / extraction
-    "reframe":          "gpt-4o-mini",                 # compare / mirror / kaleidoscope
+    "brief_text":       "gpt-4o-mini",            # fast brief analysis
+    "detailed_text":    "claude-sonnet-4-6",      # deep analysis
+    "vision":           "gpt-4o-mini",            # image extraction
+    "router":           "gpt-4o-mini",            # heuristic escalation / extraction
+    "reframe":          "gpt-4o-mini",            # compare / mirror / kaleidoscope
 }
 
 # Human-readable role labels for the admin UI
