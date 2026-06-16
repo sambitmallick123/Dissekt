@@ -62,9 +62,9 @@ function ScanAppInner() {
   }, [mounted, searchParams, urlHandled]);
 
 
-  const handleScan = async (content: string, modeArg: string) => {
+  const handleScan = async (content: string, modeArg: string, image?: string) => {
     const mode = (modeArg === 'detailed' ? 'detailed' : 'brief') as 'brief' | 'detailed';
-    if (!content || content.length < 10) { setError('Please enter at least 10 characters'); return; }
+    if (!image && (!content || content.length < 10)) { setError('Please enter at least 10 characters, or attach an image'); return; }
 
     // Gate detailed mode
     if (mode === 'detailed' && !enabledFeatures.includes('detailed_mode')) {
@@ -87,7 +87,7 @@ function ScanAppInner() {
       const res = await fetch(`${API_URL}/api/scan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, mode }),
+        body: JSON.stringify({ content, mode, image }),
       });
       if (!res.ok) {
         const err = await res.json();

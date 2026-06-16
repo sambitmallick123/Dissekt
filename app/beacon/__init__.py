@@ -297,7 +297,36 @@ Rules:
 # Main scan pipeline
 # ============================================
 
-async def scan(content: str, mode: str = "brief") -> FullAnalysis:
+
+async def _extract_from_image(image_data_url: str) -> str:
+    """Use GPT-4o-mini vision to extract text + describe manipulation signals from an image."""
+    try:
+        from openai import AsyncOpenAI
+        from app.config import get_settings
+        s = get_settings()
+        client = AsyncOpenAI(api_key=s.openai_api_key)
+        resp = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=1000,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": (
+                        "Extract ALL text visible in this image verbatim (headlines, body, captions, overlaid text). "
+                        "Then on a new line after '---VISUAL---', briefly note any visual manipulation signals "
+                        "(misleading charts, emotional imagery, out-of-context or doctored photos, missing context). "
+                        "If there is no text, transcribe what the image depicts."
+                    )},
+                    {"type": "image_url", "image_url": {"url": image_data_url}},
+                ],
+            }],
+        )
+        return resp.choices[0].message.content or ""
+    except Exception as e:
+        logger.warning(f"Image vision extraction failed: {e}")
+        return ""
+
+async def scan(content: str, mode: str = "brief", image: str | None = None) -> FullAnalysis:
     """Main entry point: scan content through all engines.
 
     1. Detect input type (URL vs text)
@@ -310,6 +339,13 @@ async def scan(content: str, mode: str = "brief") -> FullAnalysis:
     8. Store in claim graph
     9. Generate blockchain proof
     """
+    # Vision: if an image was supplied, extract its text/signals and prepend to content
+    if image:
+        _vision_text = await _extract_from_image(image)
+        if _vision_text:
+            content = (_vision_text + "\n\n" + (content or "")).strip()
+        elif not content:
+            content = "[Image provided but no text could be extracted]"
     start_time = time.time()
 
     # Step 0: Check if social media URL

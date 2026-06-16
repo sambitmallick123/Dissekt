@@ -248,7 +248,7 @@ async def telegram_webhook(request: Request):
     await bot.send_message(chat_id=chat_id, text="🔍 Analyzing... This takes 3-10 seconds.", parse_mode=ParseMode.HTML)
     
     try:
-        result = await scan(content=text, mode="brief")
+        result = await scan(content=text, mode="brief", image=request.image)
         result_dict = result.model_dump(mode="json")
         
         # Save report to Supabase so the link works

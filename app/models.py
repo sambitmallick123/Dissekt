@@ -34,8 +34,9 @@ class TechniqueCategory(str, Enum):
 
 class ScanRequest(BaseModel):
     """Main input: user pastes a URL or text."""
-    content: str = Field(..., min_length=1, max_length=50000, description="URL or text to analyze")
+    content: str = Field(default="", max_length=50000, description="URL or text to analyze")
     mode: AnalysisMode = Field(default=AnalysisMode.brief, description="brief or detailed")
+    image: str | None = Field(default=None, description="Base64 data-URL of an image to analyze via vision")
 
 
 # ============================================
