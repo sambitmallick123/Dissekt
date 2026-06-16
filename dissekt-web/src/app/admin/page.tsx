@@ -147,7 +147,7 @@ export default function AdminPage() {
         {tab === 'contacts' && <ContactsTab adminKey={adminKey} />}
         {tab === 'corrections' && <CorrectionsTab adminKey={adminKey} />}
         {tab === 'decisions' && <DecisionsTab adminKey={adminKey} />}
-        {tab === 'feeds' && <FeedsTab />}
+        {tab === 'feeds' && <FeedsTab adminKey={adminKey} />}
         {tab === 'sources' && <SourcesTab />}
         {tab === 'settings' && <SettingsTab adminKey={adminKey} />}
       </div>

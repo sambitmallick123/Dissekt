@@ -969,7 +969,7 @@ async def dispatch_cron(body: dict = {}):
     """Send weekly digest to all invited users. Call via cron.org or Railway cron."""
     settings = get_settings()
     secret = body.get("secret", "")
-    if secret != (settings.dissekt_admin_key if hasattr(settings, "dissekt_admin_key") else "dissekt-sambit-2026"):
+    if secret != settings.dissekt_admin_key:
         from fastapi import HTTPException
         raise HTTPException(401, "Invalid secret")
     

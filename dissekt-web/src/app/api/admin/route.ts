@@ -10,7 +10,7 @@ const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = 'sambitmallick123@gmail.com';
 
 function getAdminKey(): string {
-  return process.env.DISSEKT_ADMIN_KEY || 'dissekt-sambit-2026';
+  return process.env.DISSEKT_ADMIN_KEY || '';
 }
 
 function checkAdmin(req: NextRequest): boolean {

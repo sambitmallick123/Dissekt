@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react';
 
 const MARKETS = ['india', 'us', 'germany', 'uk', 'international', 'substack'];
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const ADMIN_KEY = 'dissekt-sambit-2026';
 
-export default function FeedsTab() {
+export default function FeedsTab({ adminKey }: { adminKey: string }) {
   const [feeds, setFeeds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -27,7 +26,7 @@ export default function FeedsTab() {
   const post = async (body: any) => {
     const res = await fetch(`${API_URL}/api/admin/feeds`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, adminKey: ADMIN_KEY }),
+      body: JSON.stringify({ ...body, adminKey }),
     });
     const data = await res.json();
     if (data.feeds) setFeeds(data.feeds);

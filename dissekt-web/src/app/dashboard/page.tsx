@@ -105,6 +105,16 @@ export default function DashboardPage() {
 
         {tab === 'insights' && (
           <>
+            {/* Community */}
+            <div style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', borderRadius: 10, padding: 16, marginBottom: 12, color: '#fff' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>💬 Join the community</div>
+              <div style={{ fontSize: 11, opacity: 0.85, marginBottom: 10 }}>Report bugs, share ideas, and follow what we&apos;re building — exclusive to invited members.</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <a href="https://discord.gg/Bkv4zpmdJD" target="_blank" rel="noopener" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: '#fff', textDecoration: 'none', fontWeight: 600 }}>Discord →</a>
+                <a href="https://github.com/sambitmallick123/Dissekt" target="_blank" rel="noopener" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: '#fff', textDecoration: 'none', fontWeight: 600 }}>GitHub →</a>
+              </div>
+            </div>
+
             {/* Top row cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 12 }}>
               <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 14, borderTop: '3px solid #0d9488' }}>
