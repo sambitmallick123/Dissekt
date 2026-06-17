@@ -11,6 +11,7 @@ const SECTIONS = [
   { id: 'engines', label: '12 Engines', icon: '🔭' },
   { id: 'features', label: 'Features', icon: '🛠️' },
   { id: 'access', label: 'Access & limits', icon: '🎫' },
+  { id: 'community', label: 'Community & Access', icon: '💬' },
   { id: 'references', label: 'References', icon: '📚' },
   { id: 'faq', label: 'FAQ', icon: '❓' },
 ];
@@ -122,6 +123,14 @@ function DimensionExplorer() {
 
 export default function HelpPage() {
   const [active, setActive] = useState('overview');
+  const [isInvited, setIsInvited] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const invited = localStorage.getItem('dissekt_tier') === 'invited';
+      const admin = localStorage.getItem('dissekt_admin') === 'true';
+      setIsInvited(invited || admin);
+    }
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -142,7 +151,7 @@ export default function HelpPage() {
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '28px 16px', display: 'flex', gap: 28 }}>
+      <div className="help-container" style={{ maxWidth: 1000, margin: '0 auto', padding: '28px 16px', display: 'flex', gap: 28 }}>
 
         {/* Sticky sidebar */}
         <aside className="help-nav" style={{ width: 190, flexShrink: 0, position: 'sticky', top: 80, alignSelf: 'flex-start', maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
@@ -252,6 +261,59 @@ export default function HelpPage() {
           </div>
 
           {/* REFERENCES */}
+          {/* COMMUNITY & ACCESS */}
+          <div id="community" style={{ marginBottom: 40, scrollMarginTop: 80 }}>
+            <SectionHead icon="💬" title="Community & access" sub="Join the conversation and get full access." />
+            {isInvited ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 16 }}>
+                <a href="https://discord.gg/Bkv4zpmdJD" target="_blank" rel="noopener" style={{ textDecoration: 'none', padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, display: 'block' }}>
+                  <div style={{ fontSize: 22, marginBottom: 4 }}>💬</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#5865F2' }}>Discord</div>
+                  <div style={{ fontSize: 12, color: '#888' }}>Report bugs, share ideas, follow updates</div>
+                </a>
+                <a href="https://github.com/sambitmallick123/Dissekt" target="_blank" rel="noopener" style={{ textDecoration: 'none', padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, display: 'block' }}>
+                  <div style={{ fontSize: 22, marginBottom: 4 }}>⌨️</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>GitHub</div>
+                  <div style={{ fontSize: 12, color: '#888' }}>Open issues, discussions, contribute</div>
+                </a>
+              </div>
+            ) : (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 12 }}>
+                  <div style={{ padding: 16, background: '#fafaf8', border: '0.5px dashed #d5dada', borderRadius: 10, opacity: 0.6, position: 'relative' }}>
+                    <span style={{ position: 'absolute', top: 10, right: 10, fontSize: 13 }}>🔒</span>
+                    <div style={{ fontSize: 22, marginBottom: 4 }}>💬</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>Discord</div>
+                    <div style={{ fontSize: 12, color: '#aaa' }}>Members only</div>
+                  </div>
+                  <div style={{ padding: 16, background: '#fafaf8', border: '0.5px dashed #d5dada', borderRadius: 10, opacity: 0.6, position: 'relative' }}>
+                    <span style={{ position: 'absolute', top: 10, right: 10, fontSize: 13 }}>🔒</span>
+                    <div style={{ fontSize: 22, marginBottom: 4 }}>⌨️</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>GitHub</div>
+                    <div style={{ fontSize: 12, color: '#aaa' }}>Members only</div>
+                  </div>
+                </div>
+                <div style={{ padding: '12px 16px', background: '#f0fdfa', border: '0.5px solid #ccfbf1', borderRadius: 8, fontSize: 13, color: '#0d7a6e', lineHeight: 1.6 }}>
+                  🔑 Community channels are for invited members. <a href="/invite" style={{ color: '#0d9488', fontWeight: 600 }}>Request an invite</a> to join the Discord and GitHub. Personal sign-up is coming soon.
+                </div>
+              </div>
+            )}
+            <Collapsible title="How does invite access work?" subtitle="Getting full features">
+              Dissekt is in beta. Anyone can run single scans for free. <strong>Invited members</strong> get higher limits, all features (Bulk, Compare, Dashboard, API), and access to the community channels. Request an invite from the landing page, or ask in our Discord. Invite access currently runs for 6 months.
+            </Collapsible>
+            <Collapsible title="What can I do in the community?" subtitle="Discord & GitHub">
+              <strong>Discord</strong> is for quick feedback, bug reports, and chatting with other users.<br />
+              <strong>GitHub</strong> hosts issues and discussions for anything you want tracked to a resolution — feature requests, bugs, and how-to questions.
+            </Collapsible>
+            <div style={{ marginTop: 16, padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', marginBottom: 6 }}>📨 Have a question?</div>
+              <div style={{ fontSize: 13, color: '#555', lineHeight: 1.7 }}>
+                For any question, bug, or feedback, use the <a href="/contact" style={{ color: '#0d9488', fontWeight: 600 }}>contact form</a> or email me directly at <a href="mailto:sambitmallick123@gmail.com" style={{ color: '#0d9488', fontWeight: 600 }}>sambitmallick123@gmail.com</a>. I read everything and usually reply within a day or two.
+              </div>
+            </div>
+          </div>
+
+
           <div id="references" style={{ marginBottom: 40, scrollMarginTop: 80 }}>
             <SectionHead icon="📚" title="References" sub="Every scoring decision is backed by peer-reviewed work." />
             {[['Da San Martino et al., EMNLP 2019', 'https://aclanthology.org/D19-1565/', 'Technique severity weights'], ['Baly et al., EMNLP 2018', 'https://aclanthology.org/D18-1389/', 'Multi-dimensional credibility'], ['Wachsmuth et al., ACL 2017', 'https://aclanthology.org/P17-1002/', 'Argumentation quality'], ['Card et al., ACL 2018', 'https://aclanthology.org/P18-1017/', 'Media framing direction'], ['Pavlopoulos et al., EACL 2021', 'https://aclanthology.org/2021.eacl-main.114/', 'Context-aware toxicity'], ['UNDP HDI', 'https://hdr.undp.org/data-center/human-development-index', 'Geometric mean for indices'], ['Media Bias/Fact Check', 'https://mediabiasfactcheck.com/methodology/', 'Source credibility database']].map(r => (

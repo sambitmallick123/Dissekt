@@ -84,7 +84,21 @@ body {
 }
 
 /* ===== STICKY FOOTER ===== */
-html, body { height: 100%; margin: 0; }
+html, body { height: 100%; margin: 0; overflow-x: hidden; max-width: 100vw; }
+* { box-sizing: border-box; }
 body { min-height: 100vh; display: flex; flex-direction: column; }
+/* Sticky footer: the content area grows to fill, pushing footer to the bottom */
 main { flex: 1 0 auto; }
+/* Fallback for pages that wrap content in a top-level div instead of <main>:
+   the body's last child before footer should grow. We give the footer margin-top:auto
+   which alone pushes it down in a flex column even if siblings don't grow. */
 footer { flex-shrink: 0; margin-top: auto; }
+/* Ensure the page content wrapper (main OR the div before footer) fills space */
+body > main, body > div:not(:last-child) { flex: 1 0 auto; }
+
+
+/* Help page: hide sidebar nav on mobile, content goes full width */
+@media (max-width: 768px) {
+  .help-nav { display: none !important; }
+  .help-container { flex-direction: column !important; gap: 0 !important; padding-left: 16px !important; padding-right: 16px !important; }
+}

@@ -80,7 +80,7 @@ export default function LandingPage() {
             <p style={{ fontSize: 14, color: '#888' }}>Paste a URL, text, or social media post. Get a full transparency report in seconds.</p>
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {[{ step: '1', title: 'Paste anything', desc: 'News article, social media post, YouTube video, Reddit thread, WhatsApp forward — or just raw text.', color: '#0d9488' }, { step: '2', title: '12 engines analyze', desc: 'Technique detection, fact-checker cross-references, source credibility, toxicity, political context — all in parallel, under 4 seconds.', color: '#2563eb' }, { step: '3', title: 'See the construction', desc: "Three-dimensional score: how it is built (Construction), how verified it is (Verification), and what it wants you to do (Intent).", color: '#d97706' }].map(s => (
+            {[{ step: '1', title: 'Paste anything', desc: 'News article, social media post, YouTube video, Reddit thread, WhatsApp forward — or just raw text.', color: '#0d9488' }, { step: '2', title: '12 engines analyze', desc: 'Technique detection, fact-checker cross-references, source credibility, toxicity, political context — all in parallel.', color: '#2563eb' }, { step: '3', title: 'See the construction', desc: "Three-dimensional score: how it is built (Construction), how verified it is (Verification), and what it wants you to do (Intent).", color: '#d97706' }].map(s => (
               <div key={s.step} style={{ flex: '1 1 220px', maxWidth: 260, textAlign: 'center' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 20, background: s.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 18, fontWeight: 700 }}>{s.step}</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', marginBottom: 4 }}>{s.title}</div>
@@ -209,9 +209,9 @@ export default function LandingPage() {
 
       {/* TIERS */}
       <section style={{ padding: '48px 24px' }}>
-        <div style={{ maxWidth: 600, margin: '0 auto' }}>
+        <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 20px', textAlign: 'center' }}>Start free. Go deeper with access.</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
             <div style={{ padding: 20, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 600 }}>🆓 Free</div>
               <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>No signup</div>
@@ -224,6 +224,13 @@ export default function LandingPage() {
               <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>25 brief / day<br />10 detailed / day<br />All features + API + Dashboard</div>
               <a href="/invite" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Request access</a>
             </div>
+            <div style={{ padding: 20, background: '#fafaf8', border: '0.5px dashed #d5dada', borderRadius: 10, opacity: 0.75, position: 'relative' }}>
+              <span style={{ position: 'absolute', top: 10, right: 10, fontSize: 9, fontWeight: 600, color: '#888', background: '#f0f0ee', padding: '2px 8px', borderRadius: 10 }}>COMING SOON</span>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>🔐 Sign up / Sign in</div>
+              <div style={{ fontSize: 11, color: '#aaa', marginBottom: 10 }}>Personal account</div>
+              <div style={{ fontSize: 12, color: '#999', lineHeight: 2 }}>Save your history<br />Sync across devices<br />Custom preferences</div>
+              <div style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#f0f0ee', color: '#aaa', borderRadius: 6, fontSize: 13, cursor: 'not-allowed' }}>In development</div>
+            </div>
           </div>
         </div>
       </section>
@@ -235,7 +242,7 @@ export default function LandingPage() {
           <p style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>Paste any article, claim, or URL. Free, no signup.</p>
           <a href="/analyze" style={{ display: 'inline-block', padding: '14px 36px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 16, fontWeight: 600, textDecoration: 'none' }}>Analyze something now</a>
           <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center', gap: 16, fontSize: 11, color: '#888' }}>
-            <span>✓ Free</span><span>✓ No signup</span><span>✓ Under 4 seconds</span><span>✓ Research-backed</span>
+            <span>✓ Free</span><span>✓ No signup</span><span>✓ Research-backed</span>
           </div>
         </div>
       </section>
