@@ -257,7 +257,7 @@ async def list_techniques():
     }
 
 @app.get("/api/scope")
-async def scope_feed(market: str = "global", limit: int = 20, refresh: bool = False):
+async def scope_feed(market: str = "global", limit: int = 25, refresh: bool = False):
     """Scope feed with 6-hour Redis cache."""
     import json
     from datetime import datetime, timezone
@@ -284,7 +284,7 @@ async def scope_feed(market: str = "global", limit: int = 20, refresh: bool = Fa
             logger.warning(f"Scope cache read failed: {e}")
 
     # Fetch fresh RSS feeds
-    items = await get_scope_feed(market, limit=100)  # fetch more, cache all
+    items = await get_scope_feed(market, limit=120)  # fetch more, cache all
     now = datetime.now(timezone.utc).isoformat()
 
     # Store in Redis with 6-hour TTL

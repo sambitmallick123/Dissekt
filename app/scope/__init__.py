@@ -31,12 +31,12 @@ FEEDS = {
         "https://feeds.arstechnica.com/arstechnica/index",
     ],
     "india": [
-        "https://scroll.in/rss/feed",
         "https://www.thehindu.com/news/national/feeder/default.rss",
-        "https://www.ndtv.com/rss/india",
-        "https://thewire.in/feed",
+        "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml",
+        "https://www.livemint.com/rss/news",
+        "https://feeds.feedburner.com/ndtvnews-india-news",
+        "https://frontline.thehindu.com/feeder/default.rss",
         "https://www.altnews.in/feed/",
-        "https://indianexpress.com/section/india/feed/",
     ],
     "germany": [
         "https://www.spiegel.de/schlagzeilen/index.rss",
@@ -138,7 +138,7 @@ def _quick_risk_score(title: str, summary: str) -> str:
         return "low"
     return "none"
 
-async def get_scope_feed(market: str = "global", limit: int = 20) -> list[dict]:
+async def get_scope_feed(market: str = "global", limit: int = 25) -> list[dict]:
     """Fetch and merge RSS feeds for a market, sorted newest first."""
     feeds = []
     if market == "global":
@@ -157,7 +157,7 @@ async def get_scope_feed(market: str = "global", limit: int = 20) -> list[dict]:
                 d = feedparser.parse(resp.text)
                 source_name = d.feed.get("title", feed_url)
 
-                for entry in d.entries[:8]:
+                for entry in d.entries[:15]:
                     published = _parse_date(entry)
                     _rs = _quick_risk_score(entry.get("title", ""), (entry.get("summary", "") or "")[:200])
                     # _quick_risk_score may return a dict or a plain level string — normalize
@@ -183,26 +183,54 @@ async def get_scope_feed(market: str = "global", limit: int = 20) -> list[dict]:
         except Exception as e:
             logger.warning(f"Failed to fetch {feed_url}: {e}")
 
-    # ── Rolling 24h window: keep only items published in the last 24 hours ──
-    cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
-    recent = [it for it in items if it.get("published", "") and it["published"] >= cutoff]
-    # Fallback: if too few in the last 24h, relax to all items (most-recent first)
-    if len(recent) < min(limit, 8):
-        recent = items
-    # ── Sampling: shuffle, then cap per source so no single feed dominates ──
-    random.shuffle(recent)
-    MAX_PER_SOURCE = 3
-    capped, per_source = [], {}
-    for it in recent:
-        src = it.get("source", "")
-        if per_source.get(src, 0) < MAX_PER_SOURCE:
-            capped.append(it)
-            per_source[src] = per_source.get(src, 0) + 1
-        if len(capped) >= limit:
+    # ── Tiered fill toward `limit` items, preferring recency then diversity ──
+    now = datetime.now(timezone.utc)
+
+    def _within(hours):
+        cut = (now - timedelta(hours=hours)).isoformat()
+        return [it for it in items if it.get("published", "") and it["published"] >= cut]
+
+    def _sample(pool, cap):
+        pool = list(pool)
+        random.shuffle(pool)
+        out, per = [], {}
+        for it in pool:
+            src = it.get("source", "")
+            if per.get(src, 0) < cap:
+                out.append(it)
+                per[src] = per.get(src, 0) + 1
+            if len(out) >= limit:
+                break
+        return out
+
+    def _newest_first(lst):
+        return sorted(lst, key=lambda x: x.get("published", ""), reverse=True)
+
+    chosen = []
+    # Stage 1: stay within 24h, progressively loosen the per-source cap (recency-first)
+    pool_24 = _within(24)
+    for cap in (3, 5, 8, 9999):
+        got = _sample(pool_24, cap)
+        if len(got) >= limit:
+            chosen = got
             break
-    # Within the capped, sampled set, present newest first
-    capped.sort(key=lambda x: x.get("published", ""), reverse=True)
-    return capped[:limit]
+        chosen = got  # keep best-so-far
+    # Stage 2: still short → widen the time window, generous cap
+    if len(chosen) < limit:
+        for hours in (48, 72, 168):  # 2d, 3d, 7d
+            got = _sample(_within(hours), 9999)
+            if len(got) >= limit:
+                chosen = got
+                break
+            if len(got) > len(chosen):
+                chosen = got
+    # Final fallback: everything we have
+    if len(chosen) < limit:
+        got = _sample(items, 9999)
+        if len(got) > len(chosen):
+            chosen = got
+
+    return _newest_first(chosen)[:limit]
 
 
 def _detect_market(url: str) -> str:

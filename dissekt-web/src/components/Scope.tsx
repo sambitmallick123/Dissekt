@@ -1,6 +1,21 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+function timeAgo(iso: string): string {
+  if (!iso) return '';
+  const then = new Date(iso).getTime();
+  if (isNaN(then)) return '';
+  const mins = Math.floor((Date.now() - then) / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 type Market = 'global' | 'india' | 'us' | 'germany' | 'uk' | 'intl' | 'substack';
@@ -71,7 +86,7 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
                   <span style={{ fontSize: 9, fontWeight: 600, color: riskColor(item.risk || 'none'), padding: '1px 5px', borderRadius: 3, background: item.risk === 'high' ? '#fef2f2' : item.risk === 'medium' ? '#fffbeb' : '#eff6ff' }}>{item.risk_label}</span>
                 )}
                 <span>{item.source}</span>
-                {item.published && <span>· {new Date(item.published).toLocaleDateString()}</span>}
+                {item.published && <span>· {timeAgo(item.published)}</span>}
               </div>
             </div>
             {onAnalyze && (
