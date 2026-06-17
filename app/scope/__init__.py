@@ -3,13 +3,22 @@ Scans RSS feeds from 4 markets, returns curated items sorted by time.
 """
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import random
 import feedparser
 import httpx
 
 logger = logging.getLogger("dissekt.radar")
 
 FEEDS = {
+    "global": [
+        "https://feeds.bbci.co.uk/news/world/rss.xml",
+        "https://rss.dw.com/rdf/rss-en-all",
+        "https://www.aljazeera.com/xml/rss/all.xml",
+        "https://feeds.npr.org/1004/rss.xml",
+        "https://www.theguardian.com/world/rss",
+        "https://www.france24.com/en/rss",
+    ],
     "substack": [
         "https://on.substack.com/feed",
         "https://www.slowboring.com/feed",
@@ -27,22 +36,28 @@ FEEDS = {
         "https://www.ndtv.com/rss/india",
         "https://thewire.in/feed",
         "https://www.altnews.in/feed/",
+        "https://indianexpress.com/section/india/feed/",
     ],
     "germany": [
         "https://www.spiegel.de/schlagzeilen/index.rss",
         "https://www.tagesschau.de/xml/rss2/",
         "https://correctiv.org/feed/",
         "https://www.faz.net/rss/aktuell/",
+        "https://newsfeed.zeit.de/index",
     ],
     "us": [
         "https://feeds.apnews.com/rss/apf-topnews",
         "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
         "https://www.politifact.com/rss/factchecks/",
+        "https://feeds.npr.org/1001/rss.xml",
+        "https://www.pbs.org/newshour/feeds/rss/headlines",
     ],
     "uk": [
         "https://www.theguardian.com/world/rss",
         "https://feeds.bbci.co.uk/news/rss.xml",
         "https://fullfact.org/feed/",
+        "https://www.independent.co.uk/news/uk/rss",
+        "https://feeds.skynews.com/feeds/rss/home.xml",
     ],
 }
 
@@ -123,12 +138,12 @@ def _quick_risk_score(title: str, summary: str) -> str:
         return "low"
     return "none"
 
-async def get_scope_feed(market: str = "all", limit: int = 20) -> list[dict]:
+async def get_scope_feed(market: str = "global", limit: int = 20) -> list[dict]:
     """Fetch and merge RSS feeds for a market, sorted newest first."""
     feeds = []
-    if market == "all":
-        for m in FEEDS:
-            feeds.extend([(url, m) for url in FEEDS[m]])
+    if market == "global":
+        # Curated world news: only the global wire/international sources
+        feeds = [(url, "global") for url in FEEDS.get("global", [])]
     elif market in FEEDS:
         feeds = [(url, market) for url in FEEDS[market]]
     else:
@@ -168,9 +183,26 @@ async def get_scope_feed(market: str = "all", limit: int = 20) -> list[dict]:
         except Exception as e:
             logger.warning(f"Failed to fetch {feed_url}: {e}")
 
-    # Sort by ISO date string (works because ISO format sorts alphabetically)
-    items.sort(key=lambda x: x.get("published", ""), reverse=True)
-    return items[:limit]
+    # ── Rolling 24h window: keep only items published in the last 24 hours ──
+    cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    recent = [it for it in items if it.get("published", "") and it["published"] >= cutoff]
+    # Fallback: if too few in the last 24h, relax to all items (most-recent first)
+    if len(recent) < min(limit, 8):
+        recent = items
+    # ── Sampling: shuffle, then cap per source so no single feed dominates ──
+    random.shuffle(recent)
+    MAX_PER_SOURCE = 3
+    capped, per_source = [], {}
+    for it in recent:
+        src = it.get("source", "")
+        if per_source.get(src, 0) < MAX_PER_SOURCE:
+            capped.append(it)
+            per_source[src] = per_source.get(src, 0) + 1
+        if len(capped) >= limit:
+            break
+    # Within the capped, sampled set, present newest first
+    capped.sort(key=lambda x: x.get("published", ""), reverse=True)
+    return capped[:limit]
 
 
 def _detect_market(url: str) -> str:

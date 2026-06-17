@@ -257,7 +257,7 @@ async def list_techniques():
     }
 
 @app.get("/api/scope")
-async def scope_feed(market: str = "all", limit: int = 20, refresh: bool = False):
+async def scope_feed(market: str = "global", limit: int = 20, refresh: bool = False):
     """Scope feed with 6-hour Redis cache."""
     import json
     from datetime import datetime, timezone

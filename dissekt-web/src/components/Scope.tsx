@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-type Market = 'all' | 'india' | 'us' | 'germany' | 'uk' | 'intl' | 'substack';
+type Market = 'global' | 'india' | 'us' | 'germany' | 'uk' | 'intl' | 'substack';
 
 export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => void }) {
   const [items, setItems] = useState<any[]>([]);
-  const [market, setMarket] = useState<Market>('all');
+  const [market, setMarket] = useState<Market>('global');
   const [loading, setLoading] = useState(false);
 
   const loadFeed = async (m: Market, refresh = false) => {
@@ -48,10 +48,10 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
       <div style={{ fontSize: 10, color: '#aaa', marginBottom: 10 }}>Color reflects surface manipulation signals in the headline — not a verdict. Analyze for the full picture.</div>
 
       <div style={{ display: 'flex', gap: 4, marginBottom: 12, flexWrap: 'wrap' }}>
-        {(['all', 'india', 'us', 'germany', 'uk'] as Market[]).map(m => (
+        {(['global', 'india', 'us', 'germany', 'uk'] as Market[]).map(m => (
           <button key={m} onClick={() => setMarket(m)}
             style={{ padding: '4px 12px', borderRadius: 5, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: market === m ? '#0d9488' : '#f0f0ee', color: market === m ? '#fff' : '#555', textTransform: 'capitalize' }}>
-            {m === 'all' ? 'All' : m === 'us' ? 'US' : m === 'uk' ? 'UK' : m === 'intl' ? 'Intl' : m.charAt(0).toUpperCase() + m.slice(1)}
+            {m === 'global' ? '🌐 Global' : m === 'us' ? 'US' : m === 'uk' ? 'UK' : m === 'intl' ? 'Intl' : m.charAt(0).toUpperCase() + m.slice(1)}
           </button>
         ))}
       </div>
