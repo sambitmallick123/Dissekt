@@ -28,7 +28,7 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
   const loadFeed = async (m: Market, refresh = false) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/scope?market=${m}${refresh ? '&refresh=true' : ''}`);
+      const res = await fetch(`${API_URL}/api/scope?market=${m}&limit=25${refresh ? '&refresh=true' : ''}`);
       const data = await res.json();
       setItems(data.items || []);
     } catch { setItems([]); }
@@ -76,7 +76,7 @@ export default function Scope({ onAnalyze }: { onAnalyze?: (text: string) => voi
       {!loading && items.length === 0 && <div style={{ textAlign: 'center', padding: 16, color: '#888', fontSize: 12 }}>No items. Scope feeds update every 6 hours.</div>}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {items.slice(0, 8).map((item, i) => (
+        {items.map((item, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'start', gap: 8, padding: '8px 10px', borderRadius: 8, border: '0.5px solid #f0f0ee', borderLeft: `3px solid ${riskColor(item.risk || 'none')}` }}>
             <span style={{ fontSize: 11, marginTop: 2 }}>{riskBadge(item.risk || 'none')}</span>
             <div style={{ flex: 1, minWidth: 0 }}>

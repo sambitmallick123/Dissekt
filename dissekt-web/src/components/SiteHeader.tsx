@@ -24,7 +24,7 @@ export default function SiteHeader({ active }: { active?: string }) {
   }, []);
 
   const signOut = () => {
-    ['dissekt_tier','dissekt_invite_code','dissekt_invite_name','dissekt_access_expires','dissekt_token','dissekt_email','dissekt_name','dissekt_usage'].forEach(k => localStorage.removeItem(k));
+    ['dissekt_tier','dissekt_invite_code','dissekt_invite_name','dissekt_access_expires','dissekt_token','dissekt_email','dissekt_name','dissekt_usage','dissekt_admin'].forEach(k => localStorage.removeItem(k));
     window.location.href = '/';
   };
 
@@ -65,7 +65,7 @@ export default function SiteHeader({ active }: { active?: string }) {
               <a href="/help" style={{ fontSize: 12, color: active === 'Help' ? '#0d9488' : '#888780', textDecoration: 'none', fontWeight: active === 'Help' ? 600 : 500 }}>Help</a>
               {isLoggedIn ? (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <a href="/dashboard" title="Go to dashboard" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', cursor: 'pointer' }}>
                     <div style={{ width: 24, height: 24, background: '#0d9488', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'white', fontWeight: 600 }}>
                       {(name || 'U')[0].toUpperCase()}
                     </div>
@@ -73,7 +73,7 @@ export default function SiteHeader({ active }: { active?: string }) {
                       <div style={{ fontSize: 11, fontWeight: 500, color: '#1a1a1a', lineHeight: 1 }}>{name || 'User'}</div>
                       <div style={{ fontSize: 9, color: '#888' }}>Invited{expiryText ? ` · ${expiryText} left` : ''}</div>
                     </div>
-                  </div>
+                  </a>
                   <button onClick={signOut} style={{ fontSize: 10, padding: '3px 10px', background: '#f0f0ee', color: '#888', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Sign out</button>
                 </>
               ) : (
