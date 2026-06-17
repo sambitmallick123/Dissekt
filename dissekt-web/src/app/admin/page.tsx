@@ -123,6 +123,13 @@ export default function AdminPage() {
     overview: '📊 Overview', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
     contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', models: '🤖 Models', settings: '⚙️ Settings', sources: '📡 Sources', feeds: '📰 Feeds',
   };
+  const TAB_GROUPS: { id: string; label: string; tabs: Tab[] }[] = [
+    { id: 'monitor', label: '📊 Monitor', tabs: ['overview', 'decisions'] },
+    { id: 'people',  label: '👥 People',  tabs: ['invitations', 'feedback', 'contacts', 'corrections'] },
+    { id: 'content', label: '🗂️ Content', tabs: ['sources', 'feeds'] },
+    { id: 'config',  label: '⚙️ Config',  tabs: ['models', 'settings'] },
+  ];
+  const activeGroup = TAB_GROUPS.find(g => g.tabs.includes(tab)) || TAB_GROUPS[0];
 
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
@@ -135,9 +142,27 @@ export default function AdminPage() {
             </div>
           <button onClick={() => { setAuthenticated(false); setAdminKey(''); if (typeof window !== 'undefined') localStorage.removeItem('dissekt_admin'); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
-        <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '0.5px solid #e5eaea', flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: 0 }}>
-          {(Object.keys(tabLabels) as Tab[]).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ padding: '8px 14px', borderRadius: 0, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: 'transparent', color: tab === t ? '#0d9488' : '#888', borderBottom: tab === t ? '2px solid #0d9488' : '2px solid transparent', whiteSpace: 'nowrap' }}>
+        {/* Top-level group tabs */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+          {TAB_GROUPS.map(g => {
+            const isActive = g.id === activeGroup.id;
+            return (
+              <button key={g.id}
+                onClick={() => { if (!g.tabs.includes(tab)) setTab(g.tabs[0]); }}
+                style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
+                  background: isActive ? '#0d9488' : '#fff', color: isActive ? '#fff' : '#555',
+                  boxShadow: isActive ? 'none' : '0 0 0 0.5px #e5eaea', whiteSpace: 'nowrap' }}>
+                {g.label}
+              </button>
+            );
+          })}
+        </div>
+        {/* Sub-tabs for the active group */}
+        <div style={{ display: 'flex', gap: 0, marginBottom: 16, borderBottom: '0.5px solid #e5eaea', flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          {activeGroup.tabs.map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              style={{ padding: '8px 16px', borderRadius: 0, fontSize: 12.5, fontWeight: 500, border: 'none', cursor: 'pointer', background: 'transparent',
+                color: tab === t ? '#0d9488' : '#888', borderBottom: tab === t ? '2px solid #0d9488' : '2px solid transparent', whiteSpace: 'nowrap' }}>
               {tabLabels[t]}
             </button>
           ))}
