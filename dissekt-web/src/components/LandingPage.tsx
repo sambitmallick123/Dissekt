@@ -209,9 +209,9 @@ export default function LandingPage() {
 
       {/* TIERS */}
       <section style={{ padding: '48px 24px' }}>
-        <div style={{ maxWidth: 820, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 20px', textAlign: 'center' }}>Start free. Go deeper with access.</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
+        <div style={{ maxWidth: 560, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 20px', textAlign: 'center' }}>Start free. Go deeper with an account.</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
             <div style={{ padding: 20, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 600 }}>🆓 Free</div>
               <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>No signup</div>
@@ -219,17 +219,11 @@ export default function LandingPage() {
               <a href="/analyze" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#f0f0ee', color: '#555', borderRadius: 6, fontSize: 13, textDecoration: 'none' }}>Start scanning</a>
             </div>
             <div style={{ padding: 20, background: '#fff', border: '2px solid #0d9488', borderRadius: 10 }}>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>🎫 Invited</div>
-              <div style={{ fontSize: 11, color: '#0d9488', marginBottom: 10 }}>6 months access</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>🔐 Account</div>
+              <div style={{ fontSize: 11, color: '#0d9488', marginBottom: 10 }}>Free — sign up with email</div>
               <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>25 brief / day<br />10 detailed / day<br />All features + API + Dashboard</div>
-              <a href="/invite" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Request access</a>
-            </div>
-            <div style={{ padding: 20, background: '#fafaf8', border: '0.5px dashed #d5dada', borderRadius: 10, opacity: 0.75, position: 'relative' }}>
-              <span style={{ position: 'absolute', top: 10, right: 10, fontSize: 9, fontWeight: 600, color: '#888', background: '#f0f0ee', padding: '2px 8px', borderRadius: 10 }}>COMING SOON</span>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#888' }}>🔐 Sign up / Sign in</div>
-              <div style={{ fontSize: 11, color: '#aaa', marginBottom: 10 }}>Personal account</div>
-              <div style={{ fontSize: 12, color: '#999', lineHeight: 2 }}>Save your history<br />Sync across devices<br />Custom preferences</div>
-              <div style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#f0f0ee', color: '#aaa', borderRadius: 6, fontSize: 13, cursor: 'not-allowed' }}>In development</div>
+              <a href="/signup" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Sign up</a>
+              <a href="/login" style={{ display: 'block', textAlign: 'center', marginTop: 6, fontSize: 12, color: '#0d9488', textDecoration: 'none' }}>or sign in</a>
             </div>
           </div>
         </div>

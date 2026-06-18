@@ -1,34 +1,45 @@
 'use client';
 import WelcomeBar from '@/components/WelcomeBar';
 import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function SiteHeader({ active }: { active?: string }) {
-  const [tier, setTier] = useState('free');
   const [name, setName] = useState('');
   const [expiryText, setExpiryText] = useState('');
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== 'undefined') {
-      setTier(localStorage.getItem('dissekt_tier') || 'free');
-      setName(localStorage.getItem('dissekt_invite_name') || localStorage.getItem('dissekt_name') || '');
-      const expiry = localStorage.getItem('dissekt_access_expires');
-      if (expiry) {
-        const days = Math.round((new Date(expiry).getTime() - Date.now()) / 86400000);
-        if (days > 0) setExpiryText(`${days}d`);
-        else { localStorage.removeItem('dissekt_tier'); localStorage.removeItem('dissekt_access_expires'); setTier('free'); }
+    // Read the Supabase session
+    supabase.auth.getSession().then(({ data }) => {
+      const session = data.session;
+      setIsLoggedIn(!!session);
+      if (session?.user) {
+        const meta = session.user.user_metadata || {};
+        setName(meta.name || session.user.email?.split('@')[0] || 'User');
       }
-    }
+    });
+    // React to auth changes (login/logout in any tab)
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+      if (session?.user) {
+        const meta = session.user.user_metadata || {};
+        setName(meta.name || session.user.email?.split('@')[0] || 'User');
+      } else {
+        setName('');
+      }
+    });
+    return () => { sub.subscription.unsubscribe(); };
   }, []);
 
-  const signOut = () => {
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    // clear any legacy flags too
     ['dissekt_tier','dissekt_invite_code','dissekt_invite_name','dissekt_access_expires','dissekt_token','dissekt_email','dissekt_name','dissekt_usage','dissekt_admin'].forEach(k => localStorage.removeItem(k));
     window.location.href = '/';
   };
-
-  const isLoggedIn = tier === 'invited';
 
   const links = [
     { href: '/analyze', label: 'Analyze' },
@@ -77,7 +88,10 @@ export default function SiteHeader({ active }: { active?: string }) {
                   <button onClick={signOut} style={{ fontSize: 10, padding: '3px 10px', background: '#f0f0ee', color: '#888', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Sign out</button>
                 </>
               ) : (
-                <a href="/invite" style={{ fontSize: 11, color: '#fff', textDecoration: 'none', borderRadius: 5, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>Get access</a>
+                <>
+                <a href="/login" style={{ fontSize: 12, color: '#888780', textDecoration: 'none', fontWeight: 500 }}>Sign in</a>
+                <a href="/signup" style={{ fontSize: 11, color: '#fff', textDecoration: 'none', borderRadius: 5, padding: '5px 14px', fontWeight: 600, background: '#0d9488' }}>Sign up</a>
+                </>
               )}
             </div>
 
