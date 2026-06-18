@@ -32,7 +32,7 @@ export default function WelcomeBar() {
     } catch {}
   }, []);
 
-  if (!mounted || tier !== 'invited') return null;
+  if (!mounted || tier !== 'member') return null;
   if (EXCLUDED.includes(pathname)) return null;
 
   const hour = new Date().getHours();

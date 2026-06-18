@@ -50,7 +50,7 @@ export default function DashboardPage() {
 
   if (!mounted) return null;
 
-  if (tier !== 'invited') {
+  if (tier !== 'member') {
     return (
       <main style={{ flex: 1, background: '#fafaf8' }}>
         <SiteHeader />
@@ -58,7 +58,7 @@ export default function DashboardPage() {
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
           <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Dashboard requires access</div>
           <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Sign in with your invite code to view your personal insights, trust graph, and API keys.</div>
-          <a href="/invite" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
+          <a href="/signup" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
         </div>
         <SiteFooter />
       </main>
@@ -94,7 +94,7 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a' }}>Your reading lens</div>
-            <div style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions · {tier === 'invited' ? '🎫 Invited' : '🆓 Free'}</div>
+            <div style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions · {tier === 'member' ? '🎫 Invited' : '🆓 Free'}</div>
           </div>
           <div style={{ display: 'flex', gap: 4 }}>
             <button onClick={() => setTab('insights')} style={{ padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'insights' ? '#0d9488' : '#fff', color: tab === 'insights' ? '#fff' : '#555', boxShadow: tab !== 'insights' ? '0 0 0 0.5px #e5eaea' : 'none' }}>📊 Insights</button>

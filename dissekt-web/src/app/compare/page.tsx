@@ -38,7 +38,7 @@ export default function ComparePage() {
   const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, outline: 'none', background: '#f8f8f6', fontFamily: 'inherit', resize: 'vertical' };
 
   if (!mounted) return null;
-  if (tier !== 'invited') {
+  if (tier !== 'member') {
     return (
       <main style={{ flex: 1, background: '#fafaf8' }}>
         <SiteHeader active="Compare" />
@@ -46,7 +46,7 @@ export default function ComparePage() {
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
           <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Compare requires access</div>
           <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Side-by-side comparison is available for invited users. Sign in with your invite code to unlock it.</div>
-          <a href="/invite" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
+          <a href="/signup" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
         </div>
         <SiteFooter />
       </main>

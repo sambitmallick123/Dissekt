@@ -9,7 +9,7 @@ import LoadingState from '@/components/LoadingState';
 import { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
 import Scope from '@/components/Scope';
-import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS, fetchLiveLimits } from '@/lib/tier';
+import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS, fetchLiveLimits, refreshAuth, isMember } from '@/lib/tier';
 import { fetchConfig } from '@/lib/config';
 import { FeatureLockedPopup, useFeatureGate } from '@/components/FeatureGate';
 
@@ -21,7 +21,7 @@ function ScanAppInner() {
   const [error, setError] = useState('');
   const [inputContent, setInputContent] = useState('');
   const [scanTab, setScanTab] = useState<'single' | 'bulk'>('single');
-  const [remaining, setRemaining] = useState<{ brief: number; detailed: number; tier: 'free' | 'invited' }>({ brief: 3, detailed: 1, tier: 'free' });
+  const [remaining, setRemaining] = useState<{ brief: number; detailed: number; tier: 'free' | 'member' }>({ brief: 3, detailed: 1, tier: 'free' });
   const [resetIn, setResetIn] = useState('');
   const [shareToast, setShareToast] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -33,13 +33,16 @@ function ScanAppInner() {
 
   useEffect(() => {
     setMounted(true);
-    setIsInvited((typeof window !== 'undefined' && localStorage.getItem('dissekt_tier')) === 'invited');
-    fetchConfig().then(cfg => {
-      const tier = getTier();
-      const key = tier === 'invited' ? 'features_invited' : 'features_free';
-      setEnabledFeatures(cfg[key] || ['single_scan', 'radar']);
+    // Warm the auth state from the Supabase session, then load tier-dependent data
+    refreshAuth().then(() => {
+      setIsInvited(isMember());
+      fetchConfig().then(cfg => {
+        const key = isMember() ? 'features_member' : 'features_free';
+        setEnabledFeatures(cfg[key] || cfg['features_member'] || ['single_scan', 'radar']);
+      });
+      fetchLiveLimits().then(() => setRemaining(getRemaining()));
+      setRemaining(getRemaining());
     });
-    fetchLiveLimits().then(() => setRemaining(getRemaining()));
     setRemaining(getRemaining());
     setResetIn(getResetTime());
     const t = setInterval(() => setResetIn(getResetTime()), 60000);
@@ -140,18 +143,18 @@ function ScanAppInner() {
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
                 Single scan
               </button>
-              <button onClick={() => { if (!isInvited) { window.location.href = '/invite'; return; } if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
+              <button onClick={() => { if (!isInvited) { window.location.href = '/signup'; return; } if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555', opacity: isInvited ? 1 : 0.6 }}>
                 📊 Bulk CSV {!isInvited && '🔒'}
               </button>
-              <button onClick={() => { window.location.href = isInvited ? '/compare' : '/invite'; }}
+              <button onClick={() => { window.location.href = isInvited ? '/compare' : '/signup'; }}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: '#f0f0ee', color: '#555', display: 'flex', alignItems: 'center', gap: 4, opacity: isInvited ? 1 : 0.6 }}>
                 ⚖️ Compare {!isInvited && '🔒'}
               </button>
             </div>
             <div style={{ fontSize: 11, color: '#888', textAlign: 'right' }}>
-              <span style={{ fontWeight: 600, color: remaining.tier === 'invited' ? '#0d9488' : '#888' }}>
-                {remaining.tier === 'invited' ? '🎫 Invited' : '🆓 Free'}
+              <span style={{ fontWeight: 600, color: remaining.tier === 'member' ? '#0d9488' : '#888' }}>
+                {remaining.tier === 'member' ? '👤 Member' : '🆓 Free'}
               </span>
               {' · '}{remaining.brief} brief, {remaining.detailed} detailed left
               <div style={{ fontSize: 10, color: '#aaa' }}>Resets in {resetIn} (00:00 GMT)</div>
