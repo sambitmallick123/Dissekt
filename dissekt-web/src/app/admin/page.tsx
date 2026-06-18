@@ -1,11 +1,12 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import UsersTab from '@/components/UsersTab';
 import SiteHeader from '@/components/SiteHeader';
 import FeedsTab from '@/components/FeedsTab';
 import ModelsTab from '@/components/ModelsTab';
 import SiteFooter from '@/components/SiteFooter';
 
-type Tab = 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources' | 'feeds' | 'models';
+type Tab = 'users' | 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources' | 'feeds' | 'models';
 
 
 
@@ -120,12 +121,12 @@ export default function AdminPage() {
   }
 
   const tabLabels: Record<Tab, string> = {
-    overview: '📊 Overview', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
+    overview: '📊 Overview', users: '👤 Users', invitations: '🎟️ Invitations', feedback: '💬 Feedback',
     contacts: '📧 Contacts', corrections: '👍 Corrections', decisions: '📓 Decisions', models: '🤖 Models', settings: '⚙️ Settings', sources: '📡 Sources', feeds: '📰 Feeds',
   };
   const TAB_GROUPS: { id: string; label: string; tabs: Tab[] }[] = [
     { id: 'monitor', label: '📊 Monitor', tabs: ['overview', 'decisions'] },
-    { id: 'people',  label: '👥 People',  tabs: ['invitations', 'feedback', 'contacts', 'corrections'] },
+    { id: 'people',  label: '👥 People',  tabs: ['users', 'feedback', 'contacts', 'corrections'] },
     { id: 'content', label: '🗂️ Content', tabs: ['sources', 'feeds'] },
     { id: 'config',  label: '⚙️ Config',  tabs: ['models', 'settings'] },
   ];
@@ -168,6 +169,7 @@ export default function AdminPage() {
           ))}
         </div>
         {tab === 'overview' && <OverviewTab adminKey={adminKey} />}
+        {tab === 'users' && <UsersTab adminKey={adminKey} />}
         {tab === 'invitations' && <InvitationsTab adminKey={adminKey} />}
         {tab === 'feedback' && <FeedbackTab adminKey={adminKey} />}
         {tab === 'contacts' && <ContactsTab adminKey={adminKey} />}
