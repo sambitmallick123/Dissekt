@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
 // Pages where the banner should NOT appear
-const EXCLUDED = ['/', '/admin', '/invite', '/signup'];
+const EXCLUDED = ['/', '/admin', '/invite', '/signup', '/login', '/forgot-password', '/auth/reset-password'];
 
 export default function WelcomeBar() {
   const [name, setName] = useState('');

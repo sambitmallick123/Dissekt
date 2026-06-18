@@ -3,6 +3,8 @@ import Kaleidoscope from '@/components/Kaleidoscope';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { refreshAuth, isMember } from '@/lib/tier';
 import ClarityScore from '@/components/ClarityScore';
 import PrismCard from '@/components/PrismCard';
 import LensCard from '@/components/LensCard';
@@ -12,7 +14,7 @@ export default function ComparePage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
-    setTier(localStorage.getItem('dissekt_tier') || 'free');
+    refreshAuth().then(() => setTier(isMember() ? 'member' : 'free'));
   }, []);
   const [contentA, setContentA] = useState('');
   const [contentB, setContentB] = useState('');
@@ -44,8 +46,8 @@ export default function ComparePage() {
         <SiteHeader active="Compare" />
         <div style={{ maxWidth: 440, margin: '80px auto', padding: '0 16px', textAlign: 'center' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Compare requires access</div>
-          <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Side-by-side comparison is available for invited users. Sign in with your invite code to unlock it.</div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Compare requires an account</div>
+          <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Side-by-side comparison is available to members. Sign up free to unlock it.</div>
           <a href="/signup" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
         </div>
         <SiteFooter />

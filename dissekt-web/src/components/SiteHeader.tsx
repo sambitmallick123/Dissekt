@@ -82,7 +82,7 @@ export default function SiteHeader({ active }: { active?: string }) {
                     </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 500, color: '#1a1a1a', lineHeight: 1 }}>{name || 'User'}</div>
-                      <div style={{ fontSize: 9, color: '#888' }}>Invited{expiryText ? ` · ${expiryText} left` : ''}</div>
+                      <div style={{ fontSize: 9, color: '#888' }}>Member</div>
                     </div>
                   </a>
                   <button onClick={signOut} style={{ fontSize: 10, padding: '3px 10px', background: '#f0f0ee', color: '#888', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Sign out</button>
@@ -120,7 +120,7 @@ export default function SiteHeader({ active }: { active?: string }) {
                 <div style={{ width: 28, height: 28, background: '#0d9488', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'white', fontWeight: 600 }}>
                   {(name || 'U')[0].toUpperCase()}
                 </div>
-                <div><div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a1a' }}>{name || 'User'}</div><div style={{ fontSize: 10, color: '#888' }}>Invited{expiryText ? ` · ${expiryText} left` : ''}</div></div>
+                <div><div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a1a' }}>{name || 'User'}</div><div style={{ fontSize: 10, color: '#888' }}>Member</div></div>
               </div>
             )}
             {links.map(l => (
@@ -131,7 +131,7 @@ export default function SiteHeader({ active }: { active?: string }) {
                             {isLoggedIn ? (
                 <button onClick={signOut} style={{ padding: '8px 16px', background: '#f0f0ee', color: '#555', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer', width: '100%' }}>Sign out</button>
               ) : (
-                <a href="/invite" style={{ display: 'block', textAlign: 'center', padding: '8px 16px', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Get access</a>
+                <a href="/signup" style={{ display: 'block', textAlign: 'center', padding: '8px 16px', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Sign up</a>
               )}
             </div>
           </div>

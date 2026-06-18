@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { refreshAuth, isMember } from '@/lib/tier';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import Reflect from '@/components/Reflect';
@@ -25,13 +27,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setMounted(true);
-    const e = localStorage.getItem('dissekt_email') || '';
-    const n = localStorage.getItem('dissekt_invite_name') || localStorage.getItem('dissekt_name') || '';
-    const t = localStorage.getItem('dissekt_tier') || 'free';
-    setEmail(e); setName(n); setTier(t);
-    
-    fetch(`${API_URL}/api/decisions`).then(r => r.json()).then(d => setDecisions(d.decisions || [])).catch(() => {});
-    if (e) fetch(`${API_URL}/api/keys/usage?email=${encodeURIComponent(e)}`).then(r => r.json()).then(d => setKeys(d.keys || [])).catch(() => {});
+    refreshAuth().then(async () => {
+      const member = isMember();
+      setTier(member ? 'member' : 'free');
+      if (!member) return;
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      const e = user?.email || '';
+      const n = (user?.user_metadata?.name as string) || e.split('@')[0] || 'User';
+      setEmail(e); setName(n);
+      fetch(`${API_URL}/api/decisions`).then(r => r.json()).then(d => setDecisions(d.decisions || [])).catch(() => {});
+      if (e) fetch(`${API_URL}/api/keys/usage?email=${encodeURIComponent(e)}`).then(r => r.json()).then(d => setKeys(d.keys || [])).catch(() => {});
+    });
   }, []);
 
   const createKey = async () => {
@@ -57,7 +64,7 @@ export default function DashboardPage() {
         <div style={{ maxWidth: 440, margin: '80px auto', padding: '0 16px', textAlign: 'center' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
           <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Dashboard requires access</div>
-          <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Sign in with your invite code to view your personal insights, trust graph, and API keys.</div>
+          <div style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>Sign in to view your personal insights, trust graph, and API keys.</div>
           <a href="/signup" style={{ display: 'inline-block', padding: '10px 24px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Sign in</a>
         </div>
         <SiteFooter />
@@ -94,7 +101,7 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a' }}>Your reading lens</div>
-            <div style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions · {tier === 'member' ? '🎫 Invited' : '🆓 Free'}</div>
+            <div style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions · {tier === 'member' ? '👤 Member' : '🆓 Free'}</div>
           </div>
           <div style={{ display: 'flex', gap: 4 }}>
             <button onClick={() => setTab('insights')} style={{ padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'insights' ? '#0d9488' : '#fff', color: tab === 'insights' ? '#fff' : '#555', boxShadow: tab !== 'insights' ? '0 0 0 0.5px #e5eaea' : 'none' }}>📊 Insights</button>
@@ -108,10 +115,10 @@ export default function DashboardPage() {
             {/* Community */}
             <div style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', borderRadius: 10, padding: 16, marginBottom: 12, color: '#fff' }}>
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>💬 Join the community</div>
-              <div style={{ fontSize: 11, opacity: 0.85, marginBottom: 10 }}>Report bugs, share ideas, and follow what we&apos;re building — exclusive to invited members.</div>
+              <div style={{ fontSize: 11, opacity: 0.85, marginBottom: 10 }}>Report bugs, share ideas, and follow what we&apos;re building — available to all members.</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <a href="https://discord.gg/Bkv4zpmdJD" target="_blank" rel="noopener" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: '#fff', textDecoration: 'none', fontWeight: 600 }}>Discord →</a>
-                <a href="https://github.com/sambitmallick123/Dissekt" target="_blank" rel="noopener" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: '#fff', textDecoration: 'none', fontWeight: 600 }}>GitHub →</a>
+
               </div>
             </div>
 

@@ -126,7 +126,7 @@ export default function HelpPage() {
   const [isInvited, setIsInvited] = useState(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const invited = localStorage.getItem('dissekt_tier') === 'invited';
+      const invited = localStorage.getItem('dissekt_tier') === 'member';
       const admin = localStorage.getItem('dissekt_admin') === 'true';
       setIsInvited(invited || admin);
     }
@@ -239,7 +239,7 @@ export default function HelpPage() {
           <div id="features" style={{ marginBottom: 40, scrollMarginTop: 80 }}>
             <SectionHead icon="🛠️" title="Features" sub="Tools for reading more clearly." />
             {[['🔍 Loupe', 'Inline annotations — highlights techniques directly in the text'], ['✍️ Polish', 'Pre-publish check for writers, with rewrite suggestions'], ['🔮 Kaleidoscope', 'One claim from 5 editorial perspectives'], ['🪞 Reflect', 'Your personal bias profile over time'], ['📒 Ledger', 'Decision journal — Trust / Unsure / Reject'], ['🕸️ Trust Graph', 'Per-source trust visualization'], ['🧵 Thread', 'Track how a claim evolved over time'], ['🔬 Imprint', 'Source fingerprinting']].map(f => (
-              <Collapsible key={f[0]} title={f[0]} subtitle={f[1]}><span style={{ fontSize: 12, color: '#888' }}>Available on the Analyze page and dashboard for invited users.</span></Collapsible>
+              <Collapsible key={f[0]} title={f[0]} subtitle={f[1]}><span style={{ fontSize: 12, color: '#888' }}>Available on the Analyze page and dashboard for members.</span></Collapsible>
             ))}
           </div>
 
@@ -253,8 +253,8 @@ export default function HelpPage() {
                 <div style={{ fontSize: 12, color: '#555', lineHeight: 1.9 }}>3 brief / day<br />1 detailed / day<br />Resets 00:00 GMT</div>
               </div>
               <div style={{ padding: 16, background: '#fff', border: '2px solid #0d9488', borderRadius: 10 }}>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>🎫 Invited</div>
-                <div style={{ fontSize: 11, color: '#0d9488', marginBottom: 8 }}>6 months</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>👤 Member</div>
+                <div style={{ fontSize: 11, color: '#0d9488', marginBottom: 8 }}>Free account</div>
                 <div style={{ fontSize: 12, color: '#555', lineHeight: 1.9 }}>25 brief / day<br />10 detailed / day<br />All features + API</div>
               </div>
             </div>
@@ -264,26 +264,19 @@ export default function HelpPage() {
           {/* COMMUNITY & ACCESS */}
           <div id="community" style={{ marginBottom: 40, scrollMarginTop: 80 }}>
             <SectionHead icon="💬" title="Community & access" sub="Join the conversation and get full access." />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 16 }}>
-              <div style={{ padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, maxWidth: 320 }}>
                 <div style={{ fontSize: 22, marginBottom: 4 }}>💬</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: '#5865F2' }}>Discord</div>
                 <div style={{ fontSize: 12, color: '#888' }}>Report bugs, share ideas, follow updates</div>
-                <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>Available to invited members</div>
-              </div>
-              <div style={{ padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
-                <div style={{ fontSize: 22, marginBottom: 4 }}>⌨️</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>GitHub</div>
-                <div style={{ fontSize: 12, color: '#888' }}>Open issues, discussions, contribute</div>
-                <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>Available to invited members</div>
+                <div style={{ fontSize: 11, color: '#aaa', marginTop: 6 }}>Available to members</div>
               </div>
             </div>
-            <Collapsible title="How does invite access work?" subtitle="Getting full features">
-              Dissekt is in beta. Anyone can run single scans for free. <strong>Invited members</strong> get higher limits, all features (Bulk, Compare, Dashboard, API), and access to the community channels. Request an invite from the landing page, or ask in our Discord. Invite access currently runs for 6 months.
+            <Collapsible title="How does member access work?" subtitle="Getting full features">
+              Dissekt is in beta. Anyone can run single scans for free. <strong>Members</strong> get higher limits, all features (Bulk, Compare, Dashboard, API), and access to the Discord community — all with a free account. Sign up with just your name and email.
             </Collapsible>
-            <Collapsible title="What can I do in the community?" subtitle="Discord & GitHub">
-              <strong>Discord</strong> is for quick feedback, bug reports, and chatting with other users.<br />
-              <strong>GitHub</strong> hosts issues and discussions for anything you want tracked to a resolution — feature requests, bugs, and how-to questions.
+            <Collapsible title="What can I do in the community?" subtitle="Discord">
+              <strong>Discord</strong> is for quick feedback, bug reports, sharing ideas, and chatting with other members. Join us for updates and to help shape Dissekt.
             </Collapsible>
             <div style={{ marginTop: 16, padding: 16, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', marginBottom: 6 }}>📨 Have a question?</div>
@@ -317,7 +310,7 @@ export default function HelpPage() {
               Yes — paste a URL from news sites, Reddit, YouTube, Bluesky, Mastodon, or Substack. Dissekt auto-detects the platform and extracts the full content.
             </Collapsible>
             <Collapsible title="Is there an API?">
-              Yes, for invited users. See the <a href="/docs" style={{ color: '#0d9488', textDecoration: 'none' }}>API documentation</a>.
+              Yes, for members. See the <a href="/docs" style={{ color: '#0d9488', textDecoration: 'none' }}>API documentation</a>.
             </Collapsible>
           </div>
         </div>

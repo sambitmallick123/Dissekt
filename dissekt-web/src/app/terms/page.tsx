@@ -28,7 +28,7 @@ export default function TermsPage() {
           <p>You agree not to: use the service for illegal purposes; attempt to overwhelm or attack our infrastructure; scrape or resell our analysis at scale without permission; use the service to harass, defame, or harm others.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>5. Access tiers</h2>
-          <p>Free tier provides limited daily scans (3 brief + 1 detailed, resetting at 00:00 GMT). Invitation-based access provides expanded limits and features. Invite codes expire 7 days after issue. Granted access is valid for 6 months, after which it expires and must be renewed.</p>
+          <p>Free tier provides limited daily scans (3 brief + 1 detailed, resetting at 00:00 GMT) with no account required. A free member account provides expanded limits (25 brief + 10 detailed per day) and access to all features. Member accounts are created via email signup.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>6. Intellectual property</h2>
           <p>You retain rights to content you submit. By submitting content, you grant us a limited license to process it for analysis. Analysis outputs may be stored to provide features like shareable reports and the knowledge graph.</p>
