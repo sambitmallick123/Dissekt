@@ -131,7 +131,10 @@ export default function SiteHeader({ active }: { active?: string }) {
                             {isLoggedIn ? (
                 <button onClick={signOut} style={{ padding: '8px 16px', background: '#f0f0ee', color: '#555', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer', width: '100%' }}>Sign out</button>
               ) : (
+                <>
+                <a href="/login" style={{ display: 'block', textAlign: 'center', padding: '8px 16px', background: '#f0f0ee', color: '#555', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none', marginBottom: 8 }}>Sign in</a>
                 <a href="/signup" style={{ display: 'block', textAlign: 'center', padding: '8px 16px', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Sign up</a>
+                </>
               )}
             </div>
           </div>

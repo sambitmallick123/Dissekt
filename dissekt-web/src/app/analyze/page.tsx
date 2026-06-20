@@ -68,8 +68,8 @@ function ScanAppInner() {
     const mode = (modeArg === 'detailed' ? 'detailed' : 'brief') as 'brief' | 'detailed';
     if (!image && (!content || content.length < 10)) { setError('Please enter at least 10 characters, or attach an image'); return; }
 
-    // Gate detailed mode
-    if (mode === 'detailed' && !enabledFeatures.includes('detailed_mode')) {
+    // Gate detailed mode — members always have access; free users gated by feature list
+    if (mode === 'detailed' && !isMember() && !enabledFeatures.includes('detailed_mode')) {
       checkFeature('Detailed mode', enabledFeatures);
       return;
     }

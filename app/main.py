@@ -216,7 +216,53 @@ async def health():
     }
 
 
-def _persist_scan(email: str, mode: str, result) -> None:
+async def _extract_entities(text: str) -> list:
+    """Extract entities + main topic via gpt-4o-mini. Returns [{name, type}]. Best-effort."""
+    if not text or len(text.strip()) < 20:
+        return []
+    try:
+        import openai, json as _json
+        _settings = get_settings()
+        client = openai.AsyncOpenAI(api_key=_settings.openai_api_key)
+        prompt = (
+            "Extract the key entities and main topic from this text. "
+            "Return ONLY a JSON array, each item {\"name\": str, \"type\": one of "
+            "\"person\"|\"org\"|\"place\"|\"theme\"|\"topic\"}. "
+            "Include the single main topic with type \"topic\". "
+            "Limit to the 8 most significant. No duplicates. No commentary.\n\n"
+            + text[:2000]
+        )
+        resp = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            max_tokens=300,
+        )
+        raw = resp.choices[0].message.content.strip()
+        # strip code fences if present
+        if raw.startswith("```"):
+            raw = raw.split("```")[1] if "```" in raw[3:] else raw
+            raw = raw.replace("json", "", 1).strip() if raw.lstrip().startswith("json") else raw
+        start = raw.find("[")
+        end = raw.rfind("]")
+        if start != -1 and end != -1:
+            raw = raw[start:end+1]
+        ents = _json.loads(raw)
+        # normalize
+        out = []
+        seen = set()
+        for e in ents:
+            name = (e.get("name") or "").strip()
+            etype = (e.get("type") or "topic").strip().lower()
+            if name and name.lower() not in seen:
+                seen.add(name.lower())
+                out.append({"name": name, "type": etype})
+        return out[:8]
+    except Exception as e:
+        logger.warning(f"[ner] extraction failed (non-fatal): {e}")
+        return []
+
+async def _persist_scan(email: str, mode: str, result) -> None:
     """Persist scan METADATA for members only (no raw text). Best-effort."""
     logger.info(f"[persist] called with email={email!r} mode={mode}")
     if not email:
@@ -249,6 +295,10 @@ def _persist_scan(email: str, mode: str, result) -> None:
         toxicity = g(result, "signal", "toxicity_score", default=0.0)
         language = g(result, "detected_language", default="en")
 
+        # NER: extract entities + main topic from the analyzed text
+        text_for_ner = g(result, "extracted_text", default="") or g(result, "input_content", default="")
+        entities = await _extract_entities(text_for_ner)
+
         sb.table("scans").insert({
             "user_email": email,
             "mode": mode,
@@ -256,7 +306,7 @@ def _persist_scan(email: str, mode: str, result) -> None:
             "clarity": clarity,
             "techniques": techniques,
             "toxicity": toxicity,
-            "entities": [],
+            "entities": entities,
         }).execute()
         logger.info(f"[persist] ✓ saved scan for {email}")
     except Exception as e:
@@ -285,7 +335,7 @@ async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias
             image=request.image,
         )
         try:
-            _persist_scan(x_user_email or "", request.mode.value, result)
+            await _persist_scan(x_user_email or "", request.mode.value, result)
         except Exception:
             pass
         return result
