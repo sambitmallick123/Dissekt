@@ -91,20 +91,12 @@ export function getResetTime(): string {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export async function fetchLiveLimits(): Promise<{ brief: number; detailed: number; tier: Tier } | null> {
+  // Member limits come from tier defaults (LIMITS). Admin per-user overrides
+  // are applied server-side via user_metadata; the client uses defaults.
+  // (Previously called /api/user/access which no longer exists.)
   if (typeof window === 'undefined') return null;
   await refreshAuth();
-  const email = _userEmail;
-  if (!email) return null;  // not logged in → use free defaults
-  try {
-    const res = await fetch(`${API_URL}/api/user/access?email=${encodeURIComponent(email)}`);
-    if (!res.ok) return null;
-    const d = await res.json();
-    localStorage.setItem('dissekt_live_brief', String(d.brief_limit));
-    localStorage.setItem('dissekt_live_detailed', String(d.detailed_limit));
-    return { brief: d.brief_limit, detailed: d.detailed_limit, tier: 'member' };
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 // Effective limit: admin override (cached from server) or tier default

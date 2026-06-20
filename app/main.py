@@ -318,7 +318,8 @@ async def scope_feed(market: str = "global", limit: int = 25, refresh: bool = Fa
     # Check Redis cache (unless force refresh)
     if not refresh:
         try:
-            from app.cache import redis_client
+            from app.cache import _get_redis
+            redis_client = await _get_redis()
             if redis_client:
                 cached = await redis_client.get(cache_key)
                 if cached:
@@ -339,7 +340,8 @@ async def scope_feed(market: str = "global", limit: int = 25, refresh: bool = Fa
 
     # Store in Redis with 6-hour TTL
     try:
-        from app.cache import redis_client
+        from app.cache import _get_redis
+        redis_client = await _get_redis()
         if redis_client and items:  # never cache an empty result
             cache_data = json.dumps({"items": items, "timestamp": now})
             await redis_client.set(cache_key, cache_data, ex=SCOPE_TTL)
