@@ -224,7 +224,8 @@ def _persist_scan(email: str, mode: str, result) -> None:
         return  # free/anonymous -> not stored (member-only)
     try:
         from supabase import create_client
-        sb = create_client(settings.supabase_url, settings.supabase_service_key)
+        _settings = get_settings()
+        sb = create_client(_settings.supabase_url, _settings.supabase_service_key)
         def g(obj, *path, default=None):
             cur = obj
             for p in path:
