@@ -12,7 +12,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 14px', background: '#f0fdfa', borderRadius: 20, fontSize: 11, color: '#0d9488', fontWeight: 500, marginBottom: 16 }}>
             <span style={{ width: 6, height: 6, borderRadius: 3, background: '#0d9488' }} />
-            Beta · Free to use · No signup required
+            Beta · Free to use
           </div>
           <h1 style={{ fontSize: 40, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.15, margin: '0 0 14px' }}>See how information<br />is constructed</h1>
           <p style={{ fontSize: 16, color: '#888', lineHeight: 1.7, margin: '0 0 28px', maxWidth: 540, marginLeft: 'auto', marginRight: 'auto' }}>
@@ -214,7 +214,7 @@ export default function LandingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
             <div style={{ padding: 20, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 600 }}>🆓 Free</div>
-              <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>No signup</div>
+              <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>Start instantly</div>
               <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>3 brief / day<br />1 detailed / day<br />Help + Feedback</div>
               <a href="/analyze" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#f0f0ee', color: '#555', borderRadius: 6, fontSize: 13, textDecoration: 'none' }}>Start scanning</a>
             </div>
@@ -233,10 +233,10 @@ export default function LandingPage() {
       <section style={{ padding: '56px 24px', textAlign: 'center', background: '#fff', borderTop: '0.5px solid #e5eaea' }}>
         <div style={{ maxWidth: 520, margin: '0 auto' }}>
           <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 10px' }}>Ready to see clearly?</h2>
-          <p style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>Paste any article, claim, or URL. Free, no signup.</p>
+          <p style={{ fontSize: 14, color: '#888', marginBottom: 20 }}>Paste any article, claim, or URL.</p>
           <a href="/analyze" style={{ display: 'inline-block', padding: '14px 36px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 16, fontWeight: 600, textDecoration: 'none' }}>Analyze something now</a>
           <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center', gap: 16, fontSize: 11, color: '#888' }}>
-            <span>✓ Free</span><span>✓ No signup</span><span>✓ Research-backed</span>
+            <span>✓ Free to start</span><span>✓ Research-backed</span>
           </div>
         </div>
       </section>

@@ -9,7 +9,7 @@ import LoadingState from '@/components/LoadingState';
 import { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
 import Scope from '@/components/Scope';
-import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS, fetchLiveLimits, refreshAuth, isMember } from '@/lib/tier';
+import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS, fetchLiveLimits, refreshAuth, isMember, getUserEmail } from '@/lib/tier';
 import { fetchConfig } from '@/lib/config';
 import { FeatureLockedPopup, useFeatureGate } from '@/components/FeatureGate';
 
@@ -88,7 +88,7 @@ function ScanAppInner() {
     try {
       const res = await fetch(`${API_URL}/api/scan`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-User-Email': getUserEmail() || '' },
         body: JSON.stringify({ content, mode, image }),
       });
       if (!res.ok) {
