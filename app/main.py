@@ -290,7 +290,7 @@ async def _persist_scan(email: str, mode: str, result) -> None:
         scoring = g(result, "scoring", default={}) or {}
         clarity = None
         if isinstance(scoring, dict):
-            clarity = scoring.get("clarity", scoring.get("score"))
+            clarity = scoring.get("clarity_score", scoring.get("clarity", scoring.get("score")))
 
         toxicity = g(result, "signal", "toxicity_score", default=0.0)
         language = g(result, "detected_language", default="en")
