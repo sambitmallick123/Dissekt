@@ -218,7 +218,9 @@ async def health():
 
 def _persist_scan(email: str, mode: str, result) -> None:
     """Persist scan METADATA for members only (no raw text). Best-effort."""
+    logger.info(f"[persist] called with email={email!r} mode={mode}")
     if not email:
+        logger.info("[persist] SKIPPED — no email (free/anonymous)")
         return  # free/anonymous -> not stored (member-only)
     try:
         from supabase import create_client
@@ -255,8 +257,9 @@ def _persist_scan(email: str, mode: str, result) -> None:
             "toxicity": toxicity,
             "entities": [],
         }).execute()
+        logger.info(f"[persist] ✓ saved scan for {email}")
     except Exception as e:
-        logger.warning(f"Scan persist failed (non-fatal): {e}")
+        logger.error(f"[persist] ✗ FAILED for {email}: {e}")
 
 @app.post("/api/scan", response_model=FullAnalysis)
 async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias="X-API-Key"), x_user_email: str = Header(None, alias="X-User-Email")):
