@@ -43,9 +43,6 @@ export default function Constellation() {
   const clusterRef = useRef<number>(-1);
   const [zoom, setZoom] = useState(1);
   const zoomRef = useRef(1);
-  const panRef = useRef({ x: 0, y: 0 });
-  const panningRef = useRef(false);
-  const panStartRef = useRef({ x: 0, y: 0 });
   useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   const rafRef = useRef<number>(0);
 
@@ -109,9 +106,9 @@ export default function Constellation() {
       if (canvas.width !== Math.round(W * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      // apply pan + zoom world transform
-      ctx.translate(panRef.current.x, panRef.current.y);
-      ctx.scale(zoomRef.current, zoomRef.current);
+      // center zoom: scale around canvas center
+      const z = zoomRef.current;
+      ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
       const ns = nodesRef.current, es = edgesRef.current;
       es.forEach(e => {
         const a = byId[e.source], b = byId[e.target]; if (!a || !b) return;
@@ -133,8 +130,15 @@ export default function Constellation() {
         // highlight ring for nodes in the selected cluster
         if (cl2 >= 0 && inCl) { ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = '#0d9488'; ctx.stroke(); }
         if (n === selRef.current) { ctx.globalAlpha = 1; ctx.lineWidth = 2.5; ctx.strokeStyle = '#2C2C2A'; ctx.stroke(); }
-        ctx.globalAlpha = (cl2 >= 0 && !inCl) ? 0.4 : 1; ctx.fillStyle = '#fff'; ctx.font = '500 10px sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n.name, n.x, n.y);
+        // label: readable size, halo for contrast, dim if outside selected cluster
+        ctx.globalAlpha = (cl2 >= 0 && !inCl) ? 0.35 : 1;
+        const fs = 11;
+        ctx.font = `600 ${fs}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.strokeText(n.name, n.x, n.y - radius(n) - 8);
+        ctx.fillStyle = '#2C2C2A';
+        ctx.fillText(n.name, n.x, n.y - radius(n) - 8);
         ctx.globalAlpha = 1;
       });
     };
@@ -150,23 +154,21 @@ export default function Constellation() {
     const cy = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
     // canvas-space point
     const px = (cx - r.left) * sx, py = (cy - r.top) * sy;
-    // convert to world space (undo pan + zoom)
+    // undo center zoom
     const z = zoomRef.current;
-    return { x: (px - panRef.current.x) / z, y: (py - panRef.current.y) / z, _screen: { x: px, y: py } } as any;
+    return { x: (px - W / 2) / z + W / 2, y: (py - H / 2) / z + H / 2 };
   };
   const hit = (p: { x: number; y: number }) => nodesRef.current.find(n => Math.hypot(n.x - p.x, n.y - p.y) <= radius(n) + 2) || null;
 
   const onDown = (e: React.MouseEvent) => {
-    const p: any = getPos(e); const n = hit(p);
+    const p = getPos(e); const n = hit(p);
     if (n) { dragRef.current = n; movedRef.current = false; offRef.current = { x: p.x - n.x, y: p.y - n.y }; }
-    else { panningRef.current = true; panStartRef.current = { x: p._screen.x - panRef.current.x, y: p._screen.y - panRef.current.y }; }
   };
   const onMove = (e: React.MouseEvent) => {
-    const p: any = getPos(e);
-    if (dragRef.current) { dragRef.current.x = p.x - offRef.current.x; dragRef.current.y = p.y - offRef.current.y; dragRef.current.vx = 0; dragRef.current.vy = 0; movedRef.current = true; }
-    else if (panningRef.current) { panRef.current = { x: p._screen.x - panStartRef.current.x, y: p._screen.y - panStartRef.current.y }; }
+    if (!dragRef.current) return;
+    const p = getPos(e); dragRef.current.x = p.x - offRef.current.x; dragRef.current.y = p.y - offRef.current.y; dragRef.current.vx = 0; dragRef.current.vy = 0; movedRef.current = true;
   };
-  const onUp = () => { if (dragRef.current && !movedRef.current) setSelected(dragRef.current); dragRef.current = null; panningRef.current = false; };
+  const onUp = () => { if (dragRef.current && !movedRef.current) setSelected(dragRef.current); dragRef.current = null; };
 
   if (state === 'loading') return <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Loading your Constellation…</div>;
   if (state === 'error') return <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Couldn't load the Constellation. Try again later.</div>;
@@ -234,12 +236,12 @@ export default function Constellation() {
 
   const zoomIn = () => setZoom(z => Math.min(z * 1.25, 4));
   const zoomOut = () => setZoom(z => Math.max(z / 1.25, 0.5));
-  const zoomReset = () => { setZoom(1); panRef.current = { x: 0, y: 0 }; };
+  const zoomReset = () => setZoom(1);
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 12, color: '#888', marginRight: 'auto' }}>Drag nodes · drag empty space to pan · click a node for details</span>
+        <span style={{ fontSize: 12, color: '#888', marginRight: 'auto' }}>Drag nodes · zoom with +/− · click a node for details</span>
         <div style={{ display: 'flex', gap: 3, marginRight: 6 }}>
           <button onClick={zoomOut} title="Zoom out" style={{ fontSize: 13, width: 26, height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555', lineHeight: 1 }}>−</button>
           <button onClick={zoomReset} title="Reset view" style={{ fontSize: 10, padding: '0 8px', height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>{Math.round(zoom * 100)}%</button>
