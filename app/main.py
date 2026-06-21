@@ -299,8 +299,10 @@ async def _persist_scan(email: str, mode: str, result) -> None:
         text_for_ner = g(result, "extracted_text", default="") or g(result, "input_content", default="")
         entities = await _extract_entities(text_for_ner)
 
+        analysis_id = g(result, "id", default="") or ""
         sb.table("scans").insert({
             "user_email": email,
+            "analysis_id": analysis_id,
             "mode": mode,
             "language": language,
             "clarity": clarity,
