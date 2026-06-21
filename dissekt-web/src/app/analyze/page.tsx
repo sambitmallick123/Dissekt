@@ -8,6 +8,7 @@ import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
 import { addToHistory } from '@/components/ScanHistory';
 import BulkAnalysis from '@/components/BulkAnalysis';
+import KeywordAnalysis from '@/components/KeywordAnalysis';
 import Scope from '@/components/Scope';
 import { getTier, getUsage, incrementUsage, canScan, getRemaining, getResetTime, LIMITS, fetchLiveLimits, refreshAuth, isMember, getUserEmail } from '@/lib/tier';
 import { fetchConfig } from '@/lib/config';
@@ -20,7 +21,7 @@ function ScanAppInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [inputContent, setInputContent] = useState('');
-  const [scanTab, setScanTab] = useState<'single' | 'bulk'>('single');
+  const [scanTab, setScanTab] = useState<'single' | 'bulk' | 'keyword'>('single');
   const [remaining, setRemaining] = useState<{ brief: number; detailed: number; tier: 'free' | 'member' }>({ brief: 3, detailed: 1, tier: 'free' });
   const [resetIn, setResetIn] = useState('');
   const [shareToast, setShareToast] = useState('');
@@ -147,6 +148,10 @@ function ScanAppInner() {
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555', opacity: isInvited ? 1 : 0.6 }}>
                 📊 Bulk CSV {!isInvited && '🔒'}
               </button>
+              <button onClick={() => setScanTab('keyword')}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'keyword' ? '#0d9488' : '#f0f0ee', color: scanTab === 'keyword' ? '#fff' : '#555' }}>
+                🔍 Keyword topic
+              </button>
               <button onClick={() => { window.location.href = isInvited ? '/compare' : '/signup'; }}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: '#f0f0ee', color: '#555', display: 'flex', alignItems: 'center', gap: 4, opacity: isInvited ? 1 : 0.6 }}>
                 ⚖️ Compare {!isInvited && '🔒'}
@@ -163,6 +168,7 @@ function ScanAppInner() {
 
           {scanTab === 'single' && <ScanInput onScan={handleScan} loading={loading} initialContent={inputContent} />}
           {scanTab === 'bulk' && <BulkAnalysis />}
+          {scanTab === 'keyword' && <KeywordAnalysis />}
         </div>
       </div>
 
