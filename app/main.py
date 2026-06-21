@@ -350,7 +350,7 @@ async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias
 
 
 @app.get("/api/constellation")
-async def constellation(email: str, preview: bool = False):
+async def constellation(email: str, preview: bool = False, x_admin_key: str = Header(default="")):
     """Member knowledge graph. Nodes=entities, edges=co-occurrence + technique-similarity.
     Each node carries related scans (analysis_id -> /report/{id}). preview bypasses threshold."""
     from fastapi import HTTPException
@@ -365,7 +365,9 @@ async def constellation(email: str, preview: bool = False):
         ).eq("user_email", email).order("created_at", desc=True).limit(500).execute()
         scans = rows.data or []
         THRESHOLD = 10
-        if len(scans) < THRESHOLD and not preview:
+        _settings_admin = get_settings()
+        admin_preview = preview and x_admin_key and x_admin_key == getattr(_settings_admin, "dissekt_admin_key", None)
+        if len(scans) < THRESHOLD and not admin_preview:
             return {"ready": False, "count": len(scans), "needed": THRESHOLD, "nodes": [], "edges": []}
 
         import math
