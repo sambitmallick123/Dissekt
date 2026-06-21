@@ -123,12 +123,21 @@ export default function Constellation() {
       ns.forEach(n => {
         const cl2 = clusterRef.current;
         const inCl = (n as any).cluster === cl2;
-        const nDim = cl2 < 0 ? 1 : (inCl ? 1 : 0.12);
-        const r = radius(n); ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 7);
-        if (cl2 >= 0 && !inCl) { ctx.fillStyle = '#c8c8c4'; } else { ctx.fillStyle = nodeColor(n); }
-        ctx.globalAlpha = 0.92 * nDim; ctx.fill();
-        // highlight ring for nodes in the selected cluster
-        if (cl2 >= 0 && inCl) { ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = '#0d9488'; ctx.stroke(); }
+        const isFocus = cl2 >= 0 && inCl;     // a cluster is selected AND this node is in it
+        const isOther = cl2 >= 0 && !inCl;    // a cluster is selected and this node is NOT in it
+        // Focused nodes get a size boost; others shrink slightly and recede
+        const baseR = radius(n);
+        const r = isFocus ? baseR * 1.25 : baseR;
+        // Soft glow behind focused nodes so they clearly pop
+        if (isFocus) {
+          ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(n.x, n.y, r + 6, 0, 7);
+          ctx.fillStyle = 'rgba(13,148,136,0.18)'; ctx.fill();
+        }
+        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 7);
+        if (isOther) { ctx.fillStyle = '#d8d8d4'; } else { ctx.fillStyle = nodeColor(n); }
+        ctx.globalAlpha = isOther ? 0.28 : 0.95; ctx.fill();
+        // crisp white edge on focused nodes (separates them from the glow)
+        if (isFocus) { ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke(); }
         if (n === selRef.current) { ctx.globalAlpha = 1; ctx.lineWidth = 2.5; ctx.strokeStyle = '#2C2C2A'; ctx.stroke(); }
         // label: readable size, halo for contrast, dim if outside selected cluster
         ctx.globalAlpha = (cl2 >= 0 && !inCl) ? 0.35 : 1;
@@ -136,9 +145,10 @@ export default function Constellation() {
         ctx.font = `600 ${fs}px sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-        ctx.strokeText(n.name, n.x, n.y - radius(n) - 8);
+        const labelR = (cl2 >= 0 && (n as any).cluster === cl2) ? radius(n) * 1.25 : radius(n);
+        ctx.strokeText(n.name, n.x, n.y - labelR - 8);
         ctx.fillStyle = '#2C2C2A';
-        ctx.fillText(n.name, n.x, n.y - radius(n) - 8);
+        ctx.fillText(n.name, n.x, n.y - labelR - 8);
         ctx.globalAlpha = 1;
       });
     };
