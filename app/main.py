@@ -911,11 +911,77 @@ async def telegram_webhook(request: Request):
         await bot.send_message(chat_id=chat_id, text="Please send more text (at least 10 characters) or a URL to analyze.", parse_mode=ParseMode.HTML)
         return {"status": "ok"}
     
+    # ── Per-user daily rate limit (10/day) ──
+    user_id = update.message.from_user.id if update.message.from_user else chat_id
+    try:
+        from datetime import datetime, timezone
+        from app.cache import _get_redis
+        r = await _get_redis()
+        if r is not None:
+            day = datetime.now(timezone.utc).strftime("%Y%m%d")
+            rk = f"tg:rl:{user_id}:{day}"
+            used = await r.incr(rk)
+            if used == 1:
+                await r.expire(rk, 90000)  # ~25h, covers the day
+            if used > 10:
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text="🚦 You've reached today's limit of 10 analyses. It resets at 00:00 UTC.\n\nFor unlimited use, try the web app at dissekt.info",
+                    parse_mode=ParseMode.HTML,
+                )
+                return {"status": "ok"}
+    except Exception as e:
+        logger.warning(f"Telegram rate-limit check failed (allowing through): {e}")
+
+    # ── Per-user daily rate limit (10/day) ──
+    user_id = update.message.from_user.id if update.message.from_user else chat_id
+    try:
+        from datetime import datetime, timezone
+        from app.cache import _get_redis
+        r = await _get_redis()
+        if r is not None:
+            day = datetime.now(timezone.utc).strftime("%Y%m%d")
+            rk = f"tg:rl:{user_id}:{day}"
+            used = await r.incr(rk)
+            if used == 1:
+                await r.expire(rk, 90000)  # ~25h, covers the day
+            if used > 10:
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text="🚦 You've reached today's limit of 10 analyses. It resets at 00:00 UTC.\n\nFor unlimited use, try the web app at dissekt.info",
+                    parse_mode=ParseMode.HTML,
+                )
+                return {"status": "ok"}
+    except Exception as e:
+        logger.warning(f"Telegram rate-limit check failed (allowing through): {e}")
+
+    # ── Per-user daily rate limit (10/day) ──
+    user_id = update.message.from_user.id if update.message.from_user else chat_id
+    try:
+        from datetime import datetime, timezone
+        from app.cache import _get_redis
+        r = await _get_redis()
+        if r is not None:
+            day = datetime.now(timezone.utc).strftime("%Y%m%d")
+            rk = f"tg:rl:{user_id}:{day}"
+            used = await r.incr(rk)
+            if used == 1:
+                await r.expire(rk, 90000)  # ~25h, covers the day
+            if used > 10:
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text="🚦 You've reached today's limit of 10 analyses. It resets at 00:00 UTC.\n\nFor unlimited use, try the web app at dissekt.info",
+                    parse_mode=ParseMode.HTML,
+                )
+                return {"status": "ok"}
+    except Exception as e:
+        logger.warning(f"Telegram rate-limit check failed (allowing through): {e}")
+
     # Send "analyzing" message
     await bot.send_message(chat_id=chat_id, text="🔍 Analyzing... This takes 3-10 seconds.", parse_mode=ParseMode.HTML)
     
     try:
-        result = await scan(content=text, mode="brief", image=request.image)
+        result = await scan(content=text, mode="brief", image=None)
         result_dict = result.model_dump(mode="json")
         
         # Save report to Supabase so the link works
