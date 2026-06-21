@@ -25,6 +25,12 @@ export default function Constellation() {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selected, setSelected] = useState<Node | null>(null);
   const [colorMode, setColorMode] = useState<'tox' | 'type'>('tox');
+  // Report state
+  const [nClusters, setNClusters] = useState(0);
+  const [reportCluster, setReportCluster] = useState(0);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [report, setReport] = useState<any>(null);
+  const [reportErr, setReportErr] = useState('');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodesRef = useRef<Node[]>([]);
@@ -54,7 +60,9 @@ export default function Constellation() {
           ...n, x: W2 / 2 + (Math.random() - 0.5) * 200, y: H2 / 2 + (Math.random() - 0.5) * 200, vx: 0, vy: 0,
         }));
         nodesRef.current = ns; edgesRef.current = d.edges || [];
-        setNodes(ns); setEdges(d.edges || []); setState('ready');
+        setNodes(ns); setEdges(d.edges || []);
+        setNClusters(d.n_clusters || (ns.length ? Math.max(...ns.map((n: any) => n.cluster ?? 0)) + 1 : 0));
+        setState('ready');
       })
       .catch(() => setState('error'));
   }, []);
@@ -143,6 +151,50 @@ export default function Constellation() {
     );
   }
 
+  const generateReport = async () => {
+    setReportLoading(true); setReportErr(''); setReport(null);
+    try {
+      const email = getUserEmail();
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/api/constellation/report?email=${encodeURIComponent(email || '')}&cluster=${reportCluster}`);
+      if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || 'Report failed'); }
+      setReport(await res.json());
+    } catch (err: any) { setReportErr(err.message || 'Something went wrong'); }
+    finally { setReportLoading(false); }
+  };
+
+  const reportPlainText = () => {
+    if (!report) return '';
+    let t = `Constellation Report — Cluster ${report.cluster}\n\n${report.report}\n\n`;
+    if (report.references?.length) {
+      t += 'References:\n';
+      report.references.forEach((r: any, i: number) => {
+        const d = r.created_at ? new Date(r.created_at).toLocaleDateString() : '';
+        t += `[${i + 1}] ${d} · ${(r.top_technique || 'analysis').replace(/_/g, ' ')} · clarity ${r.clarity != null ? r.clarity.toFixed(2) : '—'} · /report/${r.analysis_id}\n`;
+      });
+    }
+    return t;
+  };
+
+  const copyReport = () => navigator.clipboard?.writeText(reportPlainText());
+  const downloadTxt = () => {
+    const blob = new Blob([reportPlainText()], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `constellation-report-cluster-${report.cluster}.txt`; a.click();
+    URL.revokeObjectURL(url);
+  };
+  const printReport = () => {
+    const w = window.open('', '_blank');
+    if (!w) return;
+    const refs = (report.references || []).map((r: any, i: number) => {
+      const d = r.created_at ? new Date(r.created_at).toLocaleDateString() : '';
+      return `<li>${d} · ${(r.top_technique || 'analysis').replace(/_/g, ' ')} · clarity ${r.clarity != null ? r.clarity.toFixed(2) : '—'} · <a href="${location.origin}/report/${r.analysis_id}">/report/${r.analysis_id}</a></li>`;
+    }).join('');
+    w.document.write(`<html><head><title>Constellation Report</title><style>body{font-family:Georgia,serif;max-width:680px;margin:40px auto;padding:0 20px;line-height:1.6;color:#222}h1{font-size:20px}p{white-space:pre-wrap}ul{font-size:13px;color:#444}</style></head><body><h1>Constellation Report — Cluster ${report.cluster}</h1><p>${report.report.replace(/\n/g, '<br>')}</p><h3>References</h3><ul>${refs}</ul></body></html>`);
+    w.document.close(); w.focus(); w.print();
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -219,6 +271,54 @@ export default function Constellation() {
           ? 'Color = manipulation level · size = how often analyzed · solid line = appeared together · dashed purple = manipulated the same way'
           : 'Color = entity type (person/org/place/theme/topic) · size = how often analyzed · dashed purple = manipulated the same way'}
       </div>
+
+      {/* CLUSTER REPORT */}
+      {nClusters > 0 && (
+        <div style={{ marginTop: 16, borderTop: '1px solid #ececec', paddingTop: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Cluster report</div>
+          <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>Generate an analysis of how the topics in a cluster are covered, based on your scans.</div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
+            <select value={reportCluster} onChange={e => setReportCluster(Number(e.target.value))}
+              style={{ padding: '8px 12px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, background: '#fff' }}>
+              {Array.from({ length: nClusters }, (_, i) => {
+                const cnt = nodes.filter(n => (n as any).cluster === i).length;
+                return <option key={i} value={i}>Cluster {i} ({cnt} {cnt === 1 ? 'entity' : 'entities'})</option>;
+              })}
+            </select>
+            <button onClick={generateReport} disabled={reportLoading}
+              style={{ padding: '8px 18px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              {reportLoading ? 'Generating…' : 'Generate report'}
+            </button>
+          </div>
+
+          {reportErr && <div style={{ fontSize: 12, color: '#b91c1c', marginBottom: 10 }}>{reportErr}</div>}
+
+          {report && (
+            <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, marginRight: 'auto' }}>Cluster {report.cluster} report</span>
+                <button onClick={printReport} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>Print</button>
+                <button onClick={copyReport} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>Copy</button>
+                <button onClick={downloadTxt} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>.txt</button>
+                <button onClick={printReport} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>.pdf</button>
+              </div>
+              <div style={{ fontFamily: 'Charter, Georgia, serif', fontSize: 14, lineHeight: 1.65, color: '#222', whiteSpace: 'pre-wrap' }}>{report.report}</div>
+              {report.references?.length > 0 && (
+                <div style={{ marginTop: 14, borderTop: '1px solid #f0f0ee', paddingTop: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>References ({report.references.length})</div>
+                  {report.references.map((r: any, i: number) => (
+                    <a key={i} href={`/report/${r.analysis_id}`} style={{ display: 'block', marginBottom: 6, textDecoration: 'none' }}>
+                      <span style={{ fontSize: 11, color: '#404040' }}>
+                        [{i + 1}] {r.created_at ? new Date(r.created_at).toLocaleDateString() : ''} · {(r.top_technique || 'analysis').replace(/_/g, ' ')} · clarity {r.clarity != null ? r.clarity.toFixed(2) : '—'} <span style={{ color: '#0d9488' }}>→</span>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
