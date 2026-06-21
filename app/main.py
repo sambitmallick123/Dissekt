@@ -11,6 +11,8 @@ Endpoints:
 
 import logging
 import time
+import asyncio
+from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -465,6 +467,181 @@ async def constellation(email: str, preview: bool = False, x_admin_key: str = He
         logger.error(f"[constellation] failed: {e}")
         from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=f"Constellation failed: {e}")
+
+class KeywordRecommendRequest(BaseModel):
+    keyword: str
+
+class KeywordAnalyzeRequest(BaseModel):
+    keywords: list[str]
+    mode: str = "brief"
+
+
+@app.post("/api/keyword/recommend")
+async def keyword_recommend(request: KeywordRecommendRequest):
+    """Suggest related keywords to refine a topic search (gpt-4o-mini)."""
+    kw = (request.keyword or "").strip()
+    if not kw:
+        return {"suggestions": []}
+    try:
+        import openai, json as _json
+        _s = get_settings()
+        client = openai.AsyncOpenAI(api_key=_s.openai_api_key)
+        prompt = (
+            "Suggest 6 related search keywords/phrases for investigating media coverage "
+            "of this topic. Mix angles: subtopics, key figures, opposing framings. "
+            "Return ONLY a JSON array of short strings (1-3 words each). No commentary.\n\n"
+            "Topic: " + kw
+        )
+        resp = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5, max_tokens=150,
+        )
+        raw = resp.choices[0].message.content.strip()
+        if raw.startswith("```"):
+            raw = raw.split("```")[1].replace("json", "", 1).strip()
+        s, e = raw.find("["), raw.rfind("]")
+        if s != -1 and e != -1:
+            raw = raw[s:e+1]
+        out = _json.loads(raw)
+        seen, sug = set(), []
+        for x in out:
+            x = str(x).strip()
+            if x and x.lower() != kw.lower() and x.lower() not in seen:
+                seen.add(x.lower()); sug.append(x)
+        return {"suggestions": sug[:6]}
+    except Exception as e:
+        logger.warning(f"[keyword] recommend failed: {e}")
+        return {"suggestions": []}
+
+
+async def _serpapi_broad(query: str, api_key: str, num: int = 10) -> list:
+    """Broad (non-exact) news-style search for keyword topics."""
+    import httpx
+    url = "https://serpapi.com/search"
+    params = {"api_key": api_key, "q": query[:120], "num": num, "sort": "date"}
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(url, params=params)
+            resp.raise_for_status()
+            data = resp.json()
+        out = []
+        for item in data.get("organic_results", []):
+            link = item.get("link", "")
+            if link:
+                out.append({"url": link, "title": item.get("title", ""),
+                            "date": item.get("date", ""), "source": item.get("source", "")})
+        return out
+    except Exception as e:
+        logger.error(f"[keyword] serpapi broad failed: {e}")
+        return []
+
+
+@app.post("/api/keyword/analyze")
+async def keyword_analyze(request: KeywordAnalyzeRequest,
+                          x_user_email: str = Header(None, alias="X-User-Email")):
+    """Fetch recent coverage on the keywords, analyze each article, aggregate a topic report."""
+    from fastapi import HTTPException
+    kws = [k.strip() for k in (request.keywords or []) if k.strip()]
+    if not kws:
+        raise HTTPException(status_code=400, detail="keywords required")
+    mode = "detailed" if request.mode == "detailed" else "brief"
+
+    # Article count by tier + mode
+    is_member = bool(x_user_email)  # logged-in == member (free users have no email header on this call? keep simple)
+    if mode == "detailed":
+        n_articles = 5 if is_member else 3
+    else:
+        n_articles = 8 if is_member else 5
+
+    _s = get_settings()
+    query = " ".join(kws)
+
+    # Cache (Redis) on keywords+mode
+    cache_key = f"kwa:{mode}:{'|'.join(sorted(k.lower() for k in kws))}"
+    try:
+        from app.cache import _get_redis
+        rc = await _get_redis()
+        if rc:
+            import json as _json
+            hit = await rc.get(cache_key)
+            if hit:
+                d = _json.loads(hit)
+                d["cached"] = True
+                return d
+    except Exception:
+        rc = None
+
+    if not _s.serpapi_key:
+        raise HTTPException(status_code=503, detail="search not configured")
+    results = await _serpapi_broad(query, _s.serpapi_key, num=n_articles * 2)
+    # Dedup by domain, take first n
+    seen_dom, chosen = set(), []
+    import urllib.parse as _up
+    for r in results:
+        dom = _up.urlparse(r["url"]).netloc.replace("www.", "")
+        if dom and dom not in seen_dom:
+            seen_dom.add(dom); chosen.append(r)
+        if len(chosen) >= n_articles:
+            break
+
+    if not chosen:
+        return {"topic": query, "keywords": kws, "mode": mode, "articles": [],
+                "summary": {"count": 0}, "message": "No recent coverage found for these keywords."}
+
+    # Analyze each article in parallel by passing the URL straight to scan()
+    from app.beacon import scan as _scan
+    async def _analyze_one(item):
+        try:
+            res = await _scan(item["url"], mode)
+            rd = res.model_dump(mode="json") if hasattr(res, "model_dump") else res
+            scoring = rd.get("scoring") or {}
+            clarity = scoring.get("clarity_score")
+            techs = [(t.get("name") if isinstance(t, dict) else t)
+                     for t in ((rd.get("prism") or {}).get("techniques") or [])]
+            tox = ((rd.get("signal") or {}).get("toxicity_score")) or 0.0
+            return {"url": item["url"], "title": item.get("title", ""),
+                    "source": item.get("source", "") or _up.urlparse(item["url"]).netloc.replace("www.", ""),
+                    "analysis_id": rd.get("id", ""), "clarity": clarity,
+                    "toxicity": round(tox, 3), "techniques": techs, "ok": True}
+        except Exception as e:
+            logger.warning(f"[keyword] article failed {item.get('url')}: {e}")
+            return {"url": item["url"], "title": item.get("title", ""), "ok": False, "error": str(e)[:120]}
+
+    analyzed = await asyncio.gather(*[_analyze_one(it) for it in chosen])
+    good = [a for a in analyzed if a.get("ok")]
+
+    # Aggregate
+    from collections import Counter
+    clar_vals = [a["clarity"] for a in good if a.get("clarity") is not None]
+    tox_vals = [a["toxicity"] for a in good if a.get("toxicity") is not None]
+    tech_counter = Counter()
+    for a in good:
+        for t in a.get("techniques", []):
+            if t:
+                tech_counter[t] += 1
+    avg_clar = round(sum(clar_vals)/len(clar_vals), 3) if clar_vals else None
+    avg_tox = round(sum(tox_vals)/len(tox_vals), 3) if tox_vals else None
+    dom_tech = [{"name": n, "count": ct} for n, ct in tech_counter.most_common(6)]
+
+    out = {
+        "topic": query, "keywords": kws, "mode": mode,
+        "summary": {"count": len(good), "attempted": len(chosen),
+                    "avg_clarity": avg_clar, "avg_toxicity": avg_tox,
+                    "dominant_techniques": dom_tech},
+        "articles": good, "cached": False,
+    }
+
+    # Cache 30 min
+    try:
+        if rc:
+            import json as _json
+            await rc.set(cache_key, _json.dumps(out), ex=1800)
+    except Exception:
+        pass
+
+    return out
+
 
 @app.get("/api/techniques")
 async def list_techniques():
