@@ -4,6 +4,7 @@ import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { useState, useEffect } from 'react';
 import { refreshAuth, isMember } from '@/lib/tier';
+import Constellation from '@/components/Constellation';
 
 export default function TopicsPage() {
   const [query, setQuery] = useState('');
@@ -11,6 +12,7 @@ export default function TopicsPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [member, setMember] = useState(false);
+  const [tab, setTab] = useState<'topics' | 'constellation'>('topics');
 
   useEffect(() => {
     refreshAuth().then(() => { setMember(isMember()); setMounted(true); });
@@ -58,7 +60,18 @@ export default function TopicsPage() {
       <SiteHeader />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 16px' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>📈 Topic Tracking</h1>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20, borderBottom: '1px solid #ececec' }}>
+          <button onClick={() => setTab('topics')} style={{ padding: '8px 14px', fontSize: 14, fontWeight: tab === 'topics' ? 600 : 500, color: tab === 'topics' ? '#0d9488' : '#888', background: 'none', border: 'none', borderBottom: tab === 'topics' ? '2px solid #0d9488' : '2px solid transparent', cursor: 'pointer', marginBottom: -1 }}>📈 Topic Tracking</button>
+          <button onClick={() => setTab('constellation')} style={{ padding: '8px 14px', fontSize: 14, fontWeight: tab === 'constellation' ? 600 : 500, color: tab === 'constellation' ? '#0d9488' : '#888', background: 'none', border: 'none', borderBottom: tab === 'constellation' ? '2px solid #0d9488' : '2px solid transparent', cursor: 'pointer', marginBottom: -1 }}>✦ Constellation</button>
+        </div>
+
+        {tab === 'constellation' ? (
+          <>
+            <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>Your personal knowledge graph — the entities you analyze and how they connect by manipulation pattern.</p>
+            <Constellation />
+          </>
+        ) : (
+        <>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>See how a topic has been analyzed over time — techniques used, frequency, evolution.</p>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
@@ -143,6 +156,8 @@ export default function TopicsPage() {
               </div>
             )}
           </>
+        )}
+        </>
         )}
       </div>
     <SiteFooter />
