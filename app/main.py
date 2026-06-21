@@ -1594,8 +1594,25 @@ async def admin_delete_user(body: dict):
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="user_id required")
     try:
-        _admin_sb().auth.admin.delete_user(uid)
-        return {"success": True, "action": "deleted", "user_id": uid}
+        sb = _admin_sb()
+        # Look up the user's email first so we can purge their scan metadata
+        email = None
+        try:
+            u = sb.auth.admin.get_user_by_id(uid)
+            email = getattr(getattr(u, "user", None), "email", None) or (u.get("user", {}).get("email") if isinstance(u, dict) else None)
+        except Exception as e:
+            logger.warning(f"[delete] could not resolve email for {uid}: {e}")
+        # Delete their scan metadata (GDPR erasure) before removing the auth user
+        purged = 0
+        if email:
+            try:
+                res = sb.table("scans").delete().eq("user_email", email).execute()
+                purged = len(res.data) if getattr(res, "data", None) else 0
+                logger.info(f"[delete] purged {purged} scan rows for {email}")
+            except Exception as e:
+                logger.error(f"[delete] scan purge failed for {email}: {e}")
+        sb.auth.admin.delete_user(uid)
+        return {"success": True, "action": "deleted", "user_id": uid, "scans_purged": purged}
     except Exception as e:
         from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=f"Delete failed: {e}")
