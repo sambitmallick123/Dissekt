@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { getUserEmail } from '@/lib/tier';
+import { getUserEmail, canScan, incrementUsage, getTier, getResetTime, LIMITS } from '@/lib/tier';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -54,6 +54,14 @@ export default function KeywordAnalysis() {
 
   const analyze = async () => {
     if (chips.length === 0) { setError('Add at least one keyword.'); return; }
+    // Keyword analysis counts as one scan against the brief/detailed quota
+    if (!canScan(mode)) {
+      const tier = getTier();
+      setError(tier === 'free'
+        ? `Free tier limit reached for ${mode} scans (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT.`
+        : `Daily limit reached for ${mode} scans. Resets in ${getResetTime()} at 00:00 GMT.`);
+      return;
+    }
     setLoadingReport(true); setError(''); setReport(null);
     try {
       const res = await fetch(`${API_URL}/api/keyword/analyze`, {
@@ -62,7 +70,9 @@ export default function KeywordAnalysis() {
         body: JSON.stringify({ keywords: chips, mode }),
       });
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || 'Analysis failed'); }
-      setReport(await res.json());
+      const data = await res.json();
+      setReport(data);
+      incrementUsage(mode);  // count it only on success
     } catch (err: any) { setError(err.message || 'Something went wrong'); }
     finally { setLoadingReport(false); }
   };
