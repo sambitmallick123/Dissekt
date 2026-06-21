@@ -40,12 +40,14 @@ export default function Constellation() {
   const offRef = useRef({ x: 0, y: 0 });
   const selRef = useRef<Node | null>(null);
   const colorRef = useRef<'tox' | 'type'>('tox');
+  const clusterRef = useRef<number>(0);
   const rafRef = useRef<number>(0);
 
   const W = 600, H = 420;
 
   useEffect(() => { colorRef.current = colorMode; }, [colorMode]);
   useEffect(() => { selRef.current = selected; }, [selected]);
+  useEffect(() => { clusterRef.current = reportCluster; }, [reportCluster]);
 
   useEffect(() => {
     const email = getUserEmail();
@@ -100,17 +102,23 @@ export default function Constellation() {
       const ns = nodesRef.current, es = edgesRef.current;
       es.forEach(e => {
         const a = byId[e.source], b = byId[e.target]; if (!a || !b) return;
+        const cl = clusterRef.current;
+        const edgeIn = (a as any).cluster === cl && (b as any).cluster === cl;
+        const eDim = edgeIn ? 1 : 0.12;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-        if (e.type === 'tech') { ctx.strokeStyle = '#7F77DD'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.55; }
-        else { ctx.strokeStyle = '#888780'; ctx.setLineDash([]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.3; }
+        if (e.type === 'tech') { ctx.strokeStyle = '#7F77DD'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.55 * eDim; }
+        else { ctx.strokeStyle = '#888780'; ctx.setLineDash([]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.3 * eDim; }
         ctx.stroke(); ctx.globalAlpha = 1; ctx.setLineDash([]);
       });
       ns.forEach(n => {
+        const inCl = (n as any).cluster === clusterRef.current;
+        const nDim = inCl ? 1 : 0.18;
         const r = radius(n); ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 7);
-        ctx.fillStyle = nodeColor(n); ctx.globalAlpha = 0.92; ctx.fill();
+        ctx.fillStyle = nodeColor(n); ctx.globalAlpha = 0.92 * nDim; ctx.fill();
         if (n === selRef.current) { ctx.globalAlpha = 1; ctx.lineWidth = 2.5; ctx.strokeStyle = '#2C2C2A'; ctx.stroke(); }
-        ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.font = '500 10px sans-serif';
+        ctx.globalAlpha = nDim; ctx.fillStyle = '#fff'; ctx.font = '500 10px sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n.name, n.x, n.y);
+        ctx.globalAlpha = 1;
       });
     };
     const loop = () => { tick(); draw(); rafRef.current = requestAnimationFrame(loop); };
