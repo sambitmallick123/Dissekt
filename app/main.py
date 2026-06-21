@@ -519,7 +519,8 @@ async def _serpapi_broad(query: str, api_key: str, num: int = 10) -> list:
     """Broad (non-exact) news-style search for keyword topics."""
     import httpx
     url = "https://serpapi.com/search"
-    params = {"api_key": api_key, "q": query[:120], "num": num, "sort": "date"}
+    params = {"api_key": api_key, "q": query[:120], "num": num, "sort": "date",
+              "tbs": "qdr:m"}  # qdr:m = past month (keeps general web, adds recency)
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.get(url, params=params)
