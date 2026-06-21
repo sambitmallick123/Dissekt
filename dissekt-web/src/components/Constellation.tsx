@@ -41,6 +41,12 @@ export default function Constellation() {
   const selRef = useRef<Node | null>(null);
   const colorRef = useRef<'tox' | 'type'>('tox');
   const clusterRef = useRef<number>(-1);
+  const [zoom, setZoom] = useState(1);
+  const zoomRef = useRef(1);
+  const panRef = useRef({ x: 0, y: 0 });
+  const panningRef = useRef(false);
+  const panStartRef = useRef({ x: 0, y: 0 });
+  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
   const rafRef = useRef<number>(0);
 
   const W = 600, H = 420;
@@ -98,7 +104,14 @@ export default function Constellation() {
       });
     };
     const draw = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // ensure backing store matches DPR for crisp rendering
+      if (canvas.width !== Math.round(W * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
+      // apply pan + zoom world transform
+      ctx.translate(panRef.current.x, panRef.current.y);
+      ctx.scale(zoomRef.current, zoomRef.current);
       const ns = nodesRef.current, es = edgesRef.current;
       es.forEach(e => {
         const a = byId[e.source], b = byId[e.target]; if (!a || !b) return;
@@ -135,13 +148,25 @@ export default function Constellation() {
     const sx = W / r.width, sy = H / r.height;
     const cx = 'touches' in ev ? ev.touches[0].clientX : ev.clientX;
     const cy = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
-    return { x: (cx - r.left) * sx, y: (cy - r.top) * sy };
+    // canvas-space point
+    const px = (cx - r.left) * sx, py = (cy - r.top) * sy;
+    // convert to world space (undo pan + zoom)
+    const z = zoomRef.current;
+    return { x: (px - panRef.current.x) / z, y: (py - panRef.current.y) / z, _screen: { x: px, y: py } } as any;
   };
   const hit = (p: { x: number; y: number }) => nodesRef.current.find(n => Math.hypot(n.x - p.x, n.y - p.y) <= radius(n) + 2) || null;
 
-  const onDown = (e: React.MouseEvent) => { const p = getPos(e); const n = hit(p); if (n) { dragRef.current = n; movedRef.current = false; offRef.current = { x: p.x - n.x, y: p.y - n.y }; } };
-  const onMove = (e: React.MouseEvent) => { if (!dragRef.current) return; const p = getPos(e); dragRef.current.x = p.x - offRef.current.x; dragRef.current.y = p.y - offRef.current.y; dragRef.current.vx = 0; dragRef.current.vy = 0; movedRef.current = true; };
-  const onUp = () => { if (dragRef.current && !movedRef.current) setSelected(dragRef.current); dragRef.current = null; };
+  const onDown = (e: React.MouseEvent) => {
+    const p: any = getPos(e); const n = hit(p);
+    if (n) { dragRef.current = n; movedRef.current = false; offRef.current = { x: p.x - n.x, y: p.y - n.y }; }
+    else { panningRef.current = true; panStartRef.current = { x: p._screen.x - panRef.current.x, y: p._screen.y - panRef.current.y }; }
+  };
+  const onMove = (e: React.MouseEvent) => {
+    const p: any = getPos(e);
+    if (dragRef.current) { dragRef.current.x = p.x - offRef.current.x; dragRef.current.y = p.y - offRef.current.y; dragRef.current.vx = 0; dragRef.current.vy = 0; movedRef.current = true; }
+    else if (panningRef.current) { panRef.current = { x: p._screen.x - panStartRef.current.x, y: p._screen.y - panStartRef.current.y }; }
+  };
+  const onUp = () => { if (dragRef.current && !movedRef.current) setSelected(dragRef.current); dragRef.current = null; panningRef.current = false; };
 
   if (state === 'loading') return <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Loading your Constellation…</div>;
   if (state === 'error') return <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Couldn't load the Constellation. Try again later.</div>;
@@ -207,10 +232,19 @@ export default function Constellation() {
     w.document.close(); w.focus(); w.print();
   };
 
+  const zoomIn = () => setZoom(z => Math.min(z * 1.25, 4));
+  const zoomOut = () => setZoom(z => Math.max(z / 1.25, 0.5));
+  const zoomReset = () => { setZoom(1); panRef.current = { x: 0, y: 0 }; };
+
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 12, color: '#888', marginRight: 'auto' }}>Drag to rearrange · click a node for details</span>
+        <span style={{ fontSize: 12, color: '#888', marginRight: 'auto' }}>Drag nodes · drag empty space to pan · click a node for details</span>
+        <div style={{ display: 'flex', gap: 3, marginRight: 6 }}>
+          <button onClick={zoomOut} title="Zoom out" style={{ fontSize: 13, width: 26, height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555', lineHeight: 1 }}>−</button>
+          <button onClick={zoomReset} title="Reset view" style={{ fontSize: 10, padding: '0 8px', height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>{Math.round(zoom * 100)}%</button>
+          <button onClick={zoomIn} title="Zoom in" style={{ fontSize: 13, width: 26, height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555', lineHeight: 1 }}>+</button>
+        </div>
         <button onClick={() => setColorMode(m => m === 'tox' ? 'type' : 'tox')}
           style={{ fontSize: 11, padding: '5px 12px', border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>
           Color: {colorMode === 'tox' ? 'manipulation' : 'entity type'}
