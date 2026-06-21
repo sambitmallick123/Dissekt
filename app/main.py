@@ -459,7 +459,31 @@ async def constellation(email: str, preview: bool = False, x_admin_key: str = He
         for (a, b, sim) in tech_edges:
             edges.append({"source": a, "target": b, "type": "tech", "weight": sim})
 
-        return {"ready": True, "count": len(scans), "nodes": nodes, "edges": edges,
+
+        # Connected-component clustering: nodes linked by any edge form a cluster
+        adj = defaultdict(set)
+        node_ids = {n['id'] for n in nodes}
+        for e in edges:
+            if e['source'] in node_ids and e['target'] in node_ids:
+                adj[e['source']].add(e['target'])
+                adj[e['target']].add(e['source'])
+        cluster_of = {}
+        cid = 0
+        for nid in node_ids:
+            if nid in cluster_of:
+                continue
+            stack = [nid]; cluster_of[nid] = cid
+            while stack:
+                cur = stack.pop()
+                for nb in adj.get(cur, ()):
+                    if nb not in cluster_of:
+                        cluster_of[nb] = cid; stack.append(nb)
+            cid += 1
+        for n in nodes:
+            n['cluster'] = cluster_of.get(n['id'], -1)
+        n_clusters = cid
+
+        return {"ready": True, "count": len(scans), "nodes": nodes, "edges": edges, "n_clusters": n_clusters,
                 "stats": {"nodes": len(nodes), "co_edges": len(co), "tech_edges": len(tech_edges)}}
     except HTTPException:
         raise
