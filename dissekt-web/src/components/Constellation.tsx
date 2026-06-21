@@ -27,7 +27,7 @@ export default function Constellation() {
   const [colorMode, setColorMode] = useState<'tox' | 'type'>('tox');
   // Report state
   const [nClusters, setNClusters] = useState(0);
-  const [reportCluster, setReportCluster] = useState(0);
+  const [reportCluster, setReportCluster] = useState(-1);
   const [reportLoading, setReportLoading] = useState(false);
   const [report, setReport] = useState<any>(null);
   const [reportErr, setReportErr] = useState('');
@@ -40,7 +40,7 @@ export default function Constellation() {
   const offRef = useRef({ x: 0, y: 0 });
   const selRef = useRef<Node | null>(null);
   const colorRef = useRef<'tox' | 'type'>('tox');
-  const clusterRef = useRef<number>(0);
+  const clusterRef = useRef<number>(-1);
   const rafRef = useRef<number>(0);
 
   const W = 600, H = 420;
@@ -104,19 +104,23 @@ export default function Constellation() {
         const a = byId[e.source], b = byId[e.target]; if (!a || !b) return;
         const cl = clusterRef.current;
         const edgeIn = (a as any).cluster === cl && (b as any).cluster === cl;
-        const eDim = edgeIn ? 1 : 0.12;
+        const eDim = cl < 0 ? 1 : (edgeIn ? 1 : 0.08);
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
         if (e.type === 'tech') { ctx.strokeStyle = '#7F77DD'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.55 * eDim; }
         else { ctx.strokeStyle = '#888780'; ctx.setLineDash([]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.3 * eDim; }
         ctx.stroke(); ctx.globalAlpha = 1; ctx.setLineDash([]);
       });
       ns.forEach(n => {
-        const inCl = (n as any).cluster === clusterRef.current;
-        const nDim = inCl ? 1 : 0.18;
+        const cl2 = clusterRef.current;
+        const inCl = (n as any).cluster === cl2;
+        const nDim = cl2 < 0 ? 1 : (inCl ? 1 : 0.12);
         const r = radius(n); ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 7);
-        ctx.fillStyle = nodeColor(n); ctx.globalAlpha = 0.92 * nDim; ctx.fill();
+        if (cl2 >= 0 && !inCl) { ctx.fillStyle = '#c8c8c4'; } else { ctx.fillStyle = nodeColor(n); }
+        ctx.globalAlpha = 0.92 * nDim; ctx.fill();
+        // highlight ring for nodes in the selected cluster
+        if (cl2 >= 0 && inCl) { ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = '#0d9488'; ctx.stroke(); }
         if (n === selRef.current) { ctx.globalAlpha = 1; ctx.lineWidth = 2.5; ctx.strokeStyle = '#2C2C2A'; ctx.stroke(); }
-        ctx.globalAlpha = nDim; ctx.fillStyle = '#fff'; ctx.font = '500 10px sans-serif';
+        ctx.globalAlpha = (cl2 >= 0 && !inCl) ? 0.4 : 1; ctx.fillStyle = '#fff'; ctx.font = '500 10px sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n.name, n.x, n.y);
         ctx.globalAlpha = 1;
       });
@@ -288,15 +292,21 @@ export default function Constellation() {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
             <select value={reportCluster} onChange={e => setReportCluster(Number(e.target.value))}
               style={{ padding: '8px 12px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, background: '#fff' }}>
+              <option value={-1}>Select a cluster to highlight…</option>
               {Array.from({ length: nClusters }, (_, i) => {
                 const cnt = nodes.filter(n => (n as any).cluster === i).length;
                 return <option key={i} value={i}>Cluster {i} ({cnt} {cnt === 1 ? 'entity' : 'entities'})</option>;
               })}
             </select>
-            <button onClick={generateReport} disabled={reportLoading}
-              style={{ padding: '8px 18px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={generateReport} disabled={reportLoading || reportCluster < 0}
+              style={{ padding: '8px 18px', background: reportCluster < 0 ? '#b8b8b4' : '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: reportCluster < 0 ? 'default' : 'pointer' }}>
               {reportLoading ? 'Generating…' : 'Generate report'}
             </button>
+            {reportCluster >= 0 && (
+              <span style={{ fontSize: 12, color: '#0d9488', fontWeight: 600 }}>
+                ● Highlighting Cluster {reportCluster}
+              </span>
+            )}
           </div>
 
           {reportErr && <div style={{ fontSize: 12, color: '#b91c1c', marginBottom: 10 }}>{reportErr}</div>}
