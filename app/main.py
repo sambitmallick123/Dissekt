@@ -350,11 +350,9 @@ async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias
 
 
 @app.get("/api/constellation")
-async def constellation(email: str):
-    """Build the member's knowledge graph from their scan history.
-    Nodes = entities/topics. Edges = co-occurrence (same scan) + technique-similarity.
-    Returns {ready, count, nodes, edges} — ready=false if under 10 scans.
-    """
+async def constellation(email: str, preview: bool = False):
+    """Member knowledge graph. Nodes=entities, edges=co-occurrence + technique-similarity.
+    Each node carries related scans (analysis_id -> /report/{id}). preview bypasses threshold."""
     from fastapi import HTTPException
     if not email:
         raise HTTPException(status_code=400, detail="email required")
@@ -362,28 +360,28 @@ async def constellation(email: str):
         _settings = get_settings()
         from supabase import create_client
         sb = create_client(_settings.supabase_url, _settings.supabase_service_key)
-        rows = sb.table("scans").select("id, techniques, entities, toxicity, clarity, created_at") \
-            .eq("user_email", email).order("created_at", desc=True).limit(500).execute()
+        rows = sb.table("scans").select(
+            "id, analysis_id, techniques, entities, toxicity, clarity, created_at"
+        ).eq("user_email", email).order("created_at", desc=True).limit(500).execute()
         scans = rows.data or []
         THRESHOLD = 10
-        if len(scans) < THRESHOLD:
+        if len(scans) < THRESHOLD and not preview:
             return {"ready": False, "count": len(scans), "needed": THRESHOLD, "nodes": [], "edges": []}
 
         import math
-        from collections import defaultdict
+        from collections import defaultdict, Counter
+        STOP = {"ever", "dumbest", "president", "the", "a", "an", "this", "that",
+                "it", "is", "was", "they", "we", "you", "i"}
 
-        # ── Build nodes from entities ──
-        # node key = lowercased name; aggregate frequency, type, avg toxicity/clarity,
-        # and the set of techniques seen alongside it (for technique-similarity edges).
-        node_data = {}  # key -> {name, type, freq, tox_sum, clar_sum, clar_n, tech: Counter, scans: set}
-        STOP = {"ever", "dumbest", "president", "the", "a", "an", "this", "that", "it", "is", "was"}
-
+        node_data = {}
         for s in scans:
             ents = s.get("entities") or []
             techs = [t.get("name") for t in (s.get("techniques") or []) if t.get("name")]
+            top_tech = techs[0] if techs else None
             tox = s.get("toxicity") or 0.0
             clar = s.get("clarity")
-            sid = s.get("id")
+            aid = s.get("analysis_id") or ""
+            created = s.get("created_at", "")
             for e in ents:
                 name = (e.get("name") or "").strip()
                 if not name or name.lower() in STOP or len(name) < 2:
@@ -392,7 +390,7 @@ async def constellation(email: str):
                 if key not in node_data:
                     node_data[key] = {"name": name, "type": e.get("type", "topic"),
                                       "freq": 0, "tox_sum": 0.0, "clar_sum": 0.0, "clar_n": 0,
-                                      "tech": defaultdict(int), "scans": set()}
+                                      "tech": Counter(), "scans": []}
                 nd = node_data[key]
                 nd["freq"] += 1
                 nd["tox_sum"] += tox
@@ -400,92 +398,71 @@ async def constellation(email: str):
                     nd["clar_sum"] += clar; nd["clar_n"] += 1
                 for t in techs:
                     nd["tech"][t] += 1
-                nd["scans"].add(sid)
+                if aid:
+                    nd["scans"].append({"analysis_id": aid,
+                        "clarity": round(clar, 3) if clar is not None else None,
+                        "top_technique": top_tech, "toxicity": round(tox, 3),
+                        "created_at": created})
 
-        # Drop singletons only if we have plenty of nodes (keep graph populated)
-        nodes_list = list(node_data.items())
-        if len(nodes_list) > 40:
-            nodes_list = [(k, v) for k, v in nodes_list if v["freq"] >= 2]
+        items = list(node_data.items())
+        if len(items) > 40:
+            items = [(k, v) for k, v in items if v["freq"] >= 2]
 
-        # Final nodes
         nodes = []
-        keyidx = {}
-        for i, (key, nd) in enumerate(nodes_list):
-            keyidx[key] = key  # use key as id
+        for key, nd in items:
             avg_tox = nd["tox_sum"] / max(nd["freq"], 1)
             avg_clar = (nd["clar_sum"] / nd["clar_n"]) if nd["clar_n"] else None
-            nodes.append({
-                "id": key,
-                "name": nd["name"],
-                "type": nd["type"],
-                "freq": nd["freq"],
-                "toxicity": round(avg_tox, 3),
+            nodes.append({"id": key, "name": nd["name"], "type": nd["type"],
+                "freq": nd["freq"], "toxicity": round(avg_tox, 3),
                 "clarity": round(avg_clar, 3) if avg_clar is not None else None,
-            })
+                "top_techniques": [t for t, _ in nd["tech"].most_common(3)],
+                "scans": nd["scans"][:10]})
+        valid = {k for k, _ in items}
 
-        valid_keys = set(keyidx.keys())
-
-        # ── Co-occurrence edges: entities appearing in the same scan ──
-        co_counts = defaultdict(int)
-        scan_to_ents = defaultdict(list)
+        co = defaultdict(int)
         for s in scans:
-            sid = s.get("id")
-            for e in (s.get("entities") or []):
-                k = (e.get("name") or "").strip().lower()
-                if k in valid_keys:
-                    scan_to_ents[sid].append(k)
-        for sid, ks in scan_to_ents.items():
-            uniq = sorted(set(ks))
-            for i in range(len(uniq)):
-                for j in range(i+1, len(uniq)):
-                    co_counts[(uniq[i], uniq[j])] += 1
+            ks = sorted({(e.get("name") or "").strip().lower()
+                         for e in (s.get("entities") or [])
+                         if (e.get("name") or "").strip().lower() in valid})
+            for i in range(len(ks)):
+                for j in range(i+1, len(ks)):
+                    co[(ks[i], ks[j])] += 1
 
-        # ── Technique-similarity edges: nodes with similar technique fingerprints ──
-        # Build a technique vector per node, cosine similarity, connect if > threshold.
-        all_techs = sorted({t for _, nd in nodes_list for t in nd["tech"]})
-        tindex = {t: i for i, t in enumerate(all_techs)}
+        all_t = sorted({t for _, nd in items for t in nd["tech"]})
+        tix = {t: i for i, t in enumerate(all_t)}
         def vec(nd):
-            v = [0.0] * len(all_techs)
+            v = [0.0]*len(all_t)
             for t, ct in nd["tech"].items():
-                v[tindex[t]] = ct
+                v[tix[t]] = ct
             return v
-        def cosine(a, b):
-            dot = sum(x*y for x, y in zip(a, b))
+        def cosim(a, b):
+            d = sum(x*y for x, y in zip(a, b))
             na = math.sqrt(sum(x*x for x in a)); nb = math.sqrt(sum(y*y for y in b))
-            return dot / (na*nb) if na and nb else 0.0
-
-        node_vecs = {key: vec(nd) for key, nd in nodes_list}
+            return d/(na*nb) if na and nb else 0.0
+        vecs = {k: vec(nd) for k, nd in items}
         tech_edges = []
-        keys = list(node_vecs.keys())
-        SIM_THRESHOLD = 0.5
-        for i in range(len(keys)):
-            for j in range(i+1, len(keys)):
-                if not any(node_vecs[keys[i]]) or not any(node_vecs[keys[j]]):
-                    continue
-                sim = cosine(node_vecs[keys[i]], node_vecs[keys[j]])
-                if sim >= SIM_THRESHOLD:
-                    tech_edges.append((keys[i], keys[j], round(sim, 2)))
+        ks = list(vecs.keys())
+        for i in range(len(ks)):
+            for j in range(i+1, len(ks)):
+                if any(vecs[ks[i]]) and any(vecs[ks[j]]):
+                    sim = cosim(vecs[ks[i]], vecs[ks[j]])
+                    if sim >= 0.5:
+                        tech_edges.append((ks[i], ks[j], round(sim, 2)))
 
-        # ── Assemble edges (dedup; co-occurrence and technique can both exist) ──
         edges = []
-        for (a, b), ct in co_counts.items():
+        for (a, b), ct in co.items():
             edges.append({"source": a, "target": b, "type": "co", "weight": ct})
         for (a, b, sim) in tech_edges:
             edges.append({"source": a, "target": b, "type": "tech", "weight": sim})
 
-        return {
-            "ready": True,
-            "count": len(scans),
-            "nodes": nodes,
-            "edges": edges,
-            "stats": {"nodes": len(nodes), "co_edges": len(co_counts), "tech_edges": len(tech_edges)},
-        }
+        return {"ready": True, "count": len(scans), "nodes": nodes, "edges": edges,
+                "stats": {"nodes": len(nodes), "co_edges": len(co), "tech_edges": len(tech_edges)}}
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"[constellation] failed: {e}")
         from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"Constellation build failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Constellation failed: {e}")
 
 @app.get("/api/techniques")
 async def list_techniques():
