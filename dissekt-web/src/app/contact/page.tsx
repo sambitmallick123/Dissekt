@@ -3,80 +3,157 @@ import { useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 
-const SUBJECTS = [
+const COMPONENTS = [
+  { key: 'general', label: 'General feedback' },
+  { key: 'clarity_score', label: 'Clarity Score' },
+  { key: 'prism', label: 'Prism — techniques detection' },
+  { key: 'trace', label: 'Lens — cross-references' },
+  { key: 'signal', label: 'Spectrum — evidence/credibility' },
+  { key: 'compass', label: 'Meridian — political context' },
+  { key: 'pulse', label: 'Flare — coordination detection' },
+  { key: 'counterfactual', label: 'Mirror — alternative framings' },
+  { key: 'claims', label: 'Facet extraction' },
+  { key: 'radar', label: 'Scope — news feed' },
+  { key: 'keyword', label: 'Keyword topic analysis' },
+  { key: 'constellation', label: 'Constellation — knowledge graph' },
+  { key: 'bulk', label: 'Bulk CSV analysis' },
+  { key: 'compare', label: 'Comparative analysis' },
+  { key: 'topics', label: 'Topic tracking' },
+  { key: 'telegram', label: 'Telegram bot' },
+  { key: 'extension', label: 'Chrome extension' },
+  { key: 'ui', label: 'UI/UX design' },
+  { key: 'performance', label: 'Performance/speed' },
+  { key: 'bug', label: 'Bug report' },
+  { key: 'feature', label: 'Feature request' },
+];
+
+const FEEDBACK_TYPES = [
+  { key: 'feedback', label: 'Feedback', icon: '💬' },
+  { key: 'bug', label: 'Bug report', icon: '🐛' },
+  { key: 'feature', label: 'Feature request', icon: '💡' },
+  { key: 'question', label: 'Question', icon: '❓' },
+];
+
+const CONTACT_SUBJECTS = [
   'General inquiry',
   'API access / integration',
   'Partnership / collaboration',
   'Press / media inquiry',
-  'Bug report',
-  'Feature request',
   'Data deletion request',
   'Other',
 ];
 
 export default function ContactPage() {
+  const [mode, setMode] = useState<'contact' | 'feedback'>('contact');
+  // shared
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('General inquiry');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  // contact-specific
+  const [subject, setSubject] = useState('General inquiry');
+  // feedback-specific
+  const [type, setType] = useState('feedback');
+  const [component, setComponent] = useState('general');
 
   const handleSubmit = async () => {
     if (!message.trim()) return;
     setStatus('sending');
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message }),
-      });
-      if (res.ok) { setStatus('sent'); setMessage(''); }
-      else setStatus('error');
+      if (mode === 'feedback') {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const res = await fetch(`${apiUrl}/api/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message, type, component, source: 'contact_page' }),
+        });
+        if (res.ok) { setStatus('sent'); setMessage(''); } else setStatus('error');
+      } else {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, subject, message }),
+        });
+        if (res.ok) { setStatus('sent'); setMessage(''); } else setStatus('error');
+      }
     } catch { setStatus('error'); }
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fafaf8', fontFamily: 'inherit', boxSizing: 'border-box' as const };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fafaf8', fontFamily: 'inherit', boxSizing: 'border-box' };
 
   return (
     <main style={{ flex: 1, background: '#fafaf8' }}>
       <SiteHeader />
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 16px' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>Contact us</h1>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Questions, partnerships, or just want to say hi? We'll get back to you.</p>
+        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4, color: '#1a1a1a' }}>Contact &amp; Feedback</h1>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>
+          Reach out with questions and partnerships, or share feedback on a specific feature. We read everything.
+        </p>
+
+        {/* Mode toggle */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+          <button onClick={() => { setMode('contact'); setStatus('idle'); }}
+            style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: mode === 'contact' ? '#0d9488' : '#f0fdfa', color: mode === 'contact' ? '#fff' : '#0d9488' }}>
+            Contact
+          </button>
+          <button onClick={() => { setMode('feedback'); setStatus('idle'); }}
+            style={{ padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: mode === 'feedback' ? '#0d9488' : '#f0fdfa', color: mode === 'feedback' ? '#fff' : '#0d9488' }}>
+            Feedback
+          </button>
+        </div>
 
         {status === 'sent' ? (
           <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 32, textAlign: 'center' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Message sent!</div>
-            <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>We typically respond within 24 hours.</div>
+            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{mode === 'feedback' ? 'Thanks for your feedback!' : 'Message sent!'}</div>
+            <div style={{ fontSize: 13, color: '#888', marginBottom: 16 }}>{mode === 'feedback' ? 'We read every submission and use it to improve.' : 'We typically respond within 24 hours.'}</div>
             <button onClick={() => setStatus('idle')} style={{ padding: '8px 20px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Send another</button>
           </div>
         ) : (
           <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 24 }}>
-            {/* Subject */}
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Subject</label>
-              <select value={subject} onChange={e => setSubject(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
+            {mode === 'feedback' ? (
+              <>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 6 }}>Type</label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {FEEDBACK_TYPES.map(t => (
+                      <button key={t.key} onClick={() => setType(t.key)}
+                        style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, border: 'none', cursor: 'pointer', fontWeight: 500, background: type === t.key ? '#0d9488' : '#f0fdfa', color: type === t.key ? '#fff' : '#0d9488' }}>
+                        {t.icon} {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 6 }}>About which component?</label>
+                  <select value={component} onChange={e => setComponent(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                    {COMPONENTS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Subject</label>
+                <select value={subject} onChange={e => setSubject(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                  {CONTACT_SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            )}
 
-            {/* Name + Email */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Name</label>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Name{mode === 'feedback' ? ' (optional)' : ''}</label>
                 <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" style={inputStyle} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Email</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="For reply" style={inputStyle} />
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Email{mode === 'feedback' ? ' (optional)' : ''}</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={mode === 'feedback' ? 'For follow-up' : 'For reply'} style={inputStyle} />
               </div>
             </div>
 
-            {/* Message */}
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Message *</label>
-              <textarea value={message} onChange={e => setMessage(e.target.value)} rows={5} placeholder="How can we help?" style={{ ...inputStyle, resize: 'vertical' }} />
+              <textarea value={message} onChange={e => setMessage(e.target.value)} rows={5} placeholder={mode === 'feedback' ? 'What did you notice? What would you improve?' : 'How can we help?'} style={{ ...inputStyle, resize: 'vertical' }} />
             </div>
 
             {status === 'error' && (
@@ -85,7 +162,7 @@ export default function ContactPage() {
 
             <button onClick={handleSubmit} disabled={!message.trim() || status === 'sending'}
               style={{ width: '100%', padding: '11px 0', background: message.trim() ? '#0d9488' : '#ccc', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: message.trim() ? 'pointer' : 'not-allowed' }}>
-              {status === 'sending' ? 'Sending...' : 'Send message'}
+              {status === 'sending' ? 'Sending...' : (mode === 'feedback' ? 'Send feedback' : 'Send message')}
             </button>
           </div>
         )}
