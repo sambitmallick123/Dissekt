@@ -70,6 +70,11 @@ export default function KeywordAnalysis() {
   const s = report?.summary;
   const sortedArticles = report?.articles ? [...report.articles].sort((a: any, b: any) => (a.clarity ?? 1) - (b.clarity ?? 1)) : [];
   const topTech = s?.dominant_techniques?.[0];
+  const clarVals = sortedArticles.map((a: any) => a.clarity).filter((x: any) => x != null);
+  const clarLo = clarVals.length ? Math.min(...clarVals) : null;
+  const clarHi = clarVals.length ? Math.max(...clarVals) : null;
+  const uniqueSources = report ? new Set((report.articles || []).map((a: any) => a.source).filter(Boolean)).size : 0;
+  const unfetched = s ? Math.max((s.attempted || 0) - (s.count || 0), 0) : 0;
 
   return (
     <div style={{ padding: '4px 0' }}>
@@ -149,6 +154,11 @@ export default function KeywordAnalysis() {
           {s?.count > 0 ? (
             <>
               <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Coverage analysis · {report.topic}</div>
+              {unfetched > 0 && (
+                <div style={{ fontSize: 11, color: '#a16207', background: '#fef9e7', border: '0.5px solid #fde68a', borderRadius: 6, padding: '6px 10px', marginBottom: 10 }}>
+                  ⓘ {unfetched} source{unfetched !== 1 ? 's' : ''} couldn't be fetched (paywalled or blocking automated access) and {unfetched !== 1 ? 'were' : 'was'} excluded.
+                </div>
+              )}
               <div style={{ fontFamily: 'Charter, Georgia, serif', fontSize: 19, lineHeight: 1.5, marginBottom: 16, color: '#1a1a1a' }}>
                 Across {s.count} article{s.count !== 1 ? 's' : ''}, coverage shows{' '}
                 <span style={{ color: s.avg_clarity != null ? clarColor(s.avg_clarity) : '#888' }}>
@@ -161,8 +171,8 @@ export default function KeywordAnalysis() {
               <div style={{ display: 'flex', gap: 20, padding: '12px 0', borderTop: '0.5px solid #ececec', borderBottom: '0.5px solid #ececec', marginBottom: 18, flexWrap: 'wrap' }}>
                 <div><span style={{ fontSize: 20, fontWeight: 700, color: s.avg_clarity != null ? clarColor(s.avg_clarity) : '#888' }}>{s.avg_clarity != null ? s.avg_clarity.toFixed(2) : '—'}</span> <span style={{ fontSize: 12, color: '#888' }}>clarity</span></div>
                 <div><span style={{ fontSize: 20, fontWeight: 700 }}>{s.count}</span> <span style={{ fontSize: 12, color: '#888' }}>articles</span></div>
-                <div><span style={{ fontSize: 20, fontWeight: 700, color: s.avg_toxicity != null ? toxColor(s.avg_toxicity) : '#888' }}>{s.avg_toxicity != null ? `${Math.round(s.avg_toxicity * 100)}%` : '—'}</span> <span style={{ fontSize: 12, color: '#888' }}>toxicity</span></div>
-                <div><span style={{ fontSize: 20, fontWeight: 700 }}>{s.dominant_techniques?.length || 0}</span> <span style={{ fontSize: 12, color: '#888' }}>techniques</span></div>
+                <div><span style={{ fontSize: 20, fontWeight: 700 }}>{uniqueSources}</span> <span style={{ fontSize: 12, color: '#888' }}>source{uniqueSources !== 1 ? 's' : ''}</span></div>
+                <div><span style={{ fontSize: 20, fontWeight: 700 }}>{clarLo != null && clarHi != null ? `${clarLo.toFixed(2)}–${clarHi.toFixed(2)}` : '—'}</span> <span style={{ fontSize: 12, color: '#888' }}>clarity range</span></div>
               </div>
 
               {/* technique bars */}
