@@ -710,6 +710,20 @@ async def constellation_report(email: str, cluster: int,
         clar_hi = round(max(clar_vals), 2) if clar_vals else None
         top_techs = [{"name": t, "count": c} for t, c in tech_counter.most_common(6)]
 
+        # Build verifiable references: one entry per unique scan that fed this cluster.
+        ref_map = {}
+        for n in nodes:
+            for sc in (n.get("scans") or []):
+                aid = sc.get("analysis_id")
+                if aid and aid not in ref_map:
+                    ref_map[aid] = {
+                        "analysis_id": aid,
+                        "clarity": sc.get("clarity"),
+                        "top_technique": sc.get("top_technique"),
+                        "created_at": sc.get("created_at", ""),
+                    }
+        references = sorted(ref_map.values(), key=lambda r: r.get("created_at") or "", reverse=True)
+
         facts = {
             "entities": names,
             "entity_count": len(names),
@@ -725,16 +739,28 @@ async def constellation_report(email: str, cluster: int,
         _s = get_settings()
         client = openai.AsyncOpenAI(api_key=_s.openai_api_key)
         prompt = (
-            "You are an analyst writing a brief for a journalist about patterns in their own "
-            "content analysis history. Below is structured DATA about one cluster of topics they "
-            "have analyzed. Write a clear, grounded report in 2-3 short paragraphs, then a final "
-            "line starting with 'Watch for:' giving one practical thing to watch for.\n\n"
+            "You are an analyst writing a brief for a JOURNALIST who uses Dissekt to detect "
+            "manipulation in media coverage. Below is structured DATA about one cluster of topics "
+            "from THEIR analysis history (the entities they have scanned and the manipulation "
+            "techniques found). Write a clear, grounded report.\n\n"
+            "STRUCTURE:\n"
+            "1. FIRST, state how many distinct topics this cluster covers. If the entities clearly "
+            "belong to unrelated subjects (e.g. one set about Iran nuclear talks, another about "
+            "5G conspiracy, another about a different country's politics), say so explicitly and "
+            "group them. Do NOT force unrelated entities into one false narrative.\n"
+            "2. For the main topic(s), describe the manipulation pattern: which techniques dominate "
+            "(with counts) and what that implies about how the coverage is constructed.\n"
+            "3. End with a line starting 'Watch for:' — this is advice for the JOURNALIST about what "
+            "manipulation pattern to look out for in FUTURE coverage of these topics. It is NOT advice "
+            "for content producers to write better. Example tone: 'Watch for: coverage of X that omits "
+            "Y, since missing context is the dominant tactic here.'\n\n"
             "RULES:\n"
-            "- Use ONLY the data provided. Do not invent facts, sources, or numbers.\n"
-            "- Cite specific techniques and counts where relevant.\n"
-            "- If the entities span clearly different topics, say so plainly rather than forcing a single narrative.\n"
-            "- Be concise and concrete. No vague editorializing about 'democratic discourse'.\n"
-            "- Clarity is scored 0-1 where higher = clearer/less manipulative.\n\n"
+            "- Use ONLY the data provided. Do not invent facts, sources, outlets, or numbers.\n"
+            "- Cite specific techniques and their counts.\n"
+            "- Be concise and concrete. No vague editorializing about 'democratic discourse' or "
+            "'enhancing clarity'.\n"
+            "- Clarity is scored 0-1 where higher = clearer/less manipulative.\n"
+            "- 2-3 short paragraphs maximum, then the 'Watch for:' line.\n\n"
             "DATA:\n" + _json.dumps(facts, indent=2)
         )
         resp = await client.chat.completions.create(
@@ -750,6 +776,7 @@ async def constellation_report(email: str, cluster: int,
             "report": report_text,
             "facts": facts,
             "scan_ids": list(scan_ids),
+            "references": references,
         }
     except HTTPException:
         raise
