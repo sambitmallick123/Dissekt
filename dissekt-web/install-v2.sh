@@ -1,3 +1,10 @@
+#!/bin/bash
+# Run from: /mnt/d/Startup Ideas/Dissekt/dissekt-web
+# Reorder tabs + install redesigned KeywordAnalysis (Option 1 input + Option A report + split chips)
+set -e
+
+# 1. Overwrite the component
+cat > src/components/KeywordAnalysis.tsx << 'COMPONENT_EOF'
 'use client';
 import { useState } from 'react';
 import { getUserEmail } from '@/lib/tier';
@@ -207,3 +214,35 @@ export default function KeywordAnalysis() {
     </div>
   );
 }
+COMPONENT_EOF
+echo "✅ KeywordAnalysis.tsx updated (v2)"
+
+# 2. Reorder tabs: Single -> Keyword -> Bulk -> Compare
+python3 << 'PYEOF'
+c = open('src/app/analyze/page.tsx').read()
+
+bulk_btn = '''              <button onClick={() => { if (!isInvited) { window.location.href = '/signup'; return; } if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555', opacity: isInvited ? 1 : 0.6 }}>
+                📊 Bulk CSV {!isInvited && '🔒'}
+              </button>
+'''
+keyword_btn = '''              <button onClick={() => setScanTab('keyword')}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'keyword' ? '#0d9488' : '#f0f0ee', color: scanTab === 'keyword' ? '#fff' : '#555' }}>
+                🔍 Keyword topic
+              </button>
+'''
+c = c.replace(bulk_btn, '').replace(keyword_btn, '')
+single_end = '''                Single scan
+              </button>
+'''
+c = c.replace(single_end, single_end + keyword_btn + bulk_btn)
+open('src/app/analyze/page.tsx','w').write(c)
+print("✅ tabs reordered: Single -> Keyword -> Bulk -> Compare")
+PYEOF
+
+echo ""
+echo "Verify tab order:"
+grep -n "Single scan\|Keyword topic\|Bulk CSV\|Compare {" src/app/analyze/page.tsx | head
+
+echo ""
+echo "Build: rm -rf .next && npm run build"

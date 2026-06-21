@@ -144,13 +144,13 @@ function ScanAppInner() {
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'single' ? '#0d9488' : '#f0f0ee', color: scanTab === 'single' ? '#fff' : '#555' }}>
                 Single scan
               </button>
-              <button onClick={() => { if (!isInvited) { window.location.href = '/signup'; return; } if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
-                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555', opacity: isInvited ? 1 : 0.6 }}>
-                📊 Bulk CSV {!isInvited && '🔒'}
-              </button>
               <button onClick={() => setScanTab('keyword')}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'keyword' ? '#0d9488' : '#f0f0ee', color: scanTab === 'keyword' ? '#fff' : '#555' }}>
                 🔍 Keyword topic
+              </button>
+              <button onClick={() => { if (!isInvited) { window.location.href = '/signup'; return; } if (checkFeature('Bulk CSV analysis', enabledFeatures)) setScanTab('bulk'); }}
+                style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: scanTab === 'bulk' ? '#0d9488' : '#f0f0ee', color: scanTab === 'bulk' ? '#fff' : '#555', opacity: isInvited ? 1 : 0.6 }}>
+                📊 Bulk CSV {!isInvited && '🔒'}
               </button>
               <button onClick={() => { window.location.href = isInvited ? '/compare' : '/signup'; }}
                 style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: '#f0f0ee', color: '#555', display: 'flex', alignItems: 'center', gap: 4, opacity: isInvited ? 1 : 0.6 }}>
