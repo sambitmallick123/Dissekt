@@ -81,6 +81,25 @@ def _resolve_reframe_model() -> str:
     return "gpt-4o-mini"
 
 
+def _resolve_openai_model_for(role: str) -> str:
+    """Resolve a role's configured model, but only if it's an OpenAI model
+    (these inline calls use openai.AsyncOpenAI). Falls back to gpt-4o-mini."""
+    try:
+        from app.models_registry import model_meta
+        from app.config import get_settings
+        from supabase import create_client
+        s = get_settings()
+        sb = create_client(s.supabase_url, s.supabase_key)
+        rows = sb.table("model_config").select("role, model").eq("role", role).execute()
+        if rows.data:
+            mid = rows.data[0]["model"]
+            if model_meta(mid)["provider"] == "openai":
+                return mid
+    except Exception:
+        pass
+    return "gpt-4o-mini"
+
+
 @app.get("/api/admin/models")
 async def admin_get_models(adminKey: str = ""):
     """Return the model registry + current role assignments (override vs default)."""
@@ -764,7 +783,7 @@ async def constellation_report(email: str, cluster: int,
             "DATA:\n" + _json.dumps(facts, indent=2)
         )
         resp = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=_resolve_openai_model_for("constellation_report"),
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4, max_tokens=500,
         )

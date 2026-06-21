@@ -27,6 +27,7 @@ ROLE_DEFAULTS = {
     "vision":           "gpt-4o-mini",            # image extraction
     "router":           "gpt-4o-mini",            # heuristic escalation / extraction
     "reframe":          "gpt-4o-mini",            # compare / mirror / kaleidoscope
+    "constellation_report": "gpt-4o-mini",        # Constellation cluster reports
 }
 
 # Human-readable role labels for the admin UI
@@ -36,6 +37,7 @@ ROLE_LABELS = {
     "vision":        "Image / vision",
     "router":        "Escalation router",
     "reframe":       "Compare & reframe",
+    "constellation_report": "Constellation report",
 }
 
 # Which capability each role REQUIRES (so the admin UI only offers valid models)
@@ -45,6 +47,7 @@ ROLE_CAPABILITY = {
     "vision":        "vision",
     "router":        "text",
     "reframe":       "text",
+    "constellation_report": "text",
 }
 
 
