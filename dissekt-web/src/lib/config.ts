@@ -32,7 +32,7 @@ function getDefaults(): Record<string, any> {
     free_limits: { brief: 3, detailed: 1 },
     member_limits: { brief: 25, detailed: 10 },
     features_free: ['single_scan', 'radar'],
-    features_member: ['single_scan', 'bulk', 'compare', 'topics', 'radar', 'detailed_mode', 'image_upload', 'camera_upload'],
+    features_member: ['single_scan', 'topics', 'radar', 'detailed_mode', 'image_upload', 'camera_upload'],
     access_months: 6,
   };
 }

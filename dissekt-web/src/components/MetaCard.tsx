@@ -35,10 +35,6 @@ export default function MetaCard({ data }: { data: any }) {
           <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#888', wordBreak: 'break-all', lineHeight: 1.5 }}>
             {data.blockchain?.content_hash || '—'}
           </div>
-          <div style={{ ...metricLabel, marginTop: 10 }}>Proof status</div>
-          <span style={{ fontSize: 11, fontWeight: 500, padding: '3px 10px', borderRadius: 6, background: '#f0f0ee', color: '#888' }}>
-            {data.blockchain?.proof_status || 'pending'}
-          </span>
         </div>
       </div>
     </div>

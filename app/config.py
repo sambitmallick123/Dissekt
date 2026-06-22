@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     # backend returns no data for that engine. Env-overridable, e.g. ENABLE_PULSE=true
     enable_compass: bool = True            # Meridian — political context  (Phase 3 merge target)
     enable_claims: bool = True             # Facet — extracted claims       (Phase 3 merge target)
-    enable_blockchain: bool = True         # Anchor — OTS on-chain anchoring
+    enable_blockchain: bool = False         # Anchor — OTS on-chain anchoring
     enable_pulse: bool = False             # Flare — coordination detection  [HIDDEN]
     enable_counterfactual: bool = False    # Mirror — alternative framings   [HIDDEN]
 
