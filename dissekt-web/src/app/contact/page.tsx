@@ -55,26 +55,57 @@ export default function ContactPage() {
   // feedback-specific
   const [type, setType] = useState('feedback');
   const [component, setComponent] = useState('general');
+  // AI formatting
+  const [formatting, setFormatting] = useState(false);
+  const [preFormat, setPreFormat] = useState<string | null>(null);
+
+  const handleFormat = async () => {
+    if (!message.trim() || formatting) return;
+    setFormatting(true);
+    const original = message;
+    try {
+      const res = await fetch('/api/format', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: message, kind: mode }),
+      });
+      const data = await res.json();
+      if (res.ok && data.formatted && data.formatted !== original) {
+        setPreFormat(original);
+        setMessage(data.formatted);
+      }
+    } catch {
+      // silent: keep original text on any failure
+    } finally {
+      setFormatting(false);
+    }
+  };
+
+  const handleUndo = () => {
+    if (preFormat !== null) {
+      setMessage(preFormat);
+      setPreFormat(null);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!message.trim()) return;
     setStatus('sending');
     try {
       if (mode === 'feedback') {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const res = await fetch(`${apiUrl}/api/feedback`, {
+        const res = await fetch('/api/feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, message, type, component, source: 'contact_page' }),
         });
-        if (res.ok) { setStatus('sent'); setMessage(''); } else setStatus('error');
+        if (res.ok) { setStatus('sent'); setMessage(''); setPreFormat(null); } else setStatus('error');
       } else {
         const res = await fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, subject, message }),
         });
-        if (res.ok) { setStatus('sent'); setMessage(''); } else setStatus('error');
+        if (res.ok) { setStatus('sent'); setMessage(''); setPreFormat(null); } else setStatus('error');
       }
     } catch { setStatus('error'); }
   };
@@ -151,9 +182,24 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 8 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#555', display: 'block', marginBottom: 4 }}>Message *</label>
-              <textarea value={message} onChange={e => setMessage(e.target.value)} rows={5} placeholder={mode === 'feedback' ? 'What did you notice? What would you improve?' : 'How can we help?'} style={{ ...inputStyle, resize: 'vertical' }} />
+              <textarea value={message} onChange={e => { setMessage(e.target.value); if (preFormat !== null) setPreFormat(null); }} rows={5} placeholder={mode === 'feedback' ? 'What did you notice? What would you improve?' : 'How can we help?'} style={{ ...inputStyle, resize: 'vertical' }} />
+            </div>
+
+            {/* AI format toolbar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+              <button onClick={handleFormat} disabled={!message.trim() || formatting}
+                style={{ padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: '0.5px solid #0d9488', cursor: (!message.trim() || formatting) ? 'not-allowed' : 'pointer', background: '#f0fdfa', color: '#0d9488', opacity: (!message.trim() || formatting) ? 0.5 : 1 }}>
+                {formatting ? 'Formatting…' : '✨ Format with AI'}
+              </button>
+              {preFormat !== null && (
+                <button onClick={handleUndo}
+                  style={{ padding: '7px 12px', borderRadius: 8, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: 'transparent', color: '#888', textDecoration: 'underline' }}>
+                  Undo
+                </button>
+              )}
+              <span style={{ fontSize: 11, color: '#aaa' }}>Polishes grammar &amp; clarity — you can still edit after.</span>
             </div>
 
             {status === 'error' && (
