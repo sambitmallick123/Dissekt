@@ -80,7 +80,7 @@ export default function LandingPage() {
             <p style={{ fontSize: 14, color: '#888' }}>Paste a URL, text, or social media post. Get a full transparency report in seconds.</p>
           </div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {[{ step: '1', title: 'Paste anything', desc: 'News article, social media post, YouTube video, Reddit thread, WhatsApp forward — or just raw text.', color: '#0d9488' }, { step: '2', title: '12 engines analyze', desc: 'Technique detection, fact-checker cross-references, source credibility, toxicity, political context — all in parallel.', color: '#2563eb' }, { step: '3', title: 'See the construction', desc: "Three-dimensional score: how it is built (Construction), how verified it is (Verification), and what it wants you to do (Intent).", color: '#d97706' }].map(s => (
+            {[{ step: '1', title: 'Paste anything', desc: 'News article, social media post, YouTube video, Reddit thread, WhatsApp forward — or just raw text.', color: '#0d9488' }, { step: '2', title: 'Multiple engines analyze', desc: 'Technique detection, fact-checker cross-references, source credibility, toxicity, political context — all in parallel.', color: '#2563eb' }, { step: '3', title: 'See the construction', desc: "Three-dimensional score: how it is built (Construction), how verified it is (Verification), and what it wants you to do (Intent).", color: '#d97706' }].map(s => (
               <div key={s.step} style={{ flex: '1 1 220px', maxWidth: 260, textAlign: 'center' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 20, background: s.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 18, fontWeight: 700 }}>{s.step}</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', marginBottom: 4 }}>{s.title}</div>
@@ -116,11 +116,11 @@ export default function LandingPage() {
       <section style={{ padding: '48px 24px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>12 analysis engines</h2>
-            <p style={{ fontSize: 14, color: '#888' }}>Every scan runs through 12 specialized engines in parallel.</p>
+            <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>8 analysis engines</h2>
+            <p style={{ fontSize: 14, color: '#888' }}>Every scan runs through 8 specialized engines in parallel.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
-            {[{ icon: '🔦', name: 'Beacon', desc: 'Orchestrator — parallel pipeline' }, { icon: '🔺', name: 'Prism', desc: '20 manipulation techniques' }, { icon: '🔎', name: 'Lens', desc: '100+ fact-checker cross-refs' }, { icon: '🌈', name: 'Spectrum', desc: 'Toxicity + credibility + sentiment' }, { icon: '💎', name: 'Crystal', desc: 'Blockchain evidence proof' }, { icon: '🔗', name: 'Lattice', desc: 'Knowledge graph' }, { icon: '🔭', name: 'Scope', desc: '29 RSS feeds, 5 markets' }, { icon: '💠', name: 'Facet', desc: 'Claim extraction + typing' }, { icon: '👁', name: 'Iris', desc: 'Language detection' }, { icon: '🧭', name: 'Meridian', desc: '69 politicians, 4 countries' }, { icon: '🔥', name: 'Flare', desc: 'Coordination detection' }, { icon: '🪞', name: 'Mirror', desc: 'Alternative framings' }].map(e => (
+            {[{ icon: '🔦', name: 'Beacon', desc: 'Orchestrator — parallel pipeline' }, { icon: '🔺', name: 'Prism', desc: '20 manipulation techniques' }, { icon: '🔎', name: 'Lens', desc: '100+ fact-checker cross-refs' }, { icon: '🌈', name: 'Spectrum', desc: 'Toxicity + credibility + sentiment' }, { icon: '💠', name: 'Facet', desc: 'Claim extraction + typing' }, { icon: '🧭', name: 'Meridian', desc: '69 politicians, 4 countries' }, { icon: '👁', name: 'Iris', desc: 'Language detection' }, { icon: '🔗', name: 'Lattice', desc: 'Similar past analyses' }].map(e => (
               <div key={e.name} style={{ padding: '12px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}><span style={{ fontSize: 16 }}>{e.icon}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{e.name}</span></div>
                 <div style={{ fontSize: 11, color: '#888' }}>{e.desc}</div>
@@ -153,7 +153,7 @@ export default function LandingPage() {
             <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>Tools for seeing clearly</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
-            {[{ icon: '🔍', name: 'Loupe', desc: 'Inline annotations — highlights techniques directly in text' }, { icon: '✍️', name: 'Polish', desc: 'Pre-publish check for writers with rewrite suggestions' }, { icon: '🔮', name: 'Kaleidoscope', desc: 'One claim, 5 editorial perspectives' }, { icon: '🪞', name: 'Reflect', desc: 'Personal bias profile — your reading patterns' }, { icon: '📒', name: 'Ledger', desc: 'Decision journal — Trust / Unsure / Reject' }, { icon: '🕸️', name: 'Trust Graph', desc: 'Per-source trust visualization' }, { icon: '🧵', name: 'Thread', desc: 'Track how claims evolve over time' }, { icon: '🔬', name: 'Imprint', desc: 'Source fingerprinting — technique patterns per outlet' }, { icon: '📧', name: 'Dispatch', desc: 'Weekly digest with auto-scanned articles' }].map(f => (
+            {[{ icon: '📊', name: 'Dashboard', desc: 'Your scan history, reading profile, and API keys in one place' }, { icon: '📒', name: 'Ledger', desc: 'Decision journal — log Trust / Unsure / Reject on what you read' }, { icon: '🪞', name: 'Reflect', desc: 'Your reading profile — how you tend to judge what you read' }, { icon: '✦', name: 'Constellation', desc: 'Knowledge graph of the entities across your scans' }, { icon: '🔑', name: 'API access', desc: 'Scan programmatically with your own API key' }].map(f => (
               <div key={f.name} style={{ padding: 14, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}><span style={{ fontSize: 14 }}>{f.icon}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#0d9488' }}>{f.name}</span></div>
                 <div style={{ fontSize: 11, color: '#888', lineHeight: 1.7 }}>{f.desc}</div>
@@ -166,7 +166,7 @@ export default function LandingPage() {
       {/* NUMBERS */}
       <section style={{ padding: '48px 24px', background: '#0d9488' }}>
         <div style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, textAlign: 'center' }}>
-          {[{ n: '12', l: 'Engines' }, { n: '20', l: 'Techniques' }, { n: '100+', l: 'Fact-checkers' }, { n: '231', l: 'Media rated' }, { n: '69', l: 'Politicians' }, { n: '29', l: 'RSS feeds' }].map(s => (
+          {[{ n: '8', l: 'Engines' }, { n: '20', l: 'Techniques' }, { n: '100+', l: 'Fact-checkers' }, { n: '231', l: 'Media rated' }, { n: '69', l: 'Politicians' }].map(s => (
             <div key={s.l} style={{ padding: 12 }}><div style={{ fontSize: 28, fontWeight: 700, color: '#fff' }}>{s.n}</div><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{s.l}</div></div>
           ))}
         </div>
@@ -196,7 +196,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 24px', textAlign: 'center' }}>For everyone who reads</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-            {[{ icon: '📰', who: 'Journalists', how: 'Check drafts with Polish. Fingerprint sources. Track claims over time.' }, { icon: '🎓', who: 'Researchers', how: 'Systematic framing analysis. Blockchain evidence. Batch API access.' }, { icon: '👨‍🏫', who: 'Educators', how: 'Show students how framing works. Compare coverage. Build media literacy.' }, { icon: '📱', who: 'Everyone', how: 'Check that forward before sharing. See if a claim was fact-checked. Know your own bias.' }].map(u => (
+            {[{ icon: '📰', who: 'Journalists', how: 'See how a story is framed, cross-check claims against existing fact-checks, and log your trust decisions.' }, { icon: '🎓', who: 'Researchers', how: 'Systematic framing analysis, source-credibility data, and API access.' }, { icon: '👨‍🏫', who: 'Educators', how: 'Show students how framing works and build media literacy.' }, { icon: '📱', who: 'Everyone', how: 'Check that forward before sharing. See if a claim was fact-checked. Know your own bias.' }].map(u => (
               <div key={u.who} style={{ padding: 16, background: '#fafaf8', borderRadius: 10 }}>
                 <div style={{ fontSize: 24, marginBottom: 6 }}>{u.icon}</div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a', marginBottom: 4 }}>{u.who}</div>
