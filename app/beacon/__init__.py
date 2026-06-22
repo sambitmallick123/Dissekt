@@ -357,6 +357,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
         elif not content:
             content = "[Image provided but no text could be extracted]"
     start_time = time.time()
+    settings = get_settings()
 
     # Step 0: Check if social media URL
     if content.startswith('http'):
@@ -421,20 +422,27 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     signal_result = SignalResult(**signal_raw)
 
     # Step 9: Blockchain hash + OTS anchoring
-    try:
-        from app.anchor import create_timestamp
-        blockchain_raw = await create_timestamp(content_hash)
-        blockchain = BlockchainProof(
-            content_hash=blockchain_raw["content_hash"],
-            timestamp=blockchain_raw["timestamp"],
-            proof_status=blockchain_raw["proof_status"],
-        )
-    except Exception as e:
-        logger.warning(f"OTS anchoring failed: {e}")
+    if settings.enable_blockchain:
+        try:
+            from app.anchor import create_timestamp
+            blockchain_raw = await create_timestamp(content_hash)
+            blockchain = BlockchainProof(
+                content_hash=blockchain_raw["content_hash"],
+                timestamp=blockchain_raw["timestamp"],
+                proof_status=blockchain_raw["proof_status"],
+            )
+        except Exception as e:
+            logger.warning(f"OTS anchoring failed: {e}")
+            blockchain = BlockchainProof(
+                content_hash=content_hash,
+                timestamp=str(int(time.time())),
+                proof_status="pending",
+            )
+    else:
         blockchain = BlockchainProof(
             content_hash=content_hash,
             timestamp=str(int(time.time())),
-            proof_status="pending",
+            proof_status="local",
         )
 
     analysis_time = int((time.time() - start_time) * 1000)
@@ -480,26 +488,28 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
         logger.warning(f"Similar claims lookup failed: {e}")
 
     # Step 10: Political context (Compass)
-    try:
-        from app.meridian import analyze_political_context
-        compass_data = await analyze_political_context(extracted_text)
-        analysis.compass = compass_data
-    except Exception as e:
-        logger.warning(f"Compass failed: {e}")
+    if settings.enable_compass:
+        try:
+            from app.meridian import analyze_political_context
+            compass_data = await analyze_political_context(extracted_text)
+            analysis.compass = compass_data
+        except Exception as e:
+            logger.warning(f"Compass failed: {e}")
 
     # Step 10b: Coordination detection (Pulse)
-    try:
-        from app.flare import detect_coordination
-        pulse_data = await detect_coordination(extracted_text, analysis.similar_claims)
-        analysis.pulse = pulse_data
-    except Exception as e:
-        logger.warning(f"Pulse failed: {e}")
+    if settings.enable_pulse:
+        try:
+            from app.flare import detect_coordination
+            pulse_data = await detect_coordination(extracted_text, analysis.similar_claims)
+            analysis.pulse = pulse_data
+        except Exception as e:
+            logger.warning(f"Pulse failed: {e}")
 
     # Step 11: Detect language
     analysis.detected_language = detect_language(extracted_text)
 
     # Step 11a: Generate counterfactual views (alternative framing)
-    if len(prism_result.techniques) > 0:
+    if settings.enable_counterfactual and len(prism_result.techniques) > 0:
         try:
             counterfactuals = await generate_counterfactuals(extracted_text, mode)
             analysis.counterfactuals = counterfactuals
@@ -507,7 +517,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
             logger.warning(f"Counterfactual generation failed: {e}")
 
     # Step 11: Extract individual claims (only if techniques found, to save API cost)
-    if len(prism_result.techniques) > 0:
+    if settings.enable_claims and len(prism_result.techniques) > 0:
         try:
             claims = await extract_claims(extracted_text, mode)
             analysis.extracted_claims = claims

@@ -43,6 +43,15 @@ class Settings(BaseSettings):
     max_brief_length: int = 300
     max_detailed_length: int = 3000
 
+    # ── Feature flags (per-scan engines) ──
+    # Flip to hide a component everywhere. Frontend cards auto-hide when the
+    # backend returns no data for that engine. Env-overridable, e.g. ENABLE_PULSE=true
+    enable_compass: bool = True            # Meridian — political context  (Phase 3 merge target)
+    enable_claims: bool = True             # Facet — extracted claims       (Phase 3 merge target)
+    enable_blockchain: bool = True         # Anchor — OTS on-chain anchoring
+    enable_pulse: bool = False             # Flare — coordination detection  [HIDDEN]
+    enable_counterfactual: bool = False    # Mirror — alternative framings   [HIDDEN]
+
     # Rate limiting
     rate_limit_free: int = 3
     rate_limit_pro: int = 100
