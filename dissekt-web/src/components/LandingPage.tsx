@@ -15,8 +15,11 @@ export default function LandingPage() {
             Beta · Free to use
           </div>
           <h1 style={{ fontSize: 40, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.15, margin: '0 0 14px' }}>See how information<br />is constructed</h1>
-          <p style={{ fontSize: 16, color: '#888', lineHeight: 1.7, margin: '0 0 28px', maxWidth: 540, marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontSize: 16, color: '#888', lineHeight: 1.7, margin: '0 0 14px', maxWidth: 540, marginLeft: 'auto', marginRight: 'auto' }}>
             Dissekt does not tell you what is true or false. It shows you <em>how</em> content is built — what techniques are used, what evidence exists, what context is missing, and how different sources frame the same story.
+          </p>
+          <p style={{ fontSize: 14, color: '#1a1a1a', fontWeight: 500, margin: '0 0 28px', maxWidth: 540, marginLeft: 'auto', marginRight: 'auto' }}>
+            Paste any article, URL, or social post — and get a transparency report in seconds.
           </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/analyze" style={{ padding: '12px 28px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>Try it now — free</a>
@@ -38,10 +41,14 @@ export default function LandingPage() {
               <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>3 techniques · 2 fact-checks · Moderate transparency</div>
             </div>
           </div>
+          <div style={{ fontSize: 11, color: '#888', marginBottom: 10, paddingBottom: 10, borderBottom: '0.5px solid #f0f0ee' }}>
+            Clarity score <strong style={{ color: '#d97706' }}>0.52 · Moderate</strong> — higher means more transparently constructed, not &quot;more true.&quot;
+          </div>
           <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
-            {[{ label: 'Construction', score: '0.64', color: '#dc2626' }, { label: 'Verification', score: '0.38', color: '#2563eb' }, { label: 'Intent', score: '0.58', color: '#d97706' }].map(d => (
+            {[{ label: 'Construction', desc: 'how it is built', score: '0.64', color: '#dc2626' }, { label: 'Verification', desc: 'how supported', score: '0.38', color: '#2563eb' }, { label: 'Intent', desc: 'what it wants', score: '0.58', color: '#d97706' }].map(d => (
               <div key={d.label} style={{ flex: 1, padding: '8px 10px', background: '#f8fafa', borderRadius: 8, borderLeft: `3px solid ${d.color}` }}>
-                <div style={{ fontSize: 9, color: '#888' }}>{d.label}</div>
+                <div style={{ fontSize: 9, fontWeight: 600, color: '#555' }}>{d.label}</div>
+                <div style={{ fontSize: 8, color: '#aaa', marginBottom: 2 }}>{d.desc}</div>
                 <div style={{ fontSize: 16, fontWeight: 700, color: d.color }}>{d.score}</div>
               </div>
             ))}

@@ -205,7 +205,7 @@ export default function KeywordAnalysis() {
               <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Sources, least to most clear</div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {sortedArticles.map((a: any, i: number) => (
-                  <a key={i} href={a.analysis_id ? `/report/${a.analysis_id}` : a.url} target={a.analysis_id ? '_self' : '_blank'}
+                  <a key={i} href={a.url || undefined} target="_blank" rel="noopener"
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: i < sortedArticles.length - 1 ? '0.5px solid #f0efec' : 'none', textDecoration: 'none' }}>
                     <span style={{ width: 4, height: 32, background: a.clarity != null ? clarColor(a.clarity) : '#ccc', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
