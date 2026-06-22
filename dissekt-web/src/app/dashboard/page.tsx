@@ -6,9 +6,7 @@ import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import Reflect from '@/components/Reflect';
 import LedgerView from '@/components/Ledger';
-import Recall from '@/components/Recall';
 import ScanHistory from '@/components/ScanHistory';
-import TrustGraph from '@/components/TrustGraph';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -18,7 +16,7 @@ export default function DashboardPage() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [tier, setTier] = useState('free');
-  const [tab, setTab] = useState<'insights' | 'activity' | 'apikeys'>('insights');
+  const [tab, setTab] = useState<'overview' | 'apikeys'>('overview');
   const [decisions, setDecisions] = useState<any[]>([]);
   const [keys, setKeys] = useState<any[]>([]);
   const [newKeyName, setNewKeyName] = useState('');
@@ -104,13 +102,12 @@ export default function DashboardPage() {
             <div style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions · {tier === 'member' ? '👤 Member' : '🆓 Free'}</div>
           </div>
           <div style={{ display: 'flex', gap: 4 }}>
-            <button onClick={() => setTab('insights')} style={{ padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'insights' ? '#0d9488' : '#fff', color: tab === 'insights' ? '#fff' : '#555', boxShadow: tab !== 'insights' ? '0 0 0 0.5px #e5eaea' : 'none' }}>📊 Insights</button>
-            <button onClick={() => setTab('activity')} style={{ padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'activity' ? '#0d9488' : '#fff', color: tab === 'activity' ? '#fff' : '#555', boxShadow: tab !== 'activity' ? '0 0 0 0.5px #e5eaea' : 'none' }}>📒 My activity</button>
+            <button onClick={() => setTab('overview')} style={{ padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'overview' ? '#0d9488' : '#fff', color: tab === 'overview' ? '#fff' : '#555', boxShadow: tab !== 'overview' ? '0 0 0 0.5px #e5eaea' : 'none' }}>📊 Overview</button>
             <button onClick={() => setTab('apikeys')} style={{ padding: '5px 14px', borderRadius: 6, fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === 'apikeys' ? '#0d9488' : '#fff', color: tab === 'apikeys' ? '#fff' : '#555', boxShadow: tab !== 'apikeys' ? '0 0 0 0.5px #e5eaea' : 'none' }}>🔑 API keys</button>
           </div>
         </div>
 
-        {tab === 'insights' && (
+        {tab === 'overview' && (
           <>
             {/* Community */}
             <div style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', borderRadius: 10, padding: 16, marginBottom: 12, color: '#fff' }}>
@@ -193,12 +190,10 @@ export default function DashboardPage() {
           </>
         )}
 
-        {tab === 'activity' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {tab === 'overview' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
             <Reflect />
-            <TrustGraph />
             <LedgerView />
-            <Recall onAnalyze={(text: string) => { window.location.href = '/analyze?content=' + encodeURIComponent(text); }} />
             <ScanHistory onReanalyze={(input: string) => { window.location.href = '/analyze?content=' + encodeURIComponent(input); }} />
           </div>
         )}

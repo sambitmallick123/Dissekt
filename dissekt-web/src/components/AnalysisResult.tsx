@@ -8,11 +8,10 @@ import LatticeCard from './LatticeCard';
 import FacetCard from './FacetCard';
 import Mirror from './Mirror';
 import Loupe from './Loupe';
-import Marginalia from './Marginalia';
-import Chorus from './Chorus';
 import FactCheckSection from './FactCheckSection';
 import ShareButton from './ShareButton';
 import Polish from './Polish';
+import { LedgerButtons } from './Ledger';
 import MeridianCard from './MeridianCard';
 import FlareCard from './FlareCard';
 
@@ -50,6 +49,11 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
       </div>
 
+      {/* Ledger */}
+      <div className="anim-fade" style={{ marginTop: 12 }}>
+        <LedgerButtons analysisId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} inputPreview={data.input_content || data.extracted_text?.slice(0, 200) || ''} />
+      </div>
+
       {data.counterfactuals?.length > 0 && (
         <div className="anim-fade anim-d2"><Mirror counterfactuals={data.counterfactuals} /></div>
       )}
@@ -69,11 +73,6 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
       {data.pulse?.detected && (
         <div className="anim-fade anim-d4"><FlareCard pulse={data.pulse} /></div>
       )}
-      {/* Chorus */}
-      <Chorus reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
-
-      {/* Marginalia */}
-      <Marginalia reportId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ''} />
     </div>
   );
 }
