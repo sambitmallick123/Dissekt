@@ -8,8 +8,6 @@ const SECTIONS = [
   { id: 'score', label: 'The Clarity Score' },
   { id: 'single', label: 'Single scan' },
   { id: 'keyword', label: 'Keyword topic' },
-  { id: 'bulk', label: 'Bulk CSV' },
-  { id: 'compare', label: 'Compare' },
   { id: 'observatory', label: 'The Observatory' },
   { id: 'extension', label: 'Chrome extension' },
   { id: 'telegram', label: 'Telegram bot' },
@@ -42,8 +40,8 @@ export default function HelpPage() {
     ['What is a "Brief" vs "Detailed" scan?', 'Brief is a fast analysis using a lightweight model — good for quick checks. Detailed runs a deeper model with fuller reasoning and more thorough cross-referencing. Detailed scans count separately against your daily limit.'],
     ['Why did my scan find no fact-checks?', 'Cross-referencing depends on whether fact-checkers have already covered the claim. Newer or niche topics often have none yet. Absence of fact-checks is not evidence either way.'],
     ['Why is toxicity usually 0%?', 'Professional news writing rarely triggers toxicity detection, which looks for insults, threats, and obscenity. A low toxicity score is normal for news and does not mean the content is unbiased.'],
-    ['Is my data private?', 'Content you submit is processed but not stored in full. If you have an account, metadata about your scans (entities, techniques, scores — not the raw text) is stored to power Constellation and Topic Tracking. You can request deletion anytime. See the Privacy Policy for details.'],
-    ['Can I use Dissekt without an account?', 'Yes. Free use requires no account (3 brief + 1 detailed scan per day). A free account raises limits and unlocks Bulk, Compare, and the Observatory.'],
+    ['Is my data private?', 'Content you submit is processed but not stored in full. If you have an account, metadata about your scans (entities, techniques, scores — not the raw text) is stored to power Constellation. You can request deletion anytime. See the Privacy Policy for details.'],
+    ['Can I use Dissekt without an account?', 'Yes. Free use requires no account (3 brief + 1 detailed scan per day). A free account raises limits and unlocks the Observatory, your Dashboard, and API access.'],
   ];
 
   return (
@@ -95,18 +93,8 @@ export default function HelpPage() {
           <P>Searches are limited to recent coverage (about the past month) and span general web sources — news, analysis, and blogs. Sources that block automated access are noted and excluded.</P>
           <Tip>Add 2–3 related keywords rather than one broad term. "Modi, Adani, fraud allegations" returns sharper, more relevant coverage than just "Modi".</Tip>
 
-          <H id="bulk">Bulk CSV</H>
-          <P>Analyze many items at once. Upload a CSV of text snippets or URLs and Dissekt processes them in a batch, returning a Clarity Score and key findings for each row.</P>
-          <P>Useful for newsroom monitoring, research datasets, or auditing a backlog of sources. Requires a free account.</P>
-          <Tip>Keep one item per row. For URLs, make sure they point directly to the article, not a section or homepage.</Tip>
-
-          <H id="compare">Compare</H>
-          <P>Put two pieces of content side by side to see how they differ in construction — useful for comparing how two outlets cover the same event, or an original vs. a rewrite.</P>
-          <P>Compare highlights the difference in Clarity Scores, techniques, framing, and tone between the two. Requires a free account.</P>
-          <Tip>Compare works best on two items about the same subject — e.g. two articles on the same news event — so the differences in framing stand out.</Tip>
-
           <H id="observatory">The Observatory</H>
-          <P>The Observatory is your member space for seeing patterns across everything you have analyzed. It has two views.</P>
+          <P>The Observatory is your member space for seeing patterns across everything you have analyzed, centered on Constellation.</P>
           <P><strong>✦ Constellation</strong> — a knowledge graph of the entities (people, places, organizations, topics) from your scans. Nodes are entities; lines connect entities that appeared together or were manipulated in similar ways. It builds up as you analyze more (it unlocks at 10 scans).</P>
           <Steps items={[
             'Open Observatory → Constellation.',
@@ -115,7 +103,6 @@ export default function HelpPage() {
             'To generate a report, pick a cluster from the dropdown — it highlights in the graph — then Generate report.',
           ]} />
           <P>The <strong>cluster report</strong> is an AI-generated brief on one cluster of related topics: what it covers, what the analyses show (dominant techniques, clarity range), and a "Watch for" takeaway. Each report links to the real scans it draws from, and can be printed, copied, or saved as .txt or PDF.</P>
-          <P><strong>📈 Topic Tracking</strong> — shows how a specific subject has been analyzed over time, surfacing trends in how its coverage is constructed.</P>
           <Tip>Constellation gets more useful the more you scan. If a cluster mixes unrelated topics, the report will say so plainly rather than forcing a single story.</Tip>
 
           <H id="extension">Chrome extension</H>
@@ -126,12 +113,12 @@ export default function HelpPage() {
 
           <H id="access">Access &amp; limits</H>
           <P>Daily scan limits reset at 00:00 GMT.</P>
-          <P><strong>Free (no account):</strong> 3 brief + 1 detailed scan per day.<br /><strong>Free member account:</strong> 25 brief + 10 detailed per day, plus Bulk, Compare, and the Observatory.</P>
+          <P><strong>Free (no account):</strong> 3 brief + 1 detailed scan per day.<br /><strong>Free member account:</strong> 25 brief + 10 detailed per day, plus the Observatory, Dashboard, and API access.</P>
           <P>Brief and detailed scans are counted separately. Keyword topic analyses count as one scan of the chosen depth.</P>
           <Tip>An account is free and unlocks the features that get better over time — especially Constellation, which needs your scan history to build.</Tip>
 
           <H id="tips">Tips for good results</H>
-          <P>• Give Dissekt enough to work with — a full article or a substantial passage reads better than a one-line snippet.<br />• For URLs that fail to load, paste the text directly.<br />• Read the dimensions, not just the headline score — a low score driven by Intent (manipulation) tells a different story than one driven by Verification (weak sourcing).<br />• Use Compare and Keyword topic to see patterns across sources, not just single items.<br />• Treat the score as a starting point for your own judgment, never the final word.</P>
+          <P>• Give Dissekt enough to work with — a full article or a substantial passage reads better than a one-line snippet.<br />• For URLs that fail to load, paste the text directly.<br />• Read the dimensions, not just the headline score — a low score driven by Intent (manipulation) tells a different story than one driven by Verification (weak sourcing).<br />• Use Keyword topic to see patterns across sources, not just single items.<br />• Treat the score as a starting point for your own judgment, never the final word.</P>
 
           <H id="faq">FAQ</H>
           {faqs.map(([q, a], i) => (

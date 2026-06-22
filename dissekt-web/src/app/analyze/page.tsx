@@ -101,7 +101,7 @@ function ScanAppInner() {
       setRemaining(getRemaining());
       addToHistory({
         id: data.id,
-        input: content.slice(0, 100),
+        input: content.slice(0, 5000),  // enough for accurate rescan; bounds localStorage
         score: data.scoring?.clarity_score || data.clarity_score || 0.5,
         techniques: data.prism?.techniques?.length || 0,
         mode,

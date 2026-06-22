@@ -64,7 +64,6 @@ export default function ScanHistory({ onReanalyze }: { onReanalyze: (input: stri
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-              <a href={`/report/${item.id}`} style={{ fontSize: 10, color: '#2563eb', textDecoration: 'none', padding: '3px 8px', background: '#eff6ff', borderRadius: 4, fontWeight: 500 }}>View</a>
               <button onClick={() => onReanalyze(item.input)} style={{ fontSize: 10, color: '#0d9488', background: '#f0fdfa', border: 'none', borderRadius: 4, padding: '3px 8px', cursor: 'pointer', fontWeight: 500 }}>Rescan</button>
             </div>
           </div>

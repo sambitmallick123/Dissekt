@@ -124,7 +124,7 @@ export default function LedgerView() {
                   {d.note && <div style={{ fontSize: 10, color: '#888', marginTop: 1 }}>Note: {d.note}</div>}
                 </div>
                 <span style={{ fontSize: 9, color: '#aaa', flexShrink: 0 }}>{new Date(d.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                <a href={`/report/${d.analysis_id}`} style={{ fontSize: 9, color: '#2563eb', textDecoration: 'none', flexShrink: 0 }}>view ↗</a>
+                <a href={`/analyze?content=${encodeURIComponent(d.input_preview || '')}`} style={{ fontSize: 9, color: '#0d9488', textDecoration: 'none', flexShrink: 0, fontWeight: 600 }}>Rescan</a>
               </div>
             );
           })}

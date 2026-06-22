@@ -54,7 +54,7 @@ export default function LensCard({ trace }: { trace: any }) {
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#404040' }}>{fc.publisher}</div>
                       <div style={{ fontSize: 11, color: '#aaa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fc.title}</div>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: rs.bg, color: rs.color, border: `1px solid ${rs.border}`, whiteSpace: 'nowrap' }}>
+                    <span title={fc.rating} style={{ flexShrink: 0, maxWidth: 120, fontSize: 10, fontWeight: 600, padding: '4px 10px', borderRadius: 6, background: rs.bg, color: rs.color, border: `1px solid ${rs.border}`, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {fc.rating}
                     </span>
                   </a>

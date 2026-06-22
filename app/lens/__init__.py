@@ -16,6 +16,39 @@ from datetime import datetime
 logger = logging.getLogger("dissekt.trace")
 
 
+_RATING_LABELS = [
+    ("pants on fire", "Pants on Fire"), ("four pinocchios", "False"),
+    ("three pinocchios", "Mostly False"), ("two pinocchios", "Half True"),
+    ("one pinocchio", "Mostly True"),
+    ("mostly false", "Mostly False"), ("mostly true", "Mostly True"),
+    ("half true", "Half True"), ("partly false", "Partly False"),
+    ("misleading", "Misleading"), ("missing context", "Missing Context"),
+    ("out of context", "Out of Context"), ("unproven", "Unproven"),
+    ("unsupported", "Unsupported"), ("no evidence", "No Evidence"),
+    ("mixture", "Mixture"), ("mixed", "Mixture"), ("satire", "Satire"),
+    ("scam", "Scam"), ("altered", "Altered"), ("fake", "Fake"),
+    ("incorrect", "Incorrect"), ("inaccurate", "Inaccurate"),
+    ("false", "False"), ("true", "True"), ("correct", "Correct"),
+    ("accurate", "Accurate"),
+]
+
+
+def _short_rating(text: str) -> str:
+    """Collapse a free-text fact-check verdict into a short chip label."""
+    t = (text or "").strip()
+    if not t:
+        return ""
+    low = t.lower()
+    for needle, label in _RATING_LABELS:
+        if needle in low:
+            return label
+    # No known verdict word: fall back to a trimmed first fragment.
+    first = t.split(".")[0].strip()
+    if len(first) <= 24:
+        return first
+    return first[:24].rstrip() + "…"
+
+
 async def search_fact_checks(claim_text: str) -> list[dict]:
     """Search Google Fact Check API for existing fact-checks.
 
@@ -48,11 +81,13 @@ async def search_fact_checks(claim_text: str) -> list[dict]:
         results = []
         for claim in data.get("claims", []):
             for review in claim.get("claimReview", []):
+                _raw_rating = review.get("textualRating", "")
                 results.append({
                     "title": review.get("title", claim.get("text", "")),
                     "publisher": review.get("publisher", {}).get("name", "Unknown"),
                     "url": review.get("url", ""),
-                    "rating": review.get("textualRating", ""),
+                    "rating": _short_rating(_raw_rating),
+                    "rating_detail": _raw_rating,
                     "date": review.get("reviewDate", ""),
                 })
 

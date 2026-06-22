@@ -375,7 +375,9 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
         source_url = content.strip()
         if not source_url.startswith("http"):
             source_url = "https://" + source_url
+        _t_ext = time.time()
         extracted_text, _ = await extract_from_url(source_url)
+        logger.info(f"[TIMING] url_extraction: {time.time()-_t_ext:.2f}s")
     else:
         extracted_text = content.strip()
 
@@ -400,10 +402,12 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     trace_task = run_lens(trace_query if len(trace_query) > 20 else extracted_text[:200])
     signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
 
+    _t_core = time.time()
     prism_raw, trace_raw, signal_raw = await asyncio.gather(
         prism_task, trace_task, signal_task,
         return_exceptions=True,
     )
+    logger.info(f"[TIMING] core_gather (prism+lens+spectrum): {time.time()-_t_core:.2f}s")
 
     # Step 6: Combine results
     if isinstance(prism_raw, Exception):
@@ -488,6 +492,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
         logger.warning(f"Similar claims lookup failed: {e}")
 
     # Step 10: Political context (Compass)
+    _t_compass = time.time()
     if settings.enable_compass:
         try:
             from app.meridian import analyze_political_context
@@ -495,6 +500,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
             analysis.compass = compass_data
         except Exception as e:
             logger.warning(f"Compass failed: {e}")
+    logger.info(f"[TIMING] compass: {time.time()-_t_compass:.2f}s")
 
     # Step 10b: Coordination detection (Pulse)
     if settings.enable_pulse:
@@ -517,12 +523,14 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
             logger.warning(f"Counterfactual generation failed: {e}")
 
     # Step 11: Extract individual claims (only if techniques found, to save API cost)
+    _t_claims = time.time()
     if settings.enable_claims and len(prism_result.techniques) > 0:
         try:
             claims = await extract_claims(extracted_text, mode)
             analysis.extracted_claims = claims
         except Exception as e:
             logger.warning(f"Claim extraction failed: {e}")
+    logger.info(f"[TIMING] claims: {time.time()-_t_claims:.2f}s")
 
         # Compute System F Clarity Score
     try:
