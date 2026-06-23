@@ -186,15 +186,7 @@ export default function LandingPage() {
             <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>Built on research, not opinions</h2>
             <p style={{ fontSize: 14, color: '#888' }}>Our scoring metrics draw on peer-reviewed research.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
-            {[{ p: 'Da San Martino et al., EMNLP-IJCNLP 2019', t: 'Propaganda technique taxonomy', u: 'https://aclanthology.org/D19-1565/' }, { p: 'Baly et al., EMNLP 2018', t: 'Source factuality & bias (MBFC basis)', u: 'https://aclanthology.org/D18-1389/' }, { p: 'Wachsmuth et al., EACL 2017', t: 'Computational argumentation quality', u: 'https://aclanthology.org/E17-1017/' }, { p: 'Pavlopoulos et al., ACL 2020', t: 'Context-aware toxicity', u: 'https://aclanthology.org/2020.acl-main.396/' }, { p: 'Hutto & Gilbert, ICWSM 2014', t: 'VADER sentiment analysis', u: 'https://doi.org/10.1609/icwsm.v8i1.14550' }, { p: 'Recasens et al., ACL 2013', t: 'Framing & epistemological bias', u: 'https://aclanthology.org/P13-1162/' }, { p: 'Borkan et al., WWW 2019', t: 'Toxicity sub-labels (Detoxify)', u: 'https://arxiv.org/abs/1903.04561' }, { p: 'UNDP, Human Development Report 2010', t: 'Geometric mean for composite indices', u: 'https://hdr.undp.org/' }, { p: 'Hartung & Mallick, TSD 2024', t: 'Evaluating LLM-generated outputs', u: '#' }].map(r => (
-              <a key={r.p} href={r.u} target="_blank" rel="noopener" style={{ padding: '10px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, display: 'flex', gap: 8, textDecoration: 'none', color: 'inherit' }}>
-                <span style={{ fontSize: 14, flexShrink: 0 }}>📄</span>
-                <div><div style={{ fontSize: 11, fontWeight: 600, color: '#1a1a1a' }}>{r.p}</div><div style={{ fontSize: 10, color: '#888' }}>{r.t}</div></div>
-              </a>
-            ))}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 12 }}><a href="/help#references" style={{ fontSize: 12, color: '#0d9488', textDecoration: 'none' }}>All references →</a></div>
+          <div style={{ textAlign: 'center', fontSize: 13, color: '#888' }}>Our scoring metrics draw on peer-reviewed research in propaganda detection, media-source credibility, argumentation quality, and toxicity. <a href="/help#references" style={{ color: '#0d9488', textDecoration: 'none' }}>See the full references →</a></div>
         </div>
       </section>
 

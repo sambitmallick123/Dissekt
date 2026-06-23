@@ -15,6 +15,7 @@ const SECTIONS = [
   { id: 'access', label: 'Access & limits' },
   { id: 'tips', label: 'Tips' },
   { id: 'faq', label: 'FAQ' },
+  { id: 'references', label: 'References' },
 ];
 
 function H({ id, children }: { id: string; children: React.ReactNode }) {
