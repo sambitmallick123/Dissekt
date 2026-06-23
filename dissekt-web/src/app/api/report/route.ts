@@ -16,10 +16,11 @@ export async function POST(req: NextRequest) {
       input_content: (input_content || '').slice(0, 500),
       mode,
     });
-    if (error) throw error;
+    if (error) { console.error('REPORT SAVE ERROR:', error); return NextResponse.json({ ok: false, stage: 'save', error: error.message, details: error.details, hint: error.hint, code: error.code }, { status: 500 }); }
     return NextResponse.json({ success: true, url: `/report/${id}` });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error('REPORT SAVE THREW:', e);
+    return NextResponse.json({ ok: false, stage: 'save_throw', error: e.message }, { status: 500 });
   }
 }
 
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
       .select('*')
       .eq('id', id)
       .single();
-    if (error || !data) return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    if (error || !data) { console.error('REPORT READ ERROR:', error); return NextResponse.json({ ok: false, stage: 'read', error: error?.message || 'no row', code: error?.code }, { status: 404 }); }
     return NextResponse.json(data);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });

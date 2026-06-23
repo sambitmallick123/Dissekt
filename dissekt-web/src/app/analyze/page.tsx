@@ -116,10 +116,31 @@ function ScanAppInner() {
 
   const handleShare = async () => {
     if (!result?.id) return;
-    const url = `${window.location.origin}/report/${result.id}`;
-    await navigator.clipboard.writeText(url);
-    setShareToast('Report link copied!');
-    setTimeout(() => setShareToast(''), 2000);
+    try {
+      const res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: result.id,
+          analysis: result,
+          input_content: result.input_content || result.extracted_text || '',
+          mode: result.mode || 'brief',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data?.success === false || data?.ok === false) {
+        setShareToast('Could not create share link. Try again.');
+        setTimeout(() => setShareToast(''), 2500);
+        return;
+      }
+      const url = `${window.location.origin}/report/${result.id}`;
+      await navigator.clipboard.writeText(url);
+      setShareToast('Report link copied!');
+      setTimeout(() => setShareToast(''), 2000);
+    } catch {
+      setShareToast('Could not create share link. Try again.');
+      setTimeout(() => setShareToast(''), 2500);
+    }
   };
 
   if (!mounted) return null;
