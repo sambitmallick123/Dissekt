@@ -18,7 +18,7 @@ export default function ScanInput({ onScan, loading, initialContent }: Props) {
   const cameraRef = useRef<HTMLInputElement>(null);
 
   const isUrl = content.trim().startsWith('http');
-  const canSubmit = (content.trim().length >= 10 || image) && !loading;
+  const canSubmit = (content.trim().length >= 5 || image) && !loading;
 
   const processFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) return;
