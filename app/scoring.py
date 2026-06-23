@@ -15,16 +15,28 @@ Thresholds:
   0.35-0.65  MODERATE            #d97706 (amber)
   0.65-1.00  HIGH TRANSPARENCY   #16a34a (green)
 
-References:
-  Da San Martino et al., EMNLP 2019 — technique severity
-  Baly et al., EMNLP 2018 — multi-dimensional credibility
-  UNDP HDI — geometric mean for composite indices
-  Wachsmuth et al., ACL 2017 — argumentation quality
-  Card et al., ACL 2018 — media framing
-  Pavlopoulos et al., EACL 2021 — context-aware toxicity
-  Sap et al., ALW 2020 — hostile framing
-  Cialdini, 2007 — persuasion mechanics
-  Schuster et al., NAACL 2022 — temporal fact verification
+References (operationalized in the scoring):
+  Da San Martino et al., EMNLP-IJCNLP 2019 — propaganda technique taxonomy (Prism)
+    https://aclanthology.org/D19-1565/
+  Baly et al., EMNLP 2018 — news-source factuality & bias; basis for MBFC-style scoring (Spectrum)
+    https://aclanthology.org/D18-1389/
+  Wachsmuth et al., EACL 2017 — argumentation quality (Construction)
+    https://aclanthology.org/E17-1017/
+  Pavlopoulos et al., ACL 2020 — context-aware toxicity (Intent/tone)
+    https://aclanthology.org/2020.acl-main.396/
+  Hutto & Gilbert, ICWSM 2014 — VADER sentiment (Intent/tone, Spectrum)
+    https://doi.org/10.1609/icwsm.v8i1.14550
+  UNDP, Human Development Report 2010 (Technical Notes) — geometric mean for composite indices
+    https://hdr.undp.org/
+  Cialdini, Influence (rev. ed. 2006) — persuasion mechanics (Intent/manipulation); trade book, conceptual
+
+Conceptual / not yet operationalized (revisit when these metrics are built out):
+  Card et al., ACL-IJCNLP 2015 — Media Frames Corpus (narrative framing)
+    https://aclanthology.org/P15-2072/
+  Sap et al., ACL 2020 — Social Bias Frames (hostile/biased framing)
+    https://aclanthology.org/2020.acl-main.486/
+  Schuster et al., NAACL 2021 — VitaminC, temporal fact verification (temporal axis is a stub)
+    https://aclanthology.org/2021.naacl-main.52/
 """
 import re
 import math
@@ -378,6 +390,18 @@ def compute_full_score(techniques: list, fact_checks: list, toxicity_score: floa
         avg_conf = 0
     band = "high" if avg_conf >= 0.8 else "medium" if avg_conf >= 0.5 else "low" if techniques else "n/a"
 
+    # Coverage — how much *real* evidence backed this score, so the UI can be
+    # honest about thin inputs rather than presenting false precision.
+    signals = {
+        "fact_checks": evidence.get("has_data", True) and evidence.get("checks", 0) > 0,
+        "source_credibility": source.get("has_data", True),
+        "techniques_analyzed": bool(techniques),
+        "sufficient_text": len((text or "").split()) >= 120,
+    }
+    present = sum(1 for v in signals.values() if v)
+    coverage_ratio = present / len(signals)
+    coverage_level = "high" if coverage_ratio >= 0.75 else "moderate" if coverage_ratio >= 0.5 else "low"
+
     return {
         "clarity_score": _round(clarity),
         "label": score_label(clarity),
@@ -387,6 +411,11 @@ def compute_full_score(techniques: list, fact_checks: list, toxicity_score: floa
         "intent": intent,
         "confidence_band": band,
         "avg_confidence": _round(avg_conf),
+        "coverage": {
+            "level": coverage_level,
+            "ratio": _round(coverage_ratio, 2),
+            "signals": signals,
+        },
         "scale": "0.0-1.0",
         "thresholds": {"high": 0.65, "moderate": 0.35, "low": 0.0},
     }

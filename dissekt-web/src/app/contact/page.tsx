@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -38,8 +39,9 @@ const CONTACT_SUBJECTS = [
   'Other',
 ];
 
-export default function ContactPage() {
-  const [mode, setMode] = useState<'contact' | 'feedback'>('contact');
+function ContactInner() {
+  const searchParams = useSearchParams();
+  const [mode, setMode] = useState<'contact' | 'feedback'>(searchParams.get('mode') === 'feedback' ? 'feedback' : 'contact');
   // shared
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -214,5 +216,13 @@ export default function ContactPage() {
       </div>
       <SiteFooter />
     </main>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContactInner />
+    </Suspense>
   );
 }

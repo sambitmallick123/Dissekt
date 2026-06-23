@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     enable_pulse: bool = False             # Flare — coordination detection  [HIDDEN]
     enable_counterfactual: bool = False    # Mirror — alternative framings   [HIDDEN]
 
+    # Bias / language signal tags (lexicon-based, descriptive)
+    enable_bias: bool = True
+
     # Rate limiting
     rate_limit_free: int = 3
     rate_limit_pro: int = 100

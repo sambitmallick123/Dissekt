@@ -514,6 +514,14 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     # Step 11: Detect language
     analysis.detected_language = detect_language(extracted_text)
 
+    # Representation & language bias signals (lexicon-based, descriptive tags)
+    try:
+        if get_settings().enable_bias:
+            from app.bias_signals import detect_bias_signals
+            analysis.bias_signals = detect_bias_signals(extracted_text)
+    except Exception as e:
+        logger.warning(f"Bias signals failed: {e}")
+
     # Step 11a: Generate counterfactual views (alternative framing)
     if settings.enable_counterfactual and len(prism_result.techniques) > 0:
         try:

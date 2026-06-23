@@ -6,6 +6,7 @@ import SiteFooter from '@/components/SiteFooter';
 const SECTIONS = [
   { id: 'about', label: 'What is Dissekt' },
   { id: 'score', label: 'The Clarity Score' },
+  { id: 'signals', label: 'Language signals' },
   { id: 'single', label: 'Single scan' },
   { id: 'keyword', label: 'Keyword topic' },
   { id: 'observatory', label: 'The Observatory' },
@@ -68,6 +69,7 @@ export default function HelpPage() {
           <P>The bands: <strong style={{ color: '#16a34a' }}>0.65–1.00 High</strong> (transparent), <strong style={{ color: '#d97706' }}>0.35–0.64 Moderate</strong>, <strong style={{ color: '#dc2626' }}>0.00–0.34 Low</strong> (heavily constructed).</P>
           <P>The score combines three dimensions, multiplied together so a serious weakness in any one pulls the whole score down:</P>
           <P>• <strong>Construction</strong> — how it is built: rhetorical techniques, argument quality, completeness.<br />• <strong>Verification</strong> — how supported it is: fact-checker consensus, source credibility, named sources.<br />• <strong>Intent</strong> — what it wants: manipulation cues, tone, narrative framing.</P>
+          <P><strong>Coverage.</strong> The score also reflects how much real evidence was available. When there are no fact-checks, no known source rating, or very little text, the result leans on text-pattern heuristics and is flagged as <em>limited signal</em> — treat those scores as rougher. Missing signals are excluded and the rest reweighted, rather than quietly pulling the score to neutral.</P>
           <Tip>A high score is not an endorsement and a low score is not a debunk. A clearly written opinion piece and a heavily sourced report can both score well; the score is about transparency of construction, not agreement.</Tip>
 
           <H id="single">Single scan</H>
@@ -131,6 +133,34 @@ export default function HelpPage() {
               {open === String(i) && <div style={{ padding: '0 16px 14px', fontSize: 13.5, color: '#444', lineHeight: 1.7 }}>{a}</div>}
             </div>
           ))}
+
+          <H id="signals">Representation &amp; language signals</H>
+          <P>Alongside the score, Dissekt tags language patterns it notices. These are <strong>descriptive observations, not verdicts</strong> — each tag shows the exact words that triggered it, and you decide whether it matters. They do <strong>not</strong> affect the Clarity Score.</P>
+          <Tip>A report shows only the tags that actually fired, so a clean piece may show none — that&apos;s normal, not a failure. These patterns are detected in <strong>English only</strong>, so non-English articles may show fewer signals.</Tip>
+          <P><strong>Framing &amp; credibility language</strong></P>
+          <P>• <strong>Doubt-casting language</strong> — words that quietly question credibility (&ldquo;so-called&rdquo;, &ldquo;alleged&rdquo;, &ldquo;purported&rdquo;).<br />• <strong>Asserted certainty</strong> — verbs presenting contested points as settled (&ldquo;revealed&rdquo;, &ldquo;exposed&rdquo;, &ldquo;confirmed&rdquo;).<br />• <strong>Heavily hedged</strong> — frequent softeners that distance claims (&ldquo;may&rdquo;, &ldquo;possibly&rdquo;, &ldquo;arguably&rdquo;).<br />• <strong>One-sided framing</strong> — subjective intensifiers that assume agreement (&ldquo;clearly&rdquo;, &ldquo;obviously&rdquo;, &ldquo;of course&rdquo;).<br />• <strong>Sweeping generalization</strong> — broad claims about an entire group.<br />• <strong>Dehumanizing metaphor</strong> — threat/disaster language applied to people (&ldquo;flood&rdquo;, &ldquo;swarm&rdquo;, &ldquo;infestation&rdquo;).</P>
+          <P><strong>Toxicity sub-types</strong> (shown when detected): Severe toxicity, Obscene language, Threat, Insult, Identity attack, Sexually explicit.</P>
+          <P>Tap any tag in a report to see the specific words that triggered it.</P>
+
+          <H id="references">References</H>
+          <P>Dissekt&apos;s scoring draws on peer-reviewed research. Key sources:</P>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {[
+              ['Da San Martino et al., EMNLP-IJCNLP 2019', 'Propaganda technique taxonomy', 'https://aclanthology.org/D19-1565/'],
+              ['Baly et al., EMNLP 2018', 'News-source factuality & bias (MBFC basis)', 'https://aclanthology.org/D18-1389/'],
+              ['Wachsmuth et al., EACL 2017', 'Computational argumentation quality', 'https://aclanthology.org/E17-1017/'],
+              ['Pavlopoulos et al., ACL 2020', 'Context-aware toxicity', 'https://aclanthology.org/2020.acl-main.396/'],
+              ['Hutto & Gilbert, ICWSM 2014', 'VADER sentiment analysis', 'https://doi.org/10.1609/icwsm.v8i1.14550'],
+              ['Recasens et al., ACL 2013', 'Framing & epistemological bias', 'https://aclanthology.org/P13-1162/'],
+              ['Borkan et al., WWW 2019', 'Toxicity sub-labels (Jigsaw/Detoxify)', 'https://arxiv.org/abs/1903.04561'],
+              ['UNDP, Human Development Report 2010', 'Geometric mean for composite indices', 'https://hdr.undp.org/'],
+            ].map(([p, t, u]) => (
+              <a key={p} href={u} target="_blank" rel="noopener" style={{ fontSize: 13, color: '#404040', textDecoration: 'none', display: 'flex', gap: 8, padding: '7px 0', borderBottom: '0.5px solid #f0efec' }}>
+                <span style={{ flexShrink: 0 }}>📄</span>
+                <span><strong style={{ color: '#1a1a1a' }}>{p}</strong> — {t}</span>
+              </a>
+            ))}
+          </div>
         </div>
 
         <p style={{ fontSize: 12.5, color: '#aaa', textAlign: 'center', marginTop: 16 }}>

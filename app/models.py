@@ -136,6 +136,7 @@ class FullAnalysis(BaseModel):
     detected_language: str = Field(default="en", description="Detected input language")
     counterfactuals: list[dict] = Field(default_factory=list, description="Alternative framings for key claims")
     extracted_claims: list[dict] = Field(default_factory=list, description="Individual verifiable claims extracted")
+    bias_signals: list[dict] = Field(default_factory=list, description="Descriptive representation/language tags")
     cached: bool = False
     analyzed_at: datetime = Field(default_factory=datetime.utcnow)
     analysis_time_ms: int = 0

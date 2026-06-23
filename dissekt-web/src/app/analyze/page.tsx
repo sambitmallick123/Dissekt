@@ -169,9 +169,9 @@ function ScanAppInner() {
 
         {loading && <LoadingState />}
 
-        {result && !loading && <AnalysisResult data={result} onShare={handleShare} />}
+        {scanTab === 'single' && result && !loading && <AnalysisResult data={result} onShare={handleShare} />}
 
-        {!result && !loading && (
+        {scanTab === 'single' && !result && !loading && (
           <>
             <Scope onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </>

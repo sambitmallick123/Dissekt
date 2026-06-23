@@ -1,6 +1,7 @@
 'use client';
 import ClarityScore from './ClarityScore';
 import PrismCard from './PrismCard';
+import BiasTags from './BiasTags';
 import SpectrumCard from './SpectrumCard';
 import LensCard from './LensCard';
 import MetaCard from './MetaCard';
@@ -48,6 +49,8 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         <div className="anim-fade anim-d3"><SpectrumCard signal={data.signal} /></div>
         <div className="anim-fade anim-d4"><MetaCard data={data} /></div>
       </div>
+
+      <div className="anim-fade"><BiasTags data={data} /></div>
 
       {/* Ledger */}
       <div className="anim-fade" style={{ marginTop: 12 }}>

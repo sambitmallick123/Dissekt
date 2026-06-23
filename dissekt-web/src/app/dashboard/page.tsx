@@ -115,6 +115,7 @@ export default function DashboardPage() {
               <div style={{ fontSize: 11, opacity: 0.85, marginBottom: 10 }}>Report bugs, share ideas, and follow what we&apos;re building — available to all members.</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <a href="https://discord.gg/Bkv4zpmdJD" target="_blank" rel="noopener" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 11, color: '#fff', textDecoration: 'none', fontWeight: 600 }}>Discord →</a>
+                <a href="/review" style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.28)', borderRadius: 6, fontSize: 11, color: '#fff', textDecoration: 'none', fontWeight: 600 }}>📋 Reviewer hub →</a>
 
               </div>
             </div>
