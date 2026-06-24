@@ -120,6 +120,7 @@ class BlockchainProof(BaseModel):
 class FullAnalysis(BaseModel):
     """Complete analysis result combining all engines."""
     scoring: dict | None = None
+    facet: dict | None = None
     id: str = ""
     input_type: InputType
     input_content: str = Field(default="", description="Original input (truncated for display)")

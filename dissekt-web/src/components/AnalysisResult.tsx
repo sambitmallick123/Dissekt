@@ -1,5 +1,6 @@
 'use client';
 import ClarityScore from './ClarityScore';
+import Facet from './Facet';
 import PrismCard from './PrismCard';
 import BiasTags from './BiasTags';
 import SpectrumCard from './SpectrumCard';
@@ -41,7 +42,7 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
         )}
       </div>
 
-      <div className="anim-fade"><ClarityScore data={data} /></div>
+      <div className="anim-fade"><Facet data={data} /><ClarityScore data={data} /></div>
 
       <div className="result-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
         <div className="anim-fade anim-d1"><PrismCard prism={data.prism} analysisId={data.id || data.blockchain?.content_hash?.slice(0, 12) || ""} /></div>

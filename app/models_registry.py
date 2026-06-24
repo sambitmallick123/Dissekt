@@ -23,6 +23,7 @@ MODEL_REGISTRY = {
 # Which roles exist in the pipeline + their safe defaults (current production behavior)
 ROLE_DEFAULTS = {
     "brief_text":       "gpt-4o-mini",            # fast brief analysis
+    "synopsis_text":    "gpt-4o-mini",            # Report summary (Facet synopsis)
     "detailed_text":    "claude-sonnet-4-6",      # deep analysis
     "vision":           "gpt-4o-mini",            # image extraction
     "router":           "gpt-4o-mini",            # heuristic escalation / extraction
@@ -33,6 +34,7 @@ ROLE_DEFAULTS = {
 # Human-readable role labels for the admin UI
 ROLE_LABELS = {
     "brief_text":    "Brief analysis (fast)",
+    "synopsis_text": "Report summary",
     "detailed_text": "Detailed analysis (deep)",
     "vision":        "Image / vision",
     "router":        "Escalation router",
@@ -43,6 +45,7 @@ ROLE_LABELS = {
 # Which capability each role REQUIRES (so the admin UI only offers valid models)
 ROLE_CAPABILITY = {
     "brief_text":    "text",
+    "synopsis_text": "text",
     "detailed_text": "text",
     "vision":        "vision",
     "router":        "text",

@@ -312,6 +312,30 @@ Rules:
 # ============================================
 
 
+async def _generate_synopsis(text: str, mode: str) -> str | None:
+    """Neutral 1-2 sentence summary of what the content is about (admin role: synopsis_text).
+    Independent of Prism routing, so it also runs on heuristic-only scans. Non-fatal."""
+    if not text or len(text.strip()) < 40:
+        return None
+    try:
+        from app.llm_dispatch import call_model
+        disp = await call_model(
+            "synopsis_text",
+            system=("You summarize what a piece of content is ABOUT, for a reader who hasn't seen it. "
+                    "1-2 neutral sentences: the subject and its main points. "
+                    "Do NOT name manipulation techniques, judge credibility, or use loaded language. "
+                    "Plain factual description only."),
+            user=text[:3000],
+            max_tokens=160,
+            temperature=0.2,
+        )
+        out = (disp.get("text") or "").strip()
+        return out or None
+    except Exception as e:
+        logger.warning(f"Synopsis generation failed (non-fatal): {e}")
+        return None
+
+
 _last_vision_model = None
 
 
@@ -369,6 +393,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     # Step 1: Detect input type
     input_type = detect_input_type(content)
     source_url = ""
+    _title = ""
 
     # Step 2: Extract text if URL
     if input_type == InputType.url:
@@ -376,7 +401,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
         if not source_url.startswith("http"):
             source_url = "https://" + source_url
         _t_ext = time.time()
-        extracted_text, _ = await extract_from_url(source_url)
+        extracted_text, _title = await extract_from_url(source_url)
         logger.info(f"[TIMING] url_extraction: {time.time()-_t_ext:.2f}s")
     else:
         extracted_text = content.strip()
@@ -402,11 +427,15 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     trace_task = run_lens(trace_query if len(trace_query) > 20 else extracted_text[:200])
     signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
 
+    synopsis_task = _generate_synopsis(extracted_text, mode)
     _t_core = time.time()
-    prism_raw, trace_raw, signal_raw = await asyncio.gather(
-        prism_task, trace_task, signal_task,
+    prism_raw, trace_raw, signal_raw, synopsis_raw = await asyncio.gather(
+        prism_task, trace_task, signal_task, synopsis_task,
         return_exceptions=True,
     )
+    if isinstance(synopsis_raw, Exception):
+        logger.warning(f"Synopsis failed: {synopsis_raw}")
+        synopsis_raw = None
     logger.info(f"[TIMING] core_gather (prism+lens+spectrum): {time.time()-_t_core:.2f}s")
 
     # Step 6: Combine results
@@ -591,6 +620,21 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
             analysis.scoring = score_result
     except Exception as e:
         logger.warning(f"Scoring failed: {e}")
+
+    # Facet — establishing summary card (synopsis + provenance)
+    try:
+        from urllib.parse import urlparse as _urlparse
+        _kind = "image" if image else ("url" if input_type == InputType.url else "text")
+        _src = _urlparse(source_url).netloc.replace("www.", "") if source_url else ""
+        analysis.facet = {
+            "synopsis": synopsis_raw if isinstance(synopsis_raw, str) else None,
+            "published_at": None,  # TODO: wire from extract_from_url metadata (.date / datePublished)
+            "title": (_title or None),
+            "source_name": (_src or None),
+            "kind": _kind,
+        }
+    except Exception as e:
+        logger.warning(f"Facet assembly failed: {e}")
 
     # Enrich fact-checks with credibility info
     try:
