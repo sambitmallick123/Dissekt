@@ -12,7 +12,6 @@ export default function KeywordAnalysis() {
   const [keyword, setKeyword] = useState('');
   const [chips, setChips] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [mode, setMode] = useState<'brief' | 'detailed'>('brief');
   const [loadingSug, setLoadingSug] = useState(false);
   const [loadingReport, setLoadingReport] = useState(false);
   const [report, setReport] = useState<any>(null);
@@ -21,8 +20,10 @@ export default function KeywordAnalysis() {
   // split on commas so "a, b, c" becomes individual chips
   const addKeywords = (raw: string) => {
     const parts = raw.split(',').map(p => p.trim()).filter(Boolean);
+    if (report) { setReport(null); setSuggestions([]); }  // starting a fresh search
     setChips(prev => {
-      const next = [...prev];
+      const base = report ? [] : prev;  // don't append onto a finished search
+      const next = [...base];
       parts.forEach(p => { if (!next.some(x => x.toLowerCase() === p.toLowerCase())) next.push(p); });
       return next;
     });
@@ -55,11 +56,11 @@ export default function KeywordAnalysis() {
   const analyze = async () => {
     if (chips.length === 0) { setError('Add at least one keyword.'); return; }
     // Keyword analysis counts as one scan against the brief/detailed quota
-    if (!canScan(mode)) {
+    if (!canScan('brief')) {
       const tier = getTier();
       setError(tier === 'free'
-        ? `Free tier limit reached for ${mode} scans (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT.`
-        : `Daily limit reached for ${mode} scans. Resets in ${getResetTime()} at 00:00 GMT.`);
+        ? `Free tier limit reached for brief scans (${LIMITS.free.brief}/day). Resets in ${getResetTime()} at 00:00 GMT.`
+        : `Daily limit reached for brief scans. Resets in ${getResetTime()} at 00:00 GMT.`);
       return;
     }
     setLoadingReport(true); setError(''); setReport(null);
@@ -67,12 +68,12 @@ export default function KeywordAnalysis() {
       const res = await fetch(`${API_URL}/api/keyword/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-User-Email': getUserEmail() || '' },
-        body: JSON.stringify({ keywords: chips, mode }),
+        body: JSON.stringify({ keywords: chips, mode: 'brief' }),
       });
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || 'Analysis failed'); }
       const data = await res.json();
       setReport(data);
-      incrementUsage(mode);  // count it only on success
+      incrementUsage('brief');  // count it only on success
     } catch (err: any) { setError(err.message || 'Something went wrong'); }
     finally { setLoadingReport(false); }
   };
@@ -91,8 +92,8 @@ export default function KeywordAnalysis() {
       {/* INPUT */}
       <div style={{ display: 'flex', gap: 8, marginBottom: chips.length ? 14 : 0 }}>
         <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && suggest()}
-          placeholder="Enter a topic: 5G health risks, election fraud, climate…"
+          onKeyDown={e => { if (e.key === 'Enter' && keyword.trim()) { addKeywords(keyword); setKeyword(''); } }}
+          placeholder="Type a keyword and press Enter, or use Suggest…"
           style={{ flex: 1, padding: '11px 14px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fff' }} />
         <button onClick={suggest} disabled={loadingSug || keyword.trim().length < 2}
           style={{ padding: '11px 18px', background: '#f0f0ee', color: '#555', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: keyword.trim().length >= 2 ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>
@@ -131,16 +132,7 @@ export default function KeywordAnalysis() {
       {/* ACTION ROW */}
       {chips.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 3, background: '#f0f0ee', borderRadius: 8, padding: 3 }}>
-            <button onClick={() => setMode('brief')}
-              style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: mode === 'brief' ? '#fff' : 'transparent', color: mode === 'brief' ? '#0d9488' : '#888' }}>
-              Brief
-            </button>
-            <button onClick={() => setMode('detailed')}
-              style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: mode === 'detailed' ? '#fff' : 'transparent', color: mode === 'detailed' ? '#0d9488' : '#888' }}>
-              Detailed
-            </button>
-          </div>
+          <div />
           <button onClick={analyze} disabled={loadingReport}
             style={{ padding: '10px 22px', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
             {loadingReport ? 'Analyzing coverage…' : 'Analyze topic'}
@@ -178,8 +170,9 @@ export default function KeywordAnalysis() {
               </div>
 
               {s.synopsis && (
-                <div style={{ fontSize: 14, lineHeight: 1.7, color: '#374151', background: '#f0fdfa', border: '0.5px solid #cce9e3', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
-                  {s.synopsis}
+                <div style={{ background: '#f0fdfa', border: '0.5px solid #cce9e3', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
+                  <div style={{ fontSize: 14, lineHeight: 1.7, color: '#374151' }}>{s.synopsis}</div>
+                  <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 8 }}>* Topic summary is inferred from article headlines and sources, not full text.</div>
                 </div>
               )}
 

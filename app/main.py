@@ -615,11 +615,16 @@ async def _keyword_synopsis(topic: str, good: list, summary: dict) -> str | None
         system = (
             "You are an analyst briefing a JOURNALIST on how a TOPIC is being covered across "
             "multiple sources analyzed by Dissekt. You are given aggregate DATA only.\n"
-            "Write 2-3 sentences, no headers:\n"
-            "1. What the coverage looks like overall — is it uniform or split, and on what "
+            "Write 3-4 sentences, no headers:\n"
+            "1. What the topic appears to be about and what is being reported — inferred ONLY from the "
+            "article HEADLINES/TITLES and sources provided (you do not have full article text). "
+            "Mention the subject and, if the titles indicate it, roughly what happened or when. "
+            "Do not state specifics the titles do not support.\n"
+            "2. What the coverage looks like overall — is it uniform or split, and on what "
             "(clarity spread, recurring techniques with counts).\n"
-            "2. End with one practical 'Watch for:' note for the journalist reading future coverage.\n"
-            "RULES: Use ONLY the data given. Do NOT invent outlets, numbers, or claims. If the sources "
+            "3. End with one practical 'Watch for:' note for the journalist reading future coverage.\n"
+            "RULES: Your understanding of the topic comes from HEADLINES ONLY, not full text — stay at "
+            "that level and do not fabricate event details. Use ONLY the data given. Do NOT invent outlets, numbers, or claims. If the sources "
             "clearly span unrelated subjects, say so plainly rather than forcing one narrative. "
             "Clarity is 0-1, higher = more transparently constructed (not 'more true'). "
             "Cite specific techniques and counts. Be concrete, no vague editorializing."
@@ -642,14 +647,11 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
     kws = [k.strip() for k in (request.keywords or []) if k.strip()]
     if not kws:
         raise HTTPException(status_code=400, detail="keywords required")
-    mode = "detailed" if request.mode == "detailed" else "brief"
-
-    # Article count by tier + mode
-    is_member = bool(x_user_email)  # logged-in == member (free users have no email header on this call? keep simple)
-    if mode == "detailed":
-        n_articles = 5 if is_member else 3
-    else:
-        n_articles = 8 if is_member else 5
+    # Keyword scans always run Brief (more sources, fast/cheap). The Brief/Detailed
+    # toggle was removed from the UI; per-article analysis uses the brief_text model.
+    mode = "brief"
+    is_member = bool(x_user_email)
+    n_articles = 8 if is_member else 5
 
     _s = get_settings()
     query = " ".join(kws)
