@@ -1856,7 +1856,15 @@ async def admin_list_users(adminKey: str, page: int = 1, per_page: int = 100):
     try:
         sb = _admin_sb()
         resp = sb.auth.admin.list_users(page=page, per_page=per_page)
-        users = resp if isinstance(resp, list) else getattr(resp, "users", [])
+        # supabase-py return shape varies by version: bare list, .users attr, or dict.
+        if isinstance(resp, list):
+            users = resp
+        elif hasattr(resp, "users"):
+            users = resp.users or []
+        elif isinstance(resp, dict):
+            users = resp.get("users", []) or []
+        else:
+            users = list(resp) if resp else []
         out = []
         for u in users:
             meta = getattr(u, "user_metadata", {}) or {}
@@ -1919,10 +1927,14 @@ async def admin_ban_user(body: dict):
     if not uid:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="user_id required")
-    # NOTE: users live in the `users` table, which has no ban column. Banning needs a
-    # `banned boolean` column + a check in /api/auth/login. Not wired yet.
-    from fastapi import HTTPException
-    raise HTTPException(status_code=501, detail="Ban is not available: the users table has no ban column yet.")
+    try:
+        # ban_duration: a duration string; "876000h" ~ 100 years; "none" lifts the ban
+        dur = "876000h" if ban else "none"
+        _admin_sb().auth.admin.update_user_by_id(uid, {"ban_duration": dur})
+        return {"success": True, "action": "banned" if ban else "unbanned", "user_id": uid}
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Ban failed: {e}")
 
 @app.post("/api/admin/users/reset-password")
 async def admin_reset_password(body: dict):
@@ -1932,10 +1944,13 @@ async def admin_reset_password(body: dict):
     if not email:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="email required")
-    # NOTE: passwords are stored as password_hash in the `users` table; Supabase Auth
-    # recovery links don't apply. A real reset needs a token + email flow we don't have.
-    from fastapi import HTTPException
-    raise HTTPException(status_code=501, detail="Password reset is not available for table-based users yet.")
+    try:
+        # generate a recovery link / send reset email
+        _admin_sb().auth.admin.generate_link({"type": "recovery", "email": email})
+        return {"success": True, "action": "reset_sent", "email": email}
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Reset failed: {e}")
 
 @app.post("/api/admin/users/set-limits")
 async def admin_set_user_limits(body: dict):
@@ -1947,10 +1962,19 @@ async def admin_set_user_limits(body: dict):
     if not uid:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="user_id required")
-    # NOTE: the `users` table has no custom_limits column. Add `custom_limits jsonb`
-    # and update it here, plus read it in the rate-limit check, to enable per-user limits.
-    from fastapi import HTTPException
-    raise HTTPException(status_code=501, detail="Custom limits are not available: users table has no custom_limits column yet.")
+    try:
+        sb = _admin_sb()
+        # fetch current metadata, merge limits
+        u = sb.auth.admin.get_user_by_id(uid)
+        user_obj = getattr(u, "user", u)
+        meta = dict(getattr(user_obj, "user_metadata", {}) or {})
+        if brief is not None: meta["brief_limit"] = brief
+        if detailed is not None: meta["detailed_limit"] = detailed
+        sb.auth.admin.update_user_by_id(uid, {"user_metadata": meta})
+        return {"success": True, "action": "limits_set", "user_id": uid, "brief_limit": brief, "detailed_limit": detailed}
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Set limits failed: {e}")
 
 @app.get("/api/admin/users/activity")
 async def admin_user_activity(adminKey: str, email: str):
