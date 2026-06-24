@@ -7,7 +7,7 @@ import SpectrumCard from './SpectrumCard';
 import LensCard from './LensCard';
 import MetaCard from './MetaCard';
 import LatticeCard from './LatticeCard';
-import FacetCard from './FacetCard';
+import ClaimsCard from './ClaimsCard';
 import Mirror from './Mirror';
 import Loupe from './Loupe';
 import FactCheckSection from './FactCheckSection';
@@ -63,7 +63,7 @@ export default function AnalysisResult({ data, onShare }: { data: any; onShare?:
       )}
 
       {data.extracted_claims?.length > 0 && (
-        <div className="anim-fade anim-d3"><FacetCard claims={data.extracted_claims} sourceUrl={data.input_type === "url" ? data.input_content : (data.source_url || "")} /></div>
+        <div className="anim-fade anim-d3"><ClaimsCard claims={data.extracted_claims} sourceUrl={data.input_type === "url" ? data.input_content : (data.source_url || "")} fromOpening={!!data.facet?.claims_partial} /></div>
       )}
 
       {data.similar_claims?.length > 0 && (

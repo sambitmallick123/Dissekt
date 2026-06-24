@@ -47,6 +47,16 @@ def detect_language(text: str) -> str:
     return "en"
 
 MAX_TEXT_LENGTH = 5000
+# ── Claim extraction (chunked) ──
+# Slide a bounded window across the FULL extracted text, extract per chunk in
+# parallel, then dedupe. Per-chunk size AND chunk count are capped, so cost stays
+# bounded even on a 50k paste: at most MAX_CLAIM_CHUNKS LLM calls regardless of length.
+CLAIM_CHUNK_CHARS = 3500      # chars per chunk sent to the LLM
+CLAIM_CHUNK_OVERLAP = 400     # overlap so a claim straddling a boundary survives whole in one chunk
+MAX_CLAIM_CHUNKS = 5          # hard ceiling on parallel extraction calls (cost ceiling)
+CLAIM_TOTAL_CAP = 12          # max claims returned after dedup
+# Covered window = MAX_CLAIM_CHUNKS*(CLAIM_CHUNK_CHARS-OVERLAP)+OVERLAP = 15900 chars.
+CLAIM_COVERED_CHARS = MAX_CLAIM_CHUNKS * (CLAIM_CHUNK_CHARS - CLAIM_CHUNK_OVERLAP) + CLAIM_CHUNK_OVERLAP
 # ============================================
 # Content extraction
 # ============================================
@@ -212,33 +222,97 @@ def compute_content_hash(text: str) -> str:
 # Claim extraction
 # ============================================
 
-async def extract_claims(text: str, mode: str = "brief") -> list[dict]:
-    """Extract individual verifiable claims from text using LLM."""
-    settings = get_settings()
-    import openai
+def _chunk_text(text: str, size: int, overlap: int, max_chunks: int) -> list[str]:
+    """Sliding window over the full text, snapping to sentence/paragraph
+    boundaries where possible. Bounded by max_chunks (cost ceiling)."""
+    text = (text or "").strip()
+    if len(text) <= size:
+        return [text] if text else []
+    chunks, start, n = [], 0, len(text)
+    while start < n and len(chunks) < max_chunks:
+        end = min(start + size, n)
+        if end < n:
+            window = text[start:end]
+            cut = max(window.rfind(". "), window.rfind("\n"),
+                      window.rfind("! "), window.rfind("? "))
+            if cut > size * 0.5:          # only snap back if the boundary isn't too early
+                end = start + cut + 1
+        piece = text[start:end].strip()
+        if piece:
+            chunks.append(piece)
+        if end >= n:
+            break
+        start = max(end - overlap, start + 1)
+    return chunks
 
-    client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
-    try:
-        from app.llm_dispatch import call_model
-        _disp = await call_model(
-            "router",
-            system="""Extract verifiable factual claims from this text. Return ONLY a JSON array of objects.
-Each object: {"claim": "the specific factual claim", "type": "statistic|quote|event|prediction|causal"}
-Only include claims that can be fact-checked. Max 7 claims. No explanations, just the JSON array.""",
-            user=text[:1500],
-            max_tokens=500,
-        )
-        import json
-        raw = (_disp.get("text") or "").strip()
-        # Clean markdown fences if present
-        if raw.startswith("```"):
-            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
-            raw = raw.rsplit("```", 1)[0]
-        claims = json.loads(raw)
-        return claims if isinstance(claims, list) else []
-    except Exception as e:
-        logger.warning(f"Claim extraction LLM failed: {e}")
+
+def _dedupe_claims(claims: list, cap: int) -> list:
+    """Dedupe by normalized claim text — collapses identical re-extractions from
+    overlapping chunks — preserving document order and first occurrence."""
+    import re as _re
+    seen, out = set(), []
+    for c in claims:
+        if not isinstance(c, dict):
+            continue
+        txt = (c.get("claim") or "").strip()
+        if not txt:
+            continue
+        key = _re.sub(r"\s+", " ", _re.sub(r"[^a-z0-9 ]", "", txt.lower())).strip()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        out.append(c)
+        if len(out) >= cap:
+            break
+    return out
+
+
+_CLAIM_SYSTEM = (
+    "Extract verifiable factual claims from this text. Return ONLY a JSON array of objects.\n"
+    'Each object: {"claim": "the specific factual claim", "type": "statistic|quote|event|prediction|causal"}\n'
+    "Only include claims explicitly stated in THIS text that can be fact-checked. "
+    "Do not infer claims that are not present. Max 5 claims. No explanations, just the JSON array."
+)
+
+
+async def extract_claims(text: str, mode: str = "brief") -> list[dict]:
+    """Extract verifiable claims across the FULL text via bounded parallel chunks.
+
+    Slides a window over the entire extracted text (not just the head), runs each
+    chunk through the router model concurrently, then dedupes overlapping results.
+    Chunk size and count are capped, so cost stays bounded on very long inputs.
+    """
+    if not text or len(text.strip()) < 40:
         return []
+
+    chunks = _chunk_text(text, CLAIM_CHUNK_CHARS, CLAIM_CHUNK_OVERLAP, MAX_CLAIM_CHUNKS)
+    if not chunks:
+        return []
+
+    from app.llm_dispatch import call_model
+    import json
+
+    async def _extract_one(chunk: str) -> list:
+        try:
+            _disp = await call_model("router", system=_CLAIM_SYSTEM, user=chunk, max_tokens=500)
+            raw = (_disp.get("text") or "").strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+                raw = raw.rsplit("```", 1)[0]
+            parsed = json.loads(raw)
+            return parsed if isinstance(parsed, list) else []
+        except Exception as e:
+            logger.warning(f"Claim chunk extraction failed (non-fatal): {e}")
+            return []
+
+    results = await asyncio.gather(*[_extract_one(c) for c in chunks], return_exceptions=True)
+    merged = []
+    for r in results:
+        if isinstance(r, list):
+            merged.extend(r)
+    claims = _dedupe_claims(merged, CLAIM_TOTAL_CAP)
+    logger.info(f"[claims] {len(chunks)} chunk(s) -> {len(merged)} raw -> {len(claims)} deduped")
+    return claims
 
 
 # ============================================
@@ -493,9 +567,6 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
         analysis_time_ms=analysis_time,
     )
 
-    # Step 7: Cache result
-    await set_cached(content_hash, mode, analysis.model_dump(mode="json"))
-
     # Step 8: Store in claim graph (non-blocking, don't fail the response)
     try:
         from app.claim_graph import store_analysis
@@ -632,6 +703,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
             "title": (_title or None),
             "source_name": (_src or None),
             "kind": _kind,
+            "claims_partial": len(extracted_text) > CLAIM_COVERED_CHARS,
         }
     except Exception as e:
         logger.warning(f"Facet assembly failed: {e}")
@@ -650,6 +722,14 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     except Exception:
         pass
     
+    # Cache the FULLY-enriched result (scoring, facet, compass, claims all attached).
+    # Must run last — running it at construction time cached a bare result and
+    # cache hits came back with scoring/facet missing.
+    try:
+        await set_cached(content_hash, mode, analysis.model_dump(mode="json"))
+    except Exception as e:
+        logger.warning(f"Cache write failed: {e}")
+
     return analysis
 
 
