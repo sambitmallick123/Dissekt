@@ -1851,24 +1851,29 @@ def _check_admin(adminKey: str):
 
 @app.get("/api/admin/users")
 async def admin_list_users(adminKey: str, page: int = 1, per_page: int = 100):
-    """List all Supabase Auth users."""
+    """List registered users from the application `users` table (where signups land)."""
     _check_admin(adminKey)
     try:
         sb = _admin_sb()
-        resp = sb.auth.admin.list_users(page=page, per_page=per_page)
-        # resp may be a list or have .users depending on sdk version
-        users = resp if isinstance(resp, list) else getattr(resp, "users", [])
+        start = (page - 1) * per_page
+        end = start + per_page - 1
+        rows = sb.table("users").select(
+            "id, email, name, tier, invite_code, access_expires_at, last_login, created_at"
+        ).order("created_at", desc=True).range(start, end).execute()
         out = []
-        for u in users:
-            meta = getattr(u, "user_metadata", {}) or {}
+        for u in (rows.data or []):
             out.append({
-                "id": getattr(u, "id", ""),
-                "email": getattr(u, "email", ""),
-                "name": meta.get("name", ""),
-                "created_at": str(getattr(u, "created_at", "")),
-                "last_sign_in_at": str(getattr(u, "last_sign_in_at", "") or ""),
-                "banned_until": str(getattr(u, "banned_until", "") or ""),
-                "confirmed": bool(getattr(u, "email_confirmed_at", None)),
+                "id": u.get("id", ""),
+                "email": u.get("email", ""),
+                "name": u.get("name", "") or "",
+                "tier": u.get("tier", "free"),
+                "created_at": str(u.get("created_at", "") or ""),
+                "last_sign_in_at": str(u.get("last_login", "") or ""),
+                "access_expires_at": str(u.get("access_expires_at", "") or ""),
+                # Auth-only concepts; this table has no such columns. Stubbed so the
+                # frontend's optional indicators simply don't render rather than break.
+                "banned_until": "",
+                "confirmed": True,
             })
         return {"users": out, "count": len(out)}
     except Exception as e:
@@ -1885,14 +1890,13 @@ async def admin_delete_user(body: dict):
         raise HTTPException(status_code=400, detail="user_id required")
     try:
         sb = _admin_sb()
-        # Look up the user's email first so we can purge their scan metadata
+        # Resolve email from the users table so we can purge their data (GDPR erasure).
         email = None
         try:
-            u = sb.auth.admin.get_user_by_id(uid)
-            email = getattr(getattr(u, "user", None), "email", None) or (u.get("user", {}).get("email") if isinstance(u, dict) else None)
+            row = sb.table("users").select("email").eq("id", uid).single().execute()
+            email = (row.data or {}).get("email")
         except Exception as e:
             logger.warning(f"[delete] could not resolve email for {uid}: {e}")
-        # Delete all user-identifiable data (GDPR erasure) before removing the auth user.
         # These tables are keyed on user_email.
         purged = {}
         if email:
@@ -1905,7 +1909,8 @@ async def admin_delete_user(body: dict):
                 except Exception as e:
                     logger.error(f"[delete] purge failed for {tbl}/{email}: {e}")
                     purged[tbl] = "error"
-        sb.auth.admin.delete_user(uid)
+        # Remove the user record itself
+        sb.table("users").delete().eq("id", uid).execute()
         return {"success": True, "action": "deleted", "user_id": uid, "purged": purged}
     except Exception as e:
         from fastapi import HTTPException
@@ -1920,14 +1925,10 @@ async def admin_ban_user(body: dict):
     if not uid:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="user_id required")
-    try:
-        # ban_duration: a duration string; "876000h" ~ 100 years; "none" lifts the ban
-        dur = "876000h" if ban else "none"
-        _admin_sb().auth.admin.update_user_by_id(uid, {"ban_duration": dur})
-        return {"success": True, "action": "banned" if ban else "unbanned", "user_id": uid}
-    except Exception as e:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"Ban failed: {e}")
+    # NOTE: users live in the `users` table, which has no ban column. Banning needs a
+    # `banned boolean` column + a check in /api/auth/login. Not wired yet.
+    from fastapi import HTTPException
+    raise HTTPException(status_code=501, detail="Ban is not available: the users table has no ban column yet.")
 
 @app.post("/api/admin/users/reset-password")
 async def admin_reset_password(body: dict):
@@ -1937,13 +1938,10 @@ async def admin_reset_password(body: dict):
     if not email:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="email required")
-    try:
-        # generate a recovery link / send reset email
-        _admin_sb().auth.admin.generate_link({"type": "recovery", "email": email})
-        return {"success": True, "action": "reset_sent", "email": email}
-    except Exception as e:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"Reset failed: {e}")
+    # NOTE: passwords are stored as password_hash in the `users` table; Supabase Auth
+    # recovery links don't apply. A real reset needs a token + email flow we don't have.
+    from fastapi import HTTPException
+    raise HTTPException(status_code=501, detail="Password reset is not available for table-based users yet.")
 
 @app.post("/api/admin/users/set-limits")
 async def admin_set_user_limits(body: dict):
@@ -1955,19 +1953,10 @@ async def admin_set_user_limits(body: dict):
     if not uid:
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="user_id required")
-    try:
-        sb = _admin_sb()
-        # fetch current metadata, merge limits
-        u = sb.auth.admin.get_user_by_id(uid)
-        user_obj = getattr(u, "user", u)
-        meta = dict(getattr(user_obj, "user_metadata", {}) or {})
-        if brief is not None: meta["brief_limit"] = brief
-        if detailed is not None: meta["detailed_limit"] = detailed
-        sb.auth.admin.update_user_by_id(uid, {"user_metadata": meta})
-        return {"success": True, "action": "limits_set", "user_id": uid, "brief_limit": brief, "detailed_limit": detailed}
-    except Exception as e:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"Set limits failed: {e}")
+    # NOTE: the `users` table has no custom_limits column. Add `custom_limits jsonb`
+    # and update it here, plus read it in the rate-limit check, to enable per-user limits.
+    from fastapi import HTTPException
+    raise HTTPException(status_code=501, detail="Custom limits are not available: users table has no custom_limits column yet.")
 
 @app.get("/api/admin/users/activity")
 async def admin_user_activity(adminKey: str, email: str):
