@@ -222,6 +222,45 @@ async def rate_limit(request: Request, call_next):
 # Endpoints
 # ============================================
 
+@app.get("/api/_debug/admin-users")
+async def admin_users_debug():
+    """TEMPORARY diagnostic — surfaces the real admin-list error + env state. REMOVE after debugging."""
+    import json as _json, base64 as _b64
+    out = {}
+    try:
+        s = get_settings()
+        k = s.supabase_service_key or ""
+        url = s.supabase_url or ""
+        out["url_present"] = bool(url)
+        out["url_len"] = len(url)
+        out["service_key_present"] = bool(k)
+        out["service_key_len"] = len(k)
+        # decode role claim without exposing the key
+        try:
+            pay = k.split(".")[1]; pay += "=" * (-len(pay) % 4)
+            out["service_key_role"] = _json.loads(_b64.urlsafe_b64decode(pay)).get("role")
+        except Exception as de:
+            out["service_key_role"] = f"decode-failed: {de}"
+    except Exception as e:
+        out["settings_error"] = repr(e)
+    # now attempt the actual failing call
+    try:
+        sb = _admin_sb()
+        resp = sb.auth.admin.list_users(page=1, per_page=1)
+        if isinstance(resp, list):
+            n = len(resp)
+        elif hasattr(resp, "users"):
+            n = len(resp.users or [])
+        else:
+            n = -1
+        out["list_users_ok"] = True
+        out["sample_count"] = n
+    except Exception as e:
+        out["list_users_ok"] = False
+        out["list_users_error"] = repr(e)
+    return out
+
+
 @app.get("/health")
 async def health():
     """Health check endpoint."""
