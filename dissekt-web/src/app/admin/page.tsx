@@ -191,8 +191,8 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
   const [newPw, setNewPw] = useState('');
 
   useEffect(() => {
-    fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stats', adminKey }) })
-      .then(r => r.json()).then(d => { setStats(d.stats || d || {}); setUsers(d.users || []); }).catch(() => {});
+    fetch(`/api/admin?view=stats&key=${encodeURIComponent(adminKey)}`)
+      .then(r => r.json()).then(d => { setStats(d || {}); }).catch(() => {});
   }, [adminKey]);
 
   const changePassword = async () => {

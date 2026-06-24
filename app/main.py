@@ -222,6 +222,29 @@ async def rate_limit(request: Request, call_next):
 # Endpoints
 # ============================================
 
+@app.get("/api/me/limits")
+async def my_limits(email: str):
+    """Effective daily limits: admin override (user_metadata) else tier default."""
+    DEFAULTS = {"member": {"brief": 25, "detailed": 10}, "free": {"brief": 3, "detailed": 1}}
+    try:
+        sb = _admin_sb()
+        resp = sb.auth.admin.list_users(page=1, per_page=200)
+        users = resp if isinstance(resp, list) else getattr(resp, "users", [])
+        u = next((x for x in users if (getattr(x, "email", "") or "").lower() == email.lower()), None)
+        tier = "member" if u else "free"
+        meta = (getattr(u, "user_metadata", {}) or {}) if u else {}
+        b = meta.get("brief_limit")
+        d = meta.get("detailed_limit")
+        return {
+            "brief": int(b) if b is not None else DEFAULTS[tier]["brief"],
+            "detailed": int(d) if d is not None else DEFAULTS[tier]["detailed"],
+            "tier": tier,
+        }
+    except Exception as e:
+        logger.warning(f"my_limits failed for {email}: {e}")
+        return {"brief": DEFAULTS["free"]["brief"], "detailed": DEFAULTS["free"]["detailed"], "tier": "free"}
+
+
 @app.get("/health")
 async def health():
     """Health check endpoint."""

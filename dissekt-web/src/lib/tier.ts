@@ -91,12 +91,25 @@ export function getResetTime(): string {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export async function fetchLiveLimits(): Promise<{ brief: number; detailed: number; tier: Tier } | null> {
-  // Member limits come from tier defaults (LIMITS). Admin per-user overrides
-  // are applied server-side via user_metadata; the client uses defaults.
-  // (Previously called /api/user/access which no longer exists.)
+  // Fetch the user's effective limits (admin override from user_metadata, else
+  // tier default) and cache into the localStorage keys effectiveLimit() reads.
   if (typeof window === 'undefined') return null;
   await refreshAuth();
-  return null;
+  const email = getUserEmail();
+  if (!email) {
+    localStorage.removeItem('dissekt_live_brief');
+    localStorage.removeItem('dissekt_live_detailed');
+    return null;
+  }
+  try {
+    const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const res = await fetch(`${API}/api/me/limits?email=${encodeURIComponent(email)}`);
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (typeof d.brief === 'number') localStorage.setItem('dissekt_live_brief', String(d.brief));
+    if (typeof d.detailed === 'number') localStorage.setItem('dissekt_live_detailed', String(d.detailed));
+    return { brief: d.brief, detailed: d.detailed, tier: (d.tier as Tier) || getTier() };
+  } catch { return null; }
 }
 
 // Effective limit: admin override (cached from server) or tier default
