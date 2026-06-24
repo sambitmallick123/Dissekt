@@ -222,39 +222,6 @@ async def rate_limit(request: Request, call_next):
 # Endpoints
 # ============================================
 
-@app.get("/api/_debug/admin-users2")
-async def admin_users_debug2():
-    """TEMP probe — runs the real list path, returns the exception. REMOVE after."""
-    import traceback
-    try:
-        sb = _admin_sb()
-        resp = sb.auth.admin.list_users(page=1, per_page=100)
-        if isinstance(resp, list):
-            users = resp
-        elif hasattr(resp, "users"):
-            users = resp.users or []
-        elif isinstance(resp, dict):
-            users = resp.get("users", []) or []
-        else:
-            users = list(resp) if resp else []
-        out = []
-        for u in users:
-            meta = getattr(u, "user_metadata", {}) or {}
-            out.append({
-                "id": getattr(u, "id", ""),
-                "email": getattr(u, "email", ""),
-                "name": meta.get("name", ""),
-                "tier": meta.get("tier", "free"),
-                "created_at": str(getattr(u, "created_at", "")),
-                "last_sign_in_at": str(getattr(u, "last_sign_in_at", "") or ""),
-                "banned_until": str(getattr(u, "banned_until", "") or ""),
-                "confirmed": bool(getattr(u, "email_confirmed_at", None)),
-            })
-        return {"ok": True, "count": len(out), "users": out[:3]}
-    except Exception as e:
-        return {"ok": False, "error": repr(e), "trace": traceback.format_exc()[-1500:]}
-
-
 @app.get("/health")
 async def health():
     """Health check endpoint."""
@@ -1879,7 +1846,7 @@ def _admin_sb():
     return create_client(s.supabase_url, s.supabase_service_key)
 
 def _check_admin(adminKey: str):
-    if adminKey != settings.dissekt_admin_key:
+    if adminKey != get_settings().dissekt_admin_key:
         from fastapi import HTTPException
         raise HTTPException(status_code=401, detail="Invalid admin key")
 
