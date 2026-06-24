@@ -371,7 +371,7 @@ async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias
 
 
 @app.get("/api/constellation")
-async def constellation(email: str, preview: bool = False, x_admin_key: str = Header(default="")):
+async def constellation(email: str, preview: bool = False, days: int = 7, x_admin_key: str = Header(default="")):
     """Member knowledge graph. Nodes=entities, edges=co-occurrence + technique-similarity.
     Each node carries related scans (analysis_id -> /report/{id}). preview bypasses threshold."""
     from fastapi import HTTPException
@@ -381,15 +381,17 @@ async def constellation(email: str, preview: bool = False, x_admin_key: str = He
         _settings = get_settings()
         from supabase import create_client
         sb = create_client(_settings.supabase_url, _settings.supabase_service_key)
+        # Hard cap: Constellation is a recent-activity view, max 7 days, ever.
+        from datetime import datetime, timezone, timedelta
+        days = max(1, min(int(days or 7), 7))
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
         rows = sb.table("scans").select(
             "id, analysis_id, techniques, entities, toxicity, clarity, created_at"
-        ).eq("user_email", email).order("created_at", desc=True).limit(500).execute()
+        ).eq("user_email", email).gte("created_at", since).order("created_at", desc=True).limit(500).execute()
         scans = rows.data or []
-        THRESHOLD = 10
-        _settings_admin = get_settings()
-        admin_preview = preview and x_admin_key and x_admin_key == getattr(_settings_admin, "dissekt_admin_key", None)
-        if len(scans) < THRESHOLD and not admin_preview:
-            return {"ready": False, "count": len(scans), "needed": THRESHOLD, "nodes": [], "edges": []}
+        # No unlock gate — render whatever exists in the window. Empty only at zero.
+        if not scans:
+            return {"ready": True, "empty": True, "days": days, "count": 0, "nodes": [], "edges": [], "n_clusters": 0}
 
         import math
         from collections import defaultdict, Counter
@@ -470,13 +472,15 @@ async def constellation(email: str, preview: bool = False, x_admin_key: str = He
                 if any(vecs[ks[i]]) and any(vecs[ks[j]]):
                     sim = cosim(vecs[ks[i]], vecs[ks[j]])
                     if sim >= 0.5:
-                        tech_edges.append((ks[i], ks[j], round(sim, 2)))
+                        tier = "strong" if sim >= 0.78 else "medium" if sim >= 0.62 else "weak"
+                        tech_edges.append((ks[i], ks[j], round(sim, 2), tier))
 
         edges = []
         for (a, b), ct in co.items():
-            edges.append({"source": a, "target": b, "type": "co", "weight": ct})
-        for (a, b, sim) in tech_edges:
-            edges.append({"source": a, "target": b, "type": "tech", "weight": sim})
+            co_tier = "strong" if ct >= 3 else "medium" if ct == 2 else "weak"
+            edges.append({"source": a, "target": b, "type": "co", "weight": ct, "tier": co_tier})
+        for (a, b, sim, tier) in tech_edges:
+            edges.append({"source": a, "target": b, "type": "tech", "weight": sim, "tier": tier})
 
 
         # Connected-component clustering: nodes linked by any edge form a cluster
@@ -688,7 +692,7 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
 
 
 @app.get("/api/constellation/report")
-async def constellation_report(email: str, cluster: int,
+async def constellation_report(email: str, cluster: int, days: int = 7,
                                x_admin_key: str = Header(default="")):
     """Generate a grounded LLM report for one cluster of the member's Constellation."""
     from fastapi import HTTPException
@@ -696,9 +700,9 @@ async def constellation_report(email: str, cluster: int,
         raise HTTPException(status_code=400, detail="email required")
     try:
         # Reuse the constellation builder to get nodes/edges with cluster ids
-        data = await constellation(email=email, preview=True, x_admin_key=x_admin_key)
-        if not data.get("ready"):
-            return {"ready": False, "count": data.get("count", 0), "needed": data.get("needed", 10)}
+        data = await constellation(email=email, preview=True, days=days, x_admin_key=x_admin_key)
+        if data.get("empty") or not data.get("nodes"):
+            return {"ready": False, "empty": True, "count": data.get("count", 0)}
 
         nodes = [n for n in data["nodes"] if n.get("cluster") == cluster]
         if not nodes:

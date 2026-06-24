@@ -9,7 +9,7 @@ type Node = {
   scans: { analysis_id: string; clarity: number | null; top_technique: string | null; toxicity: number; created_at: string }[];
   x: number; y: number; vx: number; vy: number;
 };
-type Edge = { source: string; target: string; type: 'co' | 'tech'; weight: number };
+type Edge = { source: string; target: string; type: 'co' | 'tech'; weight: number; tier?: 'strong'|'medium'|'weak' };
 
 const TYPE_COLORS: Record<string, string> = {
   person: '#7F77DD', org: '#378ADD', place: '#1D9E75', theme: '#D85A30', topic: '#D4537E',
@@ -18,7 +18,8 @@ const toxColor = (t: number) => (t >= 0.65 ? '#E24B4A' : t >= 0.4 ? '#EF9F27' : 
 const clarColor = (c: number) => (c >= 0.65 ? '#1D9E75' : c >= 0.35 ? '#BA7517' : '#A32D2D');
 
 export default function Constellation() {
-  const [state, setState] = useState<'loading' | 'locked' | 'ready' | 'error'>('loading');
+  const [state, setState] = useState<'loading' | 'empty' | 'ready' | 'error'>('loading');
+  const [days, setDays] = useState(7);
   const [count, setCount] = useState(0);
   const [needed, setNeeded] = useState(10);
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -39,6 +40,7 @@ export default function Constellation() {
   const movedRef = useRef(false);
   const offRef = useRef({ x: 0, y: 0 });
   const selRef = useRef<Node | null>(null);
+  const hoverRef = useRef<Node | null>(null);
   const colorRef = useRef<'tox' | 'type'>('tox');
   const clusterRef = useRef<number>(-1);
   const [zoom, setZoom] = useState(1);
@@ -54,12 +56,13 @@ export default function Constellation() {
 
   useEffect(() => {
     const email = getUserEmail();
-    if (!email) { setState('locked'); setCount(0); return; }
+    if (!email) { setState('empty'); setCount(0); return; }
+    setState('loading');
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    fetch(`${apiUrl}/api/constellation?email=${encodeURIComponent(email)}`)
+    fetch(`${apiUrl}/api/constellation?email=${encodeURIComponent(email)}&days=${days}`)
       .then(r => r.json())
       .then(d => {
-        if (!d.ready) { setState('locked'); setCount(d.count || 0); setNeeded(d.needed || 10); return; }
+        if (d.empty || !(d.nodes || []).length) { setState('empty'); setCount(0); return; }
         const W2 = 600, H2 = 420;
         const ns: Node[] = (d.nodes || []).map((n: any) => ({
           ...n, x: W2 / 2 + (Math.random() - 0.5) * 200, y: H2 / 2 + (Math.random() - 0.5) * 200, vx: 0, vy: 0,
@@ -70,7 +73,7 @@ export default function Constellation() {
         setState('ready');
       })
       .catch(() => setState('error'));
-  }, []);
+  }, [days]);
 
   const radius = (n: Node) => 9 + n.freq * 2;
   const nodeColor = useCallback((n: Node) => (colorRef.current === 'tox' ? toxColor(n.toxicity) : (TYPE_COLORS[n.type] || '#888780')), []);
@@ -85,7 +88,9 @@ export default function Constellation() {
       const ns = nodesRef.current, es = edgesRef.current;
       for (let i = 0; i < ns.length; i++) for (let j = i + 1; j < ns.length; j++) {
         const a = ns[i], b = ns[j]; let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1;
-        const rep = 2400 / (d * d); a.vx -= dx / d * rep; a.vy -= dy / d * rep; b.vx += dx / d * rep; b.vy += dy / d * rep;
+        const rep = 5200 / (d * d); a.vx -= dx / d * rep; a.vy -= dy / d * rep; b.vx += dx / d * rep; b.vy += dy / d * rep;
+        const minD = radius(a) + radius(b) + 6;
+        if (d < minD) { const push = (minD - d) * 0.5; a.vx -= dx / d * push; a.vy -= dy / d * push; b.vx += dx / d * push; b.vy += dy / d * push; }
       }
       es.forEach(e => {
         const a = byId[e.source], b = byId[e.target]; if (!a || !b) return;
@@ -110,14 +115,22 @@ export default function Constellation() {
       const z = zoomRef.current;
       ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
       const ns = nodesRef.current, es = edgesRef.current;
+      const cl = clusterRef.current;
+      const focus = hoverRef.current || selRef.current;
       es.forEach(e => {
         const a = byId[e.source], b = byId[e.target]; if (!a || !b) return;
-        const cl = clusterRef.current;
-        const edgeIn = (a as any).cluster === cl && (b as any).cluster === cl;
-        const eDim = cl < 0 ? 1 : (edgeIn ? 1 : 0.08);
+        const touchesFocus = focus && (e.source === focus.id || e.target === focus.id);
+        const strong = e.tier === 'strong';
+        const edgeIn = cl >= 0 && (a as any).cluster === cl && (b as any).cluster === cl;
+        // At rest: draw strong edges only. On focus: also draw that node's full edge set. Cluster mode: that cluster's edges.
+        if (!touchesFocus && !edgeIn && !strong) return;
+        let base = e.type === 'tech' ? 0.5 : 0.28;
+        if (e.tier === 'weak') base *= 0.5;
+        const eDim = touchesFocus ? 1 : edgeIn ? 0.85 : focus ? 0.12 : (cl >= 0 ? 0.08 : 0.6);
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-        if (e.type === 'tech') { ctx.strokeStyle = '#7F77DD'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.55 * eDim; }
-        else { ctx.strokeStyle = '#888780'; ctx.setLineDash([]); ctx.lineWidth = 1.5; ctx.globalAlpha = 0.3 * eDim; }
+        if (e.type === 'tech') { ctx.strokeStyle = '#7F77DD'; ctx.setLineDash([4, 3]); }
+        else { ctx.strokeStyle = '#888780'; ctx.setLineDash([]); }
+        ctx.lineWidth = touchesFocus ? 2 : 1.4; ctx.globalAlpha = base * eDim;
         ctx.stroke(); ctx.globalAlpha = 1; ctx.setLineDash([]);
       });
       ns.forEach(n => {
@@ -139,17 +152,22 @@ export default function Constellation() {
         // crisp white edge on focused nodes (separates them from the glow)
         if (isFocus) { ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke(); }
         if (n === selRef.current) { ctx.globalAlpha = 1; ctx.lineWidth = 2.5; ctx.strokeStyle = '#2C2C2A'; ctx.stroke(); }
-        // label: readable size, halo for contrast, dim if outside selected cluster
-        ctx.globalAlpha = (cl2 >= 0 && !inCl) ? 0.35 : 1;
-        const fs = 11;
-        ctx.font = `600 ${fs}px sans-serif`;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-        const labelR = (cl2 >= 0 && (n as any).cluster === cl2) ? radius(n) * 1.25 : radius(n);
-        ctx.strokeText(n.name, n.x, n.y - labelR - 8);
-        ctx.fillStyle = '#2C2C2A';
-        ctx.fillText(n.name, n.x, n.y - labelR - 8);
-        ctx.globalAlpha = 1;
+        // label thinning: show only significant nodes at rest; reveal rest on focus/zoom/hover
+        const f = hoverRef.current || selRef.current;
+        const near = f && (f.id === n.id || es.some(e => (e.source === f.id && e.target === n.id) || (e.target === f.id && e.source === n.id)));
+        const important = n.freq >= 3 || isFocus;
+        const show = important || near || zoomRef.current >= 1.6 || n === selRef.current || n === hoverRef.current;
+        if (show) {
+          ctx.globalAlpha = isOther && !near ? 0.3 : 1;
+          ctx.font = `500 11px sans-serif`;
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+          const labelR = isFocus ? radius(n) * 1.25 : radius(n);
+          ctx.strokeText(n.name, n.x, n.y - labelR - 8);
+          ctx.fillStyle = '#2C2C2A';
+          ctx.fillText(n.name, n.x, n.y - labelR - 8);
+          ctx.globalAlpha = 1;
+        }
       });
     };
     const loop = () => { tick(); draw(); rafRef.current = requestAnimationFrame(loop); };
@@ -175,27 +193,45 @@ export default function Constellation() {
     if (n) { dragRef.current = n; movedRef.current = false; offRef.current = { x: p.x - n.x, y: p.y - n.y }; }
   };
   const onMove = (e: React.MouseEvent) => {
-    if (!dragRef.current) return;
-    const p = getPos(e); dragRef.current.x = p.x - offRef.current.x; dragRef.current.y = p.y - offRef.current.y; dragRef.current.vx = 0; dragRef.current.vy = 0; movedRef.current = true;
+    if (dragRef.current) {
+      const p = getPos(e); dragRef.current.x = p.x - offRef.current.x; dragRef.current.y = p.y - offRef.current.y; dragRef.current.vx = 0; dragRef.current.vy = 0; movedRef.current = true;
+      return;
+    }
+    hoverRef.current = hit(getPos(e));
   };
   const onUp = () => { if (dragRef.current && !movedRef.current) setSelected(dragRef.current); dragRef.current = null; };
 
   if (state === 'loading') return <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Loading your Constellation…</div>;
   if (state === 'error') return <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>Couldn't load the Constellation. Try again later.</div>;
 
-  if (state === 'locked') {
-    const pct = Math.min((count / needed) * 100, 100);
+  const RANGE = [{ d: 1, label: '24h' }, { d: 3, label: '3 days' }, { d: 7, label: '1 week' }];
+  const RangePicker = () => (
+    <div style={{ display: 'flex', gap: 3 }}>
+      {RANGE.map(r => (
+        <button key={r.d} onClick={() => setDays(r.d)}
+          style={{ fontSize: 11, padding: '5px 12px', border: '1px solid ' + (days === r.d ? '#0d9488' : '#e5e5e5'),
+            borderRadius: 6, background: days === r.d ? '#0d9488' : '#fff', color: days === r.d ? '#fff' : '#555',
+            cursor: 'pointer', fontWeight: days === r.d ? 600 : 400 }}>
+          {r.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (state === 'empty') {
     return (
-      <div style={{ textAlign: 'center', padding: '48px 16px', maxWidth: 440, margin: '0 auto' }}>
-        <div style={{ fontSize: 30, marginBottom: 12 }}>✦</div>
-        <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>Your Constellation is forming</div>
-        <div style={{ fontSize: 13, color: '#888', lineHeight: 1.6, marginBottom: 20 }}>
-          As you analyze content, Dissekt maps the people, places, and topics you investigate — and how they're manipulated. Analyze at least {needed} pieces to reveal your Constellation.
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: 12, color: '#888', marginRight: 'auto' }}>Showing analyses from the selected range</span>
+          <RangePicker />
         </div>
-        <div style={{ background: '#f0f0ee', borderRadius: 8, height: 10, overflow: 'hidden', marginBottom: 8 }}>
-          <div style={{ width: `${pct}%`, height: '100%', background: '#0d9488', transition: 'width 0.4s' }} />
+        <div style={{ textAlign: 'center', padding: '48px 16px', maxWidth: 440, margin: '0 auto' }}>
+          <div style={{ fontSize: 30, marginBottom: 12 }}>✦</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a', marginBottom: 8 }}>No analyses in this range</div>
+          <div style={{ fontSize: 13, color: '#888', lineHeight: 1.6 }}>
+            Constellation maps the people, places, and topics from your recent scans. Widen the range above, or run a new analysis to populate it.
+          </div>
         </div>
-        <div style={{ fontSize: 12, color: '#888' }}>{count} / {needed} analyses</div>
       </div>
     );
   }
@@ -205,7 +241,7 @@ export default function Constellation() {
     try {
       const email = getUserEmail();
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/constellation/report?email=${encodeURIComponent(email || '')}&cluster=${reportCluster}`);
+      const res = await fetch(`${apiUrl}/api/constellation/report?email=${encodeURIComponent(email || '')}&cluster=${reportCluster}&days=${days}`);
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || 'Report failed'); }
       setReport(await res.json());
     } catch (err: any) { setReportErr(err.message || 'Something went wrong'); }
@@ -252,6 +288,7 @@ export default function Constellation() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 12, color: '#888', marginRight: 'auto' }}>Drag nodes · zoom with +/− · click a node for details</span>
+        <div style={{ marginRight: 8 }}><RangePicker /></div>
         <div style={{ display: 'flex', gap: 3, marginRight: 6 }}>
           <button onClick={zoomOut} title="Zoom out" style={{ fontSize: 13, width: 26, height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555', lineHeight: 1 }}>−</button>
           <button onClick={zoomReset} title="Reset view" style={{ fontSize: 10, padding: '0 8px', height: 26, border: '1px solid #e5e5e5', borderRadius: 6, background: '#fff', cursor: 'pointer', color: '#555' }}>{Math.round(zoom * 100)}%</button>
