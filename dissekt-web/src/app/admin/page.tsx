@@ -168,7 +168,7 @@ export default function AdminPage() {
             </button>
           ))}
         </div>
-        {tab === 'overview' && <OverviewTab adminKey={adminKey} />}
+        {tab === 'overview' && <OverviewTab adminKey={adminKey} setTab={setTab} />}
         {tab === 'users' && <UsersTab adminKey={adminKey} />}
         {tab === 'invitations' && <InvitationsTab adminKey={adminKey} />}
         {tab === 'feedback' && <FeedbackTab adminKey={adminKey} />}
@@ -185,7 +185,7 @@ export default function AdminPage() {
   );
 }
 
-function OverviewTab({ adminKey }: { adminKey: string }) {
+function OverviewTab({ adminKey, setTab }: { adminKey: string; setTab: (t: any) => void }) {
   const [stats, setStats] = useState<any>({});
   const [users, setUsers] = useState<any[]>([]);
   const [newPw, setNewPw] = useState('');
@@ -243,19 +243,18 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
       </div>
 
       <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, overflow: 'hidden', marginBottom: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 70px', padding: '7px 14px', background: '#f8fafa', fontSize: 10, color: '#888', fontWeight: 600 }}>
-          <span>User</span><span>Status</span><span>Scans</span><span>Joined</span><span></span>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 70px', padding: '7px 14px', background: '#f8fafa', fontSize: 10, color: '#888', fontWeight: 600 }}>
+          <span>User</span><span>Scans</span><span>Joined</span><span></span>
         </div>
         {users.length === 0 && (<div style={{ padding: 20, textAlign: 'center', color: '#888', fontSize: 12 }}>No users yet</div>)}
         {users.map((u, i) => (
-          <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 70px', padding: '9px 14px', fontSize: 11, borderTop: '0.5px solid #f0f0ee', alignItems: 'center' }}>
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 70px', padding: '9px 14px', fontSize: 11, borderTop: '0.5px solid #f0f0ee', alignItems: 'center' }}>
             <span style={{ fontWeight: 500, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email || u.user_email || '—'}</span>
-            <span><span style={{ padding: '2px 7px', background: (u.status === 'approved' || u.active) ? '#f0fdf4' : '#fffbeb', color: (u.status === 'approved' || u.active) ? '#16a34a' : '#d97706', borderRadius: 3, fontSize: 9, fontWeight: 600 }}>{(u.status === 'approved' || u.active) ? 'Active' : (u.status || 'Pending')}</span></span>
             <span style={{ color: '#555' }}>{u.scans ?? u.scan_count ?? 0}</span>
             <span style={{ color: '#888' }}>{u.created_at ? new Date(u.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : '—'}</span>
             <div style={{ display: 'flex', gap: 4 }}>
-              <span style={{ fontSize: 10, padding: '2px 6px', background: '#f0fdfa', color: '#0d9488', borderRadius: 3, cursor: 'pointer' }}>⚙</span>
-              <span style={{ fontSize: 10, padding: '2px 6px', background: '#eff6ff', color: '#2563eb', borderRadius: 3, cursor: 'pointer' }}>✉</span>
+              <span onClick={() => setTab('users')} title="Manage user" style={{ fontSize: 10, padding: '2px 6px', background: '#f0fdfa', color: '#0d9488', borderRadius: 3, cursor: 'pointer' }}>⚙</span>
+              <span onClick={() => setTab('users')} title="Message user" style={{ fontSize: 10, padding: '2px 6px', background: '#eff6ff', color: '#2563eb', borderRadius: 3, cursor: 'pointer' }}>✉</span>
             </div>
           </div>
         ))}
