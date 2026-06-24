@@ -24,6 +24,7 @@ MODEL_REGISTRY = {
 ROLE_DEFAULTS = {
     "brief_text":       "gpt-4o-mini",            # fast brief analysis
     "synopsis_text":    "gpt-4o-mini",            # Report summary (Facet synopsis)
+    "keyword_summary":  "gpt-4o-mini",            # Keyword coverage synopsis
     "detailed_text":    "claude-sonnet-4-6",      # deep analysis
     "vision":           "gpt-4o-mini",            # image extraction
     "router":           "gpt-4o-mini",            # heuristic escalation / extraction
@@ -35,6 +36,7 @@ ROLE_DEFAULTS = {
 ROLE_LABELS = {
     "brief_text":    "Brief analysis (fast)",
     "synopsis_text": "Report summary",
+    "keyword_summary": "Keyword coverage summary",
     "detailed_text": "Detailed analysis (deep)",
     "vision":        "Image / vision",
     "router":        "Escalation router",
@@ -46,6 +48,7 @@ ROLE_LABELS = {
 ROLE_CAPABILITY = {
     "brief_text":    "text",
     "synopsis_text": "text",
+    "keyword_summary": "text",
     "detailed_text": "text",
     "vision":        "vision",
     "router":        "text",

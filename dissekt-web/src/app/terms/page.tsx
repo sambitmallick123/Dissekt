@@ -8,7 +8,7 @@ export default function TermsPage() {
       <SiteHeader />
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 16px' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Terms of Service</h1>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Last updated: June 21, 2026 · Beta</p>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 24 }}>Last updated: June 24, 2026 · Beta</p>
 
         <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: '24px 28px', fontSize: 13, color: '#404040', lineHeight: 1.8 }}>
           <div style={{ padding: '10px 14px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, marginBottom: 20 }}>
@@ -19,7 +19,7 @@ export default function TermsPage() {
           <p>By using Dissekt, you agree to these terms. If you disagree, please do not use the service.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>2. The service</h2>
-          <p>Dissekt is an information transparency tool that analyzes content for manipulation techniques, cross-references existing fact-checks, and scores source credibility. It produces a Clarity Score and related analysis across several features: single scans of text, URLs, or images; keyword topic analysis of recent coverage; bulk CSV analysis; side-by-side comparison; a personal knowledge graph (Constellation) with AI-generated cluster reports; topic tracking; a Chrome extension; and a Telegram bot. Dissekt does NOT determine whether content is true or false. It provides analytical perspectives to help you think critically.</p>
+          <p>Dissekt is an information transparency tool that analyzes content for manipulation techniques, cross-references existing fact-checks, and scores source credibility. It produces a Clarity Score and related analysis across several features: single scans of text, URLs, or images; keyword topic analysis of recent coverage; side-by-side comparison; a Chrome extension; and a Telegram bot. Dissekt does NOT determine whether content is true or false. It provides analytical perspectives to help you think critically.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>3. Nature of the analysis</h2>
           <p>All scores, technique detections, cross-references, and AI-generated reports are automated, probabilistic assessments. They may contain errors, omissions, or misclassifications. A high Clarity Score is not an endorsement and a low score is not a debunk. Dissekt is not a substitute for professional fact-checking, journalism, legal advice, or your own judgment. Do not rely solely on Dissekt for any important decision.</p>
@@ -28,13 +28,13 @@ export default function TermsPage() {
           <p>You agree not to: use the service for illegal purposes; attempt to overwhelm, probe, or attack our infrastructure; circumvent rate limits or access controls; scrape or resell our analysis at scale without permission; or use the service to harass, defame, or harm others. AI-generated reports are for your own use and must not be presented as independent factual verification.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>5. Access tiers</h2>
-          <p>Free tier provides limited daily scans (3 brief + 1 detailed, resetting at 00:00 GMT) with no account required. A free member account provides expanded limits (25 brief + 10 detailed per day) and access to all features, including Bulk, Compare, and the Observatory. Brief and detailed scans are counted separately; keyword topic analyses count as one scan of the chosen depth. Limits may change as the service evolves.</p>
+          <p>Free tier provides limited daily scans (3 brief + 1 detailed, resetting at 00:00 GMT) with no account required. A free member account provides expanded limits (25 brief + 10 detailed per day) and access to all member features, including Compare, your Dashboard, and API access. Brief and detailed scans are counted separately; keyword topic analyses count as one scan of the chosen depth. Limits may change as the service evolves.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>6. Accounts</h2>
           <p>You are responsible for keeping your account credentials secure and for activity under your account. You may request deletion of your account and associated data at any time (see the Privacy Policy). We may suspend accounts that violate these terms.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>7. Intellectual property</h2>
-          <p>You retain rights to content you submit. By submitting content, you grant us a limited license to process it for analysis. Analysis outputs and scan metadata may be stored to provide features like shareable reports, the knowledge graph, and topic tracking.</p>
+          <p>You retain rights to content you submit. By submitting content, you grant us a limited license to process it for analysis. Analysis outputs and scan metadata may be stored to provide features like shareable reports and your saved scan history.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginTop: 20, marginBottom: 8 }}>8. Third-party services</h2>
           <p>Dissekt relies on third-party providers to process content (including AI model providers and search services). Your submitted content may be processed by these providers solely to deliver the analysis. See the Privacy Policy for details.</p>

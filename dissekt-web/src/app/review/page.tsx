@@ -30,7 +30,7 @@ const CHECKLIST: { section: string; items: { id: string; label: string; note?: s
       { id: 'c1', label: 'Prism — techniques are fair & useful; evidence shown' },
       { id: 'c2', label: 'Lens — fact-checks found; verdicts link out; spread timeline' },
       { id: 'c3', label: 'Spectrum — credibility / bias / toxicity look right' },
-      { id: 'c4', label: 'Facet — claims extracted' },
+      { id: 'c4', label: 'Claims — verifiable claims extracted' },
       { id: 'c5', label: 'Meridian — political context (when relevant)' },
       { id: 'c6', label: 'Result layout — readable, nothing overflows or breaks' },
     ],
@@ -51,13 +51,6 @@ const CHECKLIST: { section: string; items: { id: string; label: string; note?: s
       { id: 'e3', label: 'Ledger shows decisions, with a working Rescan' },
       { id: 'e4', label: 'Past scans + Rescan' },
       { id: 'e5', label: 'API key — generate & test', note: 'Optional; technical reviewers' },
-    ],
-  },
-  {
-    section: 'F · Observatory',
-    items: [
-      { id: 'f1', label: 'Constellation graph renders', note: 'Builds up as you scan more' },
-      { id: 'f2', label: 'Useful for your work?' },
     ],
   },
   {
@@ -168,7 +161,7 @@ export default function ReviewPage() {
           </div>
 
           <H id="access">Getting access</H>
-          <P>Run a few scans with <strong>no account</strong> (3 brief + 1 detailed/day) to get a feel. For the full review, <strong>create a free account</strong> (email) → 25 brief + 10 detailed/day, plus Dashboard, Observatory, and API access. Limits reset at 00:00 GMT; brief and detailed are counted separately.</P>
+          <P>Run a few scans with <strong>no account</strong> (3 brief + 1 detailed/day) to get a feel. For the full review, <strong>create a free account</strong> (email) → 25 brief + 10 detailed/day, plus Dashboard and API access. Limits reset at 00:00 GMT; brief and detailed are counted separately.</P>
 
           <H id="workflow">Core workflow — single scan</H>
           <P>Go to <strong>Analyze → Single scan</strong>, paste text or a URL (or attach an image), choose <strong>Brief</strong> (fast) or <strong>Detailed</strong> (deeper), and read the Clarity Score, techniques, cross-references, and source credibility.</P>
@@ -233,7 +226,7 @@ export default function ReviewPage() {
             <Card title="Prism" sub="Techniques">Manipulation techniques, each with confidence and the triggering text.</Card>
             <Card title="Lens" sub="Cross-references">Existing fact-checks + where the content appeared. Verdicts link to the checker.</Card>
             <Card title="Spectrum" sub="Source & tone">Credibility / bias (231-source database), toxicity, sentiment.</Card>
-            <Card title="Facet" sub="Claims">Extracts individual verifiable claims for separate checking.</Card>
+            <Card title="Claims" sub="Extraction">Extracts individual verifiable claims for separate checking.</Card>
             <Card title="Meridian" sub="Political context">Surfaces political / accountability context where relevant.</Card>
             <Card title="Metadata">Time, model, cache status, content hash — identifiable & tamper-evident.</Card>
           </div>
@@ -242,7 +235,7 @@ export default function ReviewPage() {
           <P><strong>Keyword topic analysis</strong> — analyze how a whole topic is covered now. Add 2–3 related keywords → recent articles are fetched, analyzed, and aggregated, with each source linking to the original.</P>
           <div style={grid2}>
             <Card title="📊 Dashboard">Reading profile + decision stats, Reflect, Ledger (logged Trust/Unsure/Reject), and past scans — each with a Rescan action. Plus API keys.</Card>
-            <Card title="✦ Observatory">Patterns across everything you&apos;ve analyzed, centered on Constellation — a knowledge graph of entities and how they connect.</Card>
+            <Card title="💠 Facet">A plain-language summary at the top of every report — what the content is, what it says, and the key finding, drawn straight from the analysis.</Card>
           </div>
 
           <H id="limits">Known limitations</H>

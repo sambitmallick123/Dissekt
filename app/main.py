@@ -33,6 +33,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("dissekt")
 
+# Constellation is gated OFF. Flip to True (and unhide the nav/route) to revive.
+ENABLE_CONSTELLATION = False
+
 
 # ============================================
 # App lifecycle
@@ -318,7 +321,7 @@ async def _persist_scan(email: str, mode: str, result) -> None:
 
         # NER: extract entities + main topic from the analyzed text
         text_for_ner = g(result, "extracted_text", default="") or g(result, "input_content", default="")
-        entities = await _extract_entities(text_for_ner)
+        entities = await _extract_entities(text_for_ner) if ENABLE_CONSTELLATION else []
 
         analysis_id = g(result, "id", default="") or ""
         sb.table("scans").insert({
@@ -374,6 +377,8 @@ async def scan_content(request: ScanRequest, x_api_key: str = Header(None, alias
 async def constellation(email: str, preview: bool = False, days: int = 7, x_admin_key: str = Header(default="")):
     """Member knowledge graph. Nodes=entities, edges=co-occurrence + technique-similarity.
     Each node carries related scans (analysis_id -> /report/{id}). preview bypasses threshold."""
+    if not ENABLE_CONSTELLATION:
+        return {"ready": False, "disabled": True, "nodes": [], "edges": [], "n_clusters": 0, "count": 0}
     from fastapi import HTTPException
     if not email:
         raise HTTPException(status_code=400, detail="email required")
@@ -585,6 +590,50 @@ async def _serpapi_broad(query: str, api_key: str, num: int = 10) -> list:
         return []
 
 
+async def _keyword_synopsis(topic: str, good: list, summary: dict) -> str | None:
+    """Grounded 2-3 sentence read of how a TOPIC is being covered, adapted from the
+    Constellation cluster-report prompt. Aggregate-only facts; non-fatal."""
+    if not good or (summary or {}).get("count", 0) < 1:
+        return None
+    try:
+        import json as _json
+        from app.llm_dispatch import call_model
+        spread = sorted([a.get("clarity") for a in good if a.get("clarity") is not None])
+        facts = {
+            "topic": topic,
+            "sources_analyzed": summary.get("count"),
+            "avg_clarity": summary.get("avg_clarity"),
+            "clarity_low": round(spread[0], 2) if spread else None,
+            "clarity_high": round(spread[-1], 2) if spread else None,
+            "dominant_techniques": summary.get("dominant_techniques", []),
+            "sources": [
+                {"title": (a.get("title") or "")[:120], "source": a.get("source", ""),
+                 "clarity": a.get("clarity"), "techniques": (a.get("techniques") or [])[:3]}
+                for a in good[:10]
+            ],
+        }
+        system = (
+            "You are an analyst briefing a JOURNALIST on how a TOPIC is being covered across "
+            "multiple sources analyzed by Dissekt. You are given aggregate DATA only.\n"
+            "Write 2-3 sentences, no headers:\n"
+            "1. What the coverage looks like overall — is it uniform or split, and on what "
+            "(clarity spread, recurring techniques with counts).\n"
+            "2. End with one practical 'Watch for:' note for the journalist reading future coverage.\n"
+            "RULES: Use ONLY the data given. Do NOT invent outlets, numbers, or claims. If the sources "
+            "clearly span unrelated subjects, say so plainly rather than forcing one narrative. "
+            "Clarity is 0-1, higher = more transparently constructed (not 'more true'). "
+            "Cite specific techniques and counts. Be concrete, no vague editorializing."
+        )
+        disp = await call_model("keyword_summary", system=system,
+                                user="DATA:\n" + _json.dumps(facts, indent=2),
+                                max_tokens=220, temperature=0.4)
+        out = (disp.get("text") or "").strip()
+        return out or None
+    except Exception as e:
+        logger.warning(f"Keyword synopsis failed (non-fatal): {e}")
+        return None
+
+
 @app.post("/api/keyword/analyze")
 async def keyword_analyze(request: KeywordAnalyzeRequest,
                           x_user_email: str = Header(None, alias="X-User-Email")):
@@ -672,11 +721,14 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
     avg_tox = round(sum(tox_vals)/len(tox_vals), 3) if tox_vals else None
     dom_tech = [{"name": n, "count": ct} for n, ct in tech_counter.most_common(6)]
 
+    _summary = {"count": len(good), "attempted": len(chosen),
+                "avg_clarity": avg_clar, "avg_toxicity": avg_tox,
+                "dominant_techniques": dom_tech}
+    _summary["synopsis"] = await _keyword_synopsis(query, good, _summary)
+
     out = {
         "topic": query, "keywords": kws, "mode": mode,
-        "summary": {"count": len(good), "attempted": len(chosen),
-                    "avg_clarity": avg_clar, "avg_toxicity": avg_tox,
-                    "dominant_techniques": dom_tech},
+        "summary": _summary,
         "articles": good, "cached": False,
     }
 
@@ -695,6 +747,8 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
 async def constellation_report(email: str, cluster: int, days: int = 7,
                                x_admin_key: str = Header(default="")):
     """Generate a grounded LLM report for one cluster of the member's Constellation."""
+    if not ENABLE_CONSTELLATION:
+        return {"ready": False, "disabled": True}
     from fastapi import HTTPException
     if not email:
         raise HTTPException(status_code=400, detail="email required")

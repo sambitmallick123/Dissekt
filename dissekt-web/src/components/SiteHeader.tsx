@@ -43,7 +43,6 @@ export default function SiteHeader({ active }: { active?: string }) {
 
   const links = [
     { href: '/analyze', label: 'Analyze' },
-    { href: '/observatory', label: 'Observatory' },
     ...(isLoggedIn ? [{ href: '/dashboard', label: 'Dashboard' }] : []),
   ];
 

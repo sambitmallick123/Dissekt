@@ -123,11 +123,11 @@ export default function LandingPage() {
       <section style={{ padding: '48px 24px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>8 analysis engines</h2>
-            <p style={{ fontSize: 14, color: '#888' }}>Every scan runs through 8 specialized engines in parallel.</p>
+            <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>6 analysis engines</h2>
+            <p style={{ fontSize: 14, color: '#888' }}>Every scan runs through 6 specialized engines in parallel.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
-            {[{ icon: '🔦', name: 'Beacon', desc: 'Orchestrator — parallel pipeline' }, { icon: '🔺', name: 'Prism', desc: '20 manipulation techniques' }, { icon: '🔎', name: 'Lens', desc: '100+ fact-checker cross-refs' }, { icon: '🌈', name: 'Spectrum', desc: 'Toxicity + credibility + sentiment' }, { icon: '💠', name: 'Facet', desc: 'Claim extraction + typing' }, { icon: '🧭', name: 'Meridian', desc: '69 politicians, 4 countries' }, { icon: '👁', name: 'Iris', desc: 'Language detection' }, { icon: '🔗', name: 'Lattice', desc: 'Similar past analyses' }].map(e => (
+            {[{ icon: '🔦', name: 'Beacon', desc: 'Orchestrator — parallel pipeline' }, { icon: '🔺', name: 'Prism', desc: '20 manipulation techniques' }, { icon: '🔎', name: 'Lens', desc: 'Fact-checker cross-references' }, { icon: '🌈', name: 'Spectrum', desc: 'Toxicity + credibility + sentiment' }, { icon: '💠', name: 'Claims', desc: 'Claim extraction + typing' }, { icon: '🧭', name: 'Meridian', desc: '68 politicians, 4 countries' }].map(e => (
               <div key={e.name} style={{ padding: '12px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}><span style={{ fontSize: 16 }}>{e.icon}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{e.name}</span></div>
                 <div style={{ fontSize: 11, color: '#888' }}>{e.desc}</div>
@@ -160,7 +160,7 @@ export default function LandingPage() {
             <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>Tools for seeing clearly</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
-            {[{ icon: '📊', name: 'Dashboard', desc: 'Your scan history, reading profile, and API keys in one place' }, { icon: '📒', name: 'Ledger', desc: 'Decision journal — log Trust / Unsure / Reject on what you read' }, { icon: '🪞', name: 'Reflect', desc: 'Your reading profile — how you tend to judge what you read' }, { icon: '✦', name: 'Constellation', desc: 'Knowledge graph of the entities across your scans' }, { icon: '🔑', name: 'API access', desc: 'Scan programmatically with your own API key' }].map(f => (
+            {[{ icon: '📊', name: 'Dashboard', desc: 'Your scan history, reading profile, and API keys in one place' }, { icon: '📒', name: 'Ledger', desc: 'Decision journal — log Trust / Unsure / Reject on what you read' }, { icon: '🪞', name: 'Reflect', desc: 'Your reading profile — how you tend to judge what you read' }, { icon: '💠', name: 'Facet', desc: 'Plain-language summary atop every report — what it is, what it says, the key finding' }, { icon: '🔑', name: 'API access', desc: 'Scan programmatically with your own API key' }].map(f => (
               <div key={f.name} style={{ padding: 14, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}><span style={{ fontSize: 14 }}>{f.icon}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#0d9488' }}>{f.name}</span></div>
                 <div style={{ fontSize: 11, color: '#888', lineHeight: 1.7 }}>{f.desc}</div>
@@ -173,7 +173,7 @@ export default function LandingPage() {
       {/* NUMBERS */}
       <section style={{ padding: '48px 24px', background: '#0d9488' }}>
         <div style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, textAlign: 'center' }}>
-          {[{ n: '8', l: 'Engines' }, { n: '20', l: 'Techniques' }, { n: '100+', l: 'Fact-checkers' }, { n: '231', l: 'Media rated' }, { n: '69', l: 'Politicians' }].map(s => (
+          {[{ n: '6', l: 'Engines' }, { n: '20', l: 'Techniques' }, { n: '100+', l: 'Fact-check network' }, { n: '231', l: 'Media rated' }, { n: '68', l: 'Politicians' }].map(s => (
             <div key={s.l} style={{ padding: 12 }}><div style={{ fontSize: 28, fontWeight: 700, color: '#fff' }}>{s.n}</div><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{s.l}</div></div>
           ))}
         </div>

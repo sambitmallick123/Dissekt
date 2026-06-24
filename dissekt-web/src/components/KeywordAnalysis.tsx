@@ -177,6 +177,12 @@ export default function KeywordAnalysis() {
                 {topTech && <> — the dominant pattern is <span style={{ color: '#0d9488' }}>{topTech.name.replace(/_/g, ' ')}</span>, in {topTech.count} of {s.count} sources</>}.
               </div>
 
+              {s.synopsis && (
+                <div style={{ fontSize: 14, lineHeight: 1.7, color: '#374151', background: '#f0fdfa', border: '0.5px solid #cce9e3', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
+                  {s.synopsis}
+                </div>
+              )}
+
               {/* stat strip */}
               <div style={{ display: 'flex', gap: 20, padding: '12px 0', borderTop: '0.5px solid #ececec', borderBottom: '0.5px solid #ececec', marginBottom: 18, flexWrap: 'wrap' }}>
                 <div><span style={{ fontSize: 20, fontWeight: 700, color: s.avg_clarity != null ? clarColor(s.avg_clarity) : '#888' }}>{s.avg_clarity != null ? s.avg_clarity.toFixed(2) : '—'}</span> <span style={{ fontSize: 12, color: '#888' }}>clarity</span></div>
