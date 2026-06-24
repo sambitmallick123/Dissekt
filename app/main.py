@@ -1851,29 +1851,24 @@ def _check_admin(adminKey: str):
 
 @app.get("/api/admin/users")
 async def admin_list_users(adminKey: str, page: int = 1, per_page: int = 100):
-    """List registered users from the application `users` table (where signups land)."""
+    """List all Supabase Auth users (this is the real auth store)."""
     _check_admin(adminKey)
     try:
         sb = _admin_sb()
-        start = (page - 1) * per_page
-        end = start + per_page - 1
-        rows = sb.table("users").select(
-            "id, email, name, tier, invite_code, access_expires_at, last_login, created_at"
-        ).order("created_at", desc=True).range(start, end).execute()
+        resp = sb.auth.admin.list_users(page=page, per_page=per_page)
+        users = resp if isinstance(resp, list) else getattr(resp, "users", [])
         out = []
-        for u in (rows.data or []):
+        for u in users:
+            meta = getattr(u, "user_metadata", {}) or {}
             out.append({
-                "id": u.get("id", ""),
-                "email": u.get("email", ""),
-                "name": u.get("name", "") or "",
-                "tier": u.get("tier", "free"),
-                "created_at": str(u.get("created_at", "") or ""),
-                "last_sign_in_at": str(u.get("last_login", "") or ""),
-                "access_expires_at": str(u.get("access_expires_at", "") or ""),
-                # Auth-only concepts; this table has no such columns. Stubbed so the
-                # frontend's optional indicators simply don't render rather than break.
-                "banned_until": "",
-                "confirmed": True,
+                "id": getattr(u, "id", ""),
+                "email": getattr(u, "email", ""),
+                "name": meta.get("name", ""),
+                "tier": meta.get("tier", "free"),
+                "created_at": str(getattr(u, "created_at", "")),
+                "last_sign_in_at": str(getattr(u, "last_sign_in_at", "") or ""),
+                "banned_until": str(getattr(u, "banned_until", "") or ""),
+                "confirmed": bool(getattr(u, "email_confirmed_at", None)),
             })
         return {"users": out, "count": len(out)}
     except Exception as e:
@@ -1890,11 +1885,11 @@ async def admin_delete_user(body: dict):
         raise HTTPException(status_code=400, detail="user_id required")
     try:
         sb = _admin_sb()
-        # Resolve email from the users table so we can purge their data (GDPR erasure).
+        # Resolve email from Auth so we can purge their data (GDPR erasure).
         email = None
         try:
-            row = sb.table("users").select("email").eq("id", uid).single().execute()
-            email = (row.data or {}).get("email")
+            u = sb.auth.admin.get_user_by_id(uid)
+            email = getattr(getattr(u, "user", None), "email", None) or (u.get("user", {}).get("email") if isinstance(u, dict) else None)
         except Exception as e:
             logger.warning(f"[delete] could not resolve email for {uid}: {e}")
         # These tables are keyed on user_email.
@@ -1909,8 +1904,7 @@ async def admin_delete_user(body: dict):
                 except Exception as e:
                     logger.error(f"[delete] purge failed for {tbl}/{email}: {e}")
                     purged[tbl] = "error"
-        # Remove the user record itself
-        sb.table("users").delete().eq("id", uid).execute()
+        sb.auth.admin.delete_user(uid)
         return {"success": True, "action": "deleted", "user_id": uid, "purged": purged}
     except Exception as e:
         from fastapi import HTTPException
