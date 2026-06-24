@@ -192,7 +192,11 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
 
   useEffect(() => {
     fetch(`/api/admin?view=stats&key=${encodeURIComponent(adminKey)}`)
-      .then(r => r.json()).then(d => { setStats(d || {}); }).catch(() => {});
+      .then(r => r.json()).then(d => setStats(d || {})).catch(() => {});
+    // users for the overview table come from the FastAPI admin list (Supabase Auth)
+    const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    fetch(`${API}/api/admin/users?adminKey=${encodeURIComponent(adminKey)}`)
+      .then(r => r.json()).then(d => setUsers(d.users || [])).catch(() => {});
   }, [adminKey]);
 
   const changePassword = async () => {
@@ -213,13 +217,14 @@ function OverviewTab({ adminKey }: { adminKey: string }) {
     );
   };
 
+  const inv = stats.invitations || {};
   const metrics = [
-    { label: 'Users', value: stats.approved ?? users.length ?? 0, color: '#16a34a', spark: true, trend: '↑' },
-    { label: 'Scans', value: stats.total_scans ?? stats.scans ?? 0, color: '#2563eb', spark: true, trend: '' },
-    { label: 'Avg Clarity', value: stats.avg_clarity != null ? Number(stats.avg_clarity).toFixed(2) : '—', color: '#d97706', spark: false, trend: '' },
-    { label: 'Pending', value: stats.pending ?? 0, color: '#d97706', spark: false, trend: '' },
+    { label: 'Users', value: users.length ?? 0, color: '#16a34a', spark: true, trend: '' },
+    { label: 'Approved', value: inv.approved ?? 0, color: '#2563eb', spark: false, trend: '' },
+    { label: 'Pending', value: inv.pending ?? 0, color: '#d97706', spark: false, trend: '' },
     { label: 'Feedback', value: stats.feedback ?? 0, color: '#7c3aed', spark: false, trend: '' },
     { label: 'Contacts', value: stats.contacts ?? 0, color: '#0d9488', spark: false, trend: '' },
+    { label: 'Corrections', value: stats.corrections ?? 0, color: '#dc2626', spark: false, trend: '' },
   ];
 
   return (
