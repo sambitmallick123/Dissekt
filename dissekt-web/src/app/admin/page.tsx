@@ -203,7 +203,6 @@ export default function AdminPage() {
 function OverviewTab({ adminKey, setTab }: { adminKey: string; setTab: (t: any) => void }) {
   const [stats, setStats] = useState<any>({});
   const [users, setUsers] = useState<any[]>([]);
-  const [newPw, setNewPw] = useState('');
 
   useEffect(() => {
     fetch(`/api/admin?view=stats&key=${encodeURIComponent(adminKey)}`)
@@ -214,12 +213,6 @@ function OverviewTab({ adminKey, setTab }: { adminKey: string; setTab: (t: any) 
       .then(r => r.json()).then(d => setUsers(d.users || [])).catch(() => {});
   }, [adminKey]);
 
-  const changePassword = async () => {
-    if (!newPw) return;
-    await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'change_password', adminKey, newPassword: newPw }) });
-    setNewPw('');
-    alert('Password changed');
-  };
 
   const Spark = ({ color }: { color: string }) => {
     const bars = [4, 7, 5, 10, 8, 14, 11];
@@ -273,16 +266,6 @@ function OverviewTab({ adminKey, setTab }: { adminKey: string; setTab: (t: any) 
         ))}
       </div>
 
-      <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 14 }}>🔑</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a1a' }}>Security</span>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <input type="password" placeholder="New password" value={newPw} onChange={e => setNewPw(e.target.value)} style={{ padding: '6px 10px', border: '0.5px solid #e5eaea', borderRadius: 5, fontSize: 11, outline: 'none', width: 140 }} />
-          <button onClick={changePassword} style={{ fontSize: 11, padding: '6px 14px', background: '#f0fdfa', color: '#0d9488', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>Change password</button>
-        </div>
-      </div>
     </div>
   );
 }
