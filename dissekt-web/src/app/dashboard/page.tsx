@@ -22,6 +22,8 @@ export default function DashboardPage() {
   const [newKeyName, setNewKeyName] = useState('');
   const [newKey, setNewKey] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [reflectOpen, setReflectOpen] = useState(true);
+  const [ledgerOpen, setLedgerOpen] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -34,7 +36,7 @@ export default function DashboardPage() {
       const e = user?.email || '';
       const n = (user?.user_metadata?.name as string) || e.split('@')[0] || 'User';
       setEmail(e); setName(n);
-      fetch(`${API_URL}/api/decisions`).then(r => r.json()).then(d => setDecisions(d.decisions || [])).catch(() => {});
+      fetch(`/api/decisions`).then(r => r.json()).then(d => setDecisions(d.decisions || [])).catch(() => {});
       if (e) fetch(`${API_URL}/api/keys/usage?email=${encodeURIComponent(e)}`).then(r => r.json()).then(d => setKeys(d.keys || [])).catch(() => {});
     });
   }, []);
@@ -193,8 +195,20 @@ export default function DashboardPage() {
 
         {tab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-            <Reflect />
-            <LedgerView />
+            <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, overflow: 'hidden' }}>
+              <button onClick={() => setReflectOpen(o => !o)} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
+                <span>🪞 Your Reflect</span>
+                <span style={{ fontSize: 12, color: '#888' }}>{reflectOpen ? '▾ Collapse' : '▸ Expand'}</span>
+              </button>
+              {reflectOpen && <div style={{ borderTop: '0.5px solid #f0efec' }}><Reflect /></div>}
+            </div>
+            <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, overflow: 'hidden' }}>
+              <button onClick={() => setLedgerOpen(o => !o)} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
+                <span>📓 Ledger</span>
+                <span style={{ fontSize: 12, color: '#888' }}>{ledgerOpen ? '▾ Collapse' : '▸ Expand'}</span>
+              </button>
+              {ledgerOpen && <div style={{ borderTop: '0.5px solid #f0efec' }}><LedgerView /></div>}
+            </div>
             <ScanHistory onReanalyze={(input: string) => { window.location.href = '/analyze?content=' + encodeURIComponent(input); }} />
           </div>
         )}
