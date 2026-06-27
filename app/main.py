@@ -625,6 +625,71 @@ async def keyword_recommend(request: KeywordRecommendRequest):
         return {"suggestions": []}
 
 
+async def _gnews_search(query: str, num: int = 10) -> list:
+    """GNews API search (free tier 100/day). Returns clean article URLs."""
+    import httpx
+    from app.config import get_settings
+    key = get_settings().gnews_key
+    if not key:
+        return []
+    url = "https://gnews.io/api/v4/search"
+    params = {"q": query[:200], "token": key, "max": min(num, 10), "lang": "en", "sortby": "publishedAt"}
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        resp = await client.get(url, params=params)
+        resp.raise_for_status()
+        data = resp.json()
+    out = []
+    for a in data.get("articles", []):
+        link = a.get("url", "")
+        if link:
+            out.append({"url": link, "title": a.get("title", ""),
+                        "date": a.get("publishedAt", ""),
+                        "source": (a.get("source") or {}).get("name", "")})
+    return out
+
+
+async def _google_news_rss(query: str, num: int = 10) -> list:
+    """Google News RSS (free, unlimited, no key). URLs are redirects that scan() follows."""
+    import httpx, feedparser, urllib.parse as _up
+    q = _up.quote(query[:200])
+    url = f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
+    async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+        resp = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        feed = feedparser.parse(resp.text)
+    out = []
+    for entry in feed.entries[:num]:
+        link = getattr(entry, "link", "")
+        if link:
+            src = ""
+            if hasattr(entry, "source") and hasattr(entry.source, "title"):
+                src = entry.source.title
+            out.append({"url": link, "title": getattr(entry, "title", ""),
+                        "date": getattr(entry, "published", ""), "source": src})
+    return out
+
+
+async def _news_search(query: str, num: int = 10) -> list:
+    """Fallback chain: GNews -> Google News RSS -> SerpAPI. Returns first non-empty."""
+    from app.config import get_settings
+    _s = get_settings()
+    providers = [("gnews", lambda: _gnews_search(query, num)),
+                 ("google_rss", lambda: _google_news_rss(query, num))]
+    if _s.serpapi_key:
+        providers.append(("serpapi", lambda: _serpapi_broad(query, _s.serpapi_key, num)))
+    for name, fn in providers:
+        try:
+            results = await fn()
+            if results:
+                logger.info(f"[keyword] search via {name}: {len(results)} results for {query[:50]!r}")
+                return results
+            logger.info(f"[keyword] {name} returned 0 for {query[:50]!r}, trying next")
+        except Exception as e:
+            logger.warning(f"[keyword] {name} failed for {query[:50]!r}: {type(e).__name__}: {e}")
+    logger.warning(f"[keyword] all providers exhausted for {query[:50]!r}")
+    return []
+
+
 async def _serpapi_broad(query: str, api_key: str, num: int = 10) -> list:
     """Broad (non-exact) news-style search for keyword topics."""
     import httpx
@@ -637,15 +702,19 @@ async def _serpapi_broad(query: str, api_key: str, num: int = 10) -> list:
             resp.raise_for_status()
             data = resp.json()
         out = []
-        for item in data.get("organic_results", []):
-            link = item.get("link", "")
-            if link:
-                out.append({"url": link, "title": item.get("title", ""),
-                            "date": item.get("date", ""), "source": item.get("source", "")})
+        for bucket in ("organic_results", "news_results"):
+            for item in data.get(bucket, []):
+                link = item.get("link", "")
+                if link:
+                    out.append({"url": link, "title": item.get("title", ""),
+                                "date": item.get("date", ""), "source": item.get("source", "")})
+        if not out:
+            err = data.get("error") or data.get("search_information", {}).get("organic_results_state")
+            logger.warning(f"[keyword] serpapi 0 results for {query[:60]!r}; err={err!r} keys={list(data.keys())}")
         return out
     except Exception as e:
-        logger.error(f"[keyword] serpapi broad failed: {e}")
-        return []
+        logger.error(f"[keyword] serpapi FAILED for {query[:60]!r}: {type(e).__name__}: {e}")
+        raise
 
 
 async def _keyword_synopsis(topic: str, good: list, summary: dict) -> str | None:
@@ -731,7 +800,13 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
 
     if not _s.serpapi_key:
         raise HTTPException(status_code=503, detail="search not configured")
-    results = await _serpapi_broad(query, _s.serpapi_key, num=n_articles * 2)
+    try:
+        results = await _serpapi_broad(query, _s.serpapi_key, num=n_articles * 2)
+    except Exception as e:
+        logger.error(f"[keyword] search failed: {e}")
+        return {"topic": query, "keywords": kws, "mode": mode, "articles": [],
+                "summary": {"count": 0},
+                "message": "Search is temporarily unavailable. Please try again shortly."}
     # Dedup by domain, take first n
     seen_dom, chosen = set(), []
     import urllib.parse as _up
@@ -744,7 +819,8 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
 
     if not chosen:
         return {"topic": query, "keywords": kws, "mode": mode, "articles": [],
-                "summary": {"count": 0}, "message": "No recent coverage found for these keywords."}
+                "summary": {"count": 0},
+                "message": "No recent coverage found. Try fewer or broader keywords."}
 
     # Analyze each article in parallel by passing the URL straight to scan()
     from app.beacon import scan as _scan

@@ -17,8 +17,8 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) { setError(error.message); setLoading(false); return; }
-      // success → go to dashboard
-      window.location.href = '/dashboard';
+      // success → go to analyze
+      window.location.href = '/analyze';
     } catch (e: any) {
       setError(e.message || 'Something went wrong.');
       setLoading(false);

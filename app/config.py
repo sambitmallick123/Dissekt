@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     # Search APIs
     google_factcheck_api_key: str = ""
     serpapi_key: str = ""
+    gnews_key: str = ""
     brave_search_api_key: str = ""
 
     # Analysis

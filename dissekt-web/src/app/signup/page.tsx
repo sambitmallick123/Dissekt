@@ -12,12 +12,32 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const pwChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+  };
+  const pwValid = Object.values(pwChecks).every(Boolean);
+  const suggestPassword = () => {
+    const sets = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnpqrstuvwxyz', '23456789', '!@#$%^&*-_+='];
+    const all = sets.join('');
+    const r = (n: number) => crypto.getRandomValues(new Uint32Array(1))[0] % n;
+    const pick = (s: string) => s[r(s.length)];
+    const arr = sets.map(pick);
+    while (arr.length < 16) arr.push(pick(all));
+    for (let i = arr.length - 1; i > 0; i--) { const j = r(i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+    const pw = arr.join('');
+    setPassword(pw); setConfirmPassword(pw); setShowPw(true);
+  };
 
   const handleSignup = async () => {
     setError('');
     if (!name.trim()) { setError('Please enter your name.'); return; }
     if (!email) { setError('Please enter your email.'); return; }
-    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (!pwValid) { setError('Password must be 8+ chars with uppercase, lowercase, number, and special character.'); return; }
     if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
     setLoading(true);
     try {
@@ -30,7 +50,7 @@ export default function SignupPage() {
       if (error) { setError(error.message); setLoading(false); return; }
       if (data.session) {
         // (confirmation off) instant session
-        window.location.href = '/dashboard';
+        window.location.href = '/analyze';
       } else {
         // confirmation on → email sent, show check-your-email message
         setSent(true);
@@ -63,17 +83,35 @@ export default function SignupPage() {
           <input type="email" placeholder="you@example.com" value={email}
             onChange={e => setEmail(e.target.value)}
             style={{ padding: '10px 12px', borderRadius: 8, border: '0.5px solid #d5dada', fontSize: 14, outline: 'none' }} />
-          <input type="password" placeholder="Password (min 8 characters)" value={password}
-            onChange={e => setPassword(e.target.value)}
-            style={{ padding: '10px 12px', borderRadius: 8, border: '0.5px solid #d5dada', fontSize: 14, outline: 'none' }} />
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, color: '#888' }}>Password</span>
+              <span style={{ display: 'flex', gap: 10 }}>
+                <button type="button" onClick={() => setShowPw(s => !s)} style={{ fontSize: 11, color: '#888', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>{showPw ? 'Hide' : 'Show'}</button>
+                <button type="button" onClick={suggestPassword} style={{ fontSize: 11, color: '#0d9488', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontWeight: 600 }}>Suggest strong password</button>
+              </span>
+            </div>
+            <input type={showPw ? 'text' : 'password'} placeholder="Password" value={password}
+              onChange={e => setPassword(e.target.value)}
+              style={{ padding: '10px 12px', borderRadius: 8, border: '0.5px solid #d5dada', fontSize: 14, outline: 'none', width: '100%', boxSizing: 'border-box' as const }} />
+            {password.length > 0 && !pwValid && (
+              <div style={{ fontSize: 11, display: 'flex', flexDirection: 'column', gap: 3, marginTop: 2 }}>
+                {([['length', 'At least 8 characters'], ['upper', 'One uppercase letter'], ['lower', 'One lowercase letter'], ['number', 'One number'], ['special', 'One special character']] as const).map(([k, label]) => (
+                  <div key={k} style={{ color: (pwChecks as Record<string, boolean>)[k] ? '#16a34a' : '#aaa', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span>{(pwChecks as Record<string, boolean>)[k] ? '✓' : '○'}</span> {label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <input type="password" placeholder="Confirm password" value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleSignup(); }}
             style={{ padding: '10px 12px', borderRadius: 8, border: confirmPassword && password !== confirmPassword ? '0.5px solid #dc2626' : '0.5px solid #d5dada', fontSize: 14, outline: 'none' }} />
           {confirmPassword && password !== confirmPassword && <div style={{ fontSize: 11, color: '#dc2626' }}>Passwords do not match</div>}
           {error && <div style={{ fontSize: 12, color: '#dc2626', padding: '6px 0' }}>{error}</div>}
-          <button onClick={handleSignup} disabled={loading}
-            style={{ padding: '11px 0', borderRadius: 8, border: 'none', background: '#0d9488', color: '#fff', fontSize: 14, fontWeight: 600, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+          <button onClick={handleSignup} disabled={loading || !pwValid || password !== confirmPassword}
+            style={{ padding: '11px 0', borderRadius: 8, border: 'none', background: '#0d9488', color: '#fff', fontSize: 14, fontWeight: 600, cursor: (loading || !pwValid || password !== confirmPassword) ? 'default' : 'pointer', opacity: (loading || !pwValid || password !== confirmPassword) ? 0.55 : 1 }}>
             {loading ? 'Creating account…' : 'Create account'}
           </button>
         </div>
