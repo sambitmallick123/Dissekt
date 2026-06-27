@@ -9,6 +9,7 @@ export default function SiteHeader({ active }: { active?: string }) {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -16,6 +17,7 @@ export default function SiteHeader({ active }: { active?: string }) {
     supabase.auth.getSession().then(({ data }) => {
       const session = data.session;
       setIsLoggedIn(!!session);
+      setIsAdmin(((session?.user?.app_metadata as any)?.role) === 'admin');
       if (session?.user) {
         const meta = session.user.user_metadata || {};
         setName(meta.name || session.user.email?.split('@')[0] || 'User');
@@ -24,6 +26,7 @@ export default function SiteHeader({ active }: { active?: string }) {
     // React to auth changes (login/logout in any tab)
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(!!session);
+      setIsAdmin(((session?.user?.app_metadata as any)?.role) === 'admin');
       if (session?.user) {
         const meta = session.user.user_metadata || {};
         setName(meta.name || session.user.email?.split('@')[0] || 'User');
@@ -72,6 +75,7 @@ export default function SiteHeader({ active }: { active?: string }) {
 
             {/* Desktop right side */}
             <div className="dissekt-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {isAdmin && <a href="/admin" style={{ fontSize: 12, color: '#0d9488', textDecoration: 'none', fontWeight: 600, border: '0.5px solid #cce9e3', borderRadius: 5, padding: '3px 10px', background: '#f0fdfa' }}>Admin</a>}
               <a href="/help" style={{ fontSize: 12, color: active === 'Help' ? '#0d9488' : '#888780', textDecoration: 'none', fontWeight: active === 'Help' ? 600 : 500 }}>Help</a>
               {isLoggedIn ? (
                 <>
@@ -81,7 +85,7 @@ export default function SiteHeader({ active }: { active?: string }) {
                     </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 500, color: '#1a1a1a', lineHeight: 1 }}>{name || 'User'}</div>
-                      <div style={{ fontSize: 9, color: '#888' }}>Member</div>
+                      <div style={{ fontSize: 9, color: isAdmin ? '#0d9488' : '#888', fontWeight: isAdmin ? 600 : 400 }}>{isAdmin ? 'Admin' : 'Member'}</div>
                     </div>
                   </a>
                   <button onClick={signOut} style={{ fontSize: 10, padding: '3px 10px', background: '#f0f0ee', color: '#888', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Sign out</button>
@@ -119,13 +123,14 @@ export default function SiteHeader({ active }: { active?: string }) {
                 <div style={{ width: 28, height: 28, background: '#0d9488', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'white', fontWeight: 600 }}>
                   {(name || 'U')[0].toUpperCase()}
                 </div>
-                <div><div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a1a' }}>{name || 'User'}</div><div style={{ fontSize: 10, color: '#888' }}>Member</div></div>
+                <div><div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a1a' }}>{name || 'User'}</div><div style={{ fontSize: 10, color: isAdmin ? '#0d9488' : '#888', fontWeight: isAdmin ? 600 : 400 }}>{isAdmin ? 'Admin' : 'Member'}</div></div>
               </div>
             )}
             {links.map(l => (
               <a key={l.href} href={l.href} style={{ display: 'block', padding: '10px 24px', fontSize: 14, color: active === l.label ? '#0d9488' : '#555', textDecoration: 'none', fontWeight: active === l.label ? 600 : 400, borderBottom: '0.5px solid #f0efec' }}>{l.label}</a>
             ))}
             <div style={{ padding: '10px 24px' }}>
+              {isAdmin && <a href="/admin" style={{ display: 'block', padding: '10px 24px', fontSize: 14, color: '#0d9488', textDecoration: 'none', fontWeight: 600, borderBottom: '0.5px solid #f0efec' }}>Admin</a>}
               <a href="/help" style={{ display: 'block', padding: '10px 24px', fontSize: 14, color: active === 'Help' ? '#0d9488' : '#555', textDecoration: 'none', fontWeight: active === 'Help' ? 600 : 400, borderBottom: '0.5px solid #f0efec' }}>Help</a>
                             {isLoggedIn ? (
                 <button onClick={signOut} style={{ padding: '8px 16px', background: '#f0f0ee', color: '#555', border: 'none', borderRadius: 6, fontSize: 13, cursor: 'pointer', width: '100%' }}>Sign out</button>
