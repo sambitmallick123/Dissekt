@@ -5,6 +5,7 @@ export default function Reflect() {
   const [decisions, setDecisions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const load = async () => {
     setLoading(true);
@@ -77,12 +78,14 @@ export default function Reflect() {
 
   return (
     <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 14, padding: 20, marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: open ? 14 : 0, cursor: 'pointer' }}>
         <span style={{ fontSize: 16 }}>🪞</span>
         <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>Your Reflect</span>
         <span style={{ fontSize: 12, color: '#888' }}>Based on {total} decisions</span>
+        <span style={{ marginLeft: 'auto', fontSize: 12, color: '#888' }}>{open ? '▾' : '▸'}</span>
       </div>
 
+      {open && <>
       {/* Profile type */}
       <div style={{ padding: '12px 16px', background: '#f0fdfa', border: '0.5px solid #ccfbf1', borderRadius: 10, marginBottom: 14 }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: '#0d9488', marginBottom: 4 }}>{profileType}</div>
@@ -125,6 +128,7 @@ export default function Reflect() {
           )}
         </div>
       )}
+      </>}
     </div>
   );
 }

@@ -22,8 +22,7 @@ export default function DashboardPage() {
   const [newKeyName, setNewKeyName] = useState('');
   const [newKey, setNewKey] = useState('');
   const [mounted, setMounted] = useState(false);
-  const [reflectOpen, setReflectOpen] = useState(true);
-  const [ledgerOpen, setLedgerOpen] = useState(true);
+  const [sourceOpen, setSourceOpen] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -154,8 +153,11 @@ export default function DashboardPage() {
             {/* Trust by source */}
             {topSources.length > 0 && (
               <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 14, marginBottom: 12 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#888', marginBottom: 10 }}>🕸️ Trust by source</div>
-                {topSources.map(([src, data]) => {
+                <div onClick={() => setSourceOpen(o => !o)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, fontWeight: 600, color: '#888', marginBottom: sourceOpen ? 10 : 0, cursor: 'pointer' }}>
+                  <span>🕸️ Trust by source</span>
+                  <span>{sourceOpen ? '▾' : '▸'}</span>
+                </div>
+                {sourceOpen && topSources.map(([src, data]) => {
                   const t = data.trust + data.unsure + data.reject;
                   return (
                     <div key={src} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
@@ -169,11 +171,11 @@ export default function DashboardPage() {
                     </div>
                   );
                 })}
-                <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 10, color: '#888' }}>
+                {sourceOpen && <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 10, color: '#888' }}>
                   <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#16a34a', marginRight: 3 }} />Trust</span>
                   <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#d97706', marginRight: 3 }} />Unsure</span>
                   <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: '#dc2626', marginRight: 3 }} />Reject</span>
-                </div>
+                </div>}
               </div>
             )}
 
@@ -195,20 +197,8 @@ export default function DashboardPage() {
 
         {tab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-            <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, overflow: 'hidden' }}>
-              <button onClick={() => setReflectOpen(o => !o)} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
-                <span>🪞 Your Reflect</span>
-                <span style={{ fontSize: 12, color: '#888' }}>{reflectOpen ? '▾ Collapse' : '▸ Expand'}</span>
-              </button>
-              {reflectOpen && <div style={{ borderTop: '0.5px solid #f0efec' }}><Reflect /></div>}
-            </div>
-            <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, overflow: 'hidden' }}>
-              <button onClick={() => setLedgerOpen(o => !o)} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
-                <span>📓 Ledger</span>
-                <span style={{ fontSize: 12, color: '#888' }}>{ledgerOpen ? '▾ Collapse' : '▸ Expand'}</span>
-              </button>
-              {ledgerOpen && <div style={{ borderTop: '0.5px solid #f0efec' }}><LedgerView /></div>}
-            </div>
+            <Reflect />
+            <LedgerView />
             <ScanHistory onReanalyze={(input: string) => { window.location.href = '/analyze?content=' + encodeURIComponent(input); }} />
           </div>
         )}
