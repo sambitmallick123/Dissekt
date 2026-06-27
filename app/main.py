@@ -50,6 +50,14 @@ async def lifespan(app: FastAPI):
     logger.info(f"OpenAI API: {'configured' if settings.openai_api_key else 'NOT SET'}")
     logger.info(f"Redis: {'configured' if settings.redis_url else 'NOT SET'}")
     logger.info(f"Fact Check API: {'configured' if settings.google_factcheck_api_key else 'NOT SET'}")
+    # Pre-load Detoxify (418MB) once at startup so parallel scans don't race to load it
+    try:
+        from asyncio import to_thread
+        from app.spectrum import _get_detoxify
+        await to_thread(_get_detoxify)
+        logger.info("Detoxify pre-loaded at startup")
+    except Exception as e:
+        logger.warning(f"Detoxify warmup skipped: {e}")
     yield
     logger.info("Shutting down Dissekt")
 
@@ -824,7 +832,7 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
     from app.beacon import scan as _scan
     async def _analyze_one(item):
         try:
-            res = await _scan(item["url"], mode)
+            res = await _scan(item["url"], mode, light=True)
             rd = res.model_dump(mode="json") if hasattr(res, "model_dump") else res
             scoring = rd.get("scoring") or {}
             clarity = scoring.get("clarity_score")

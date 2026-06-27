@@ -434,7 +434,7 @@ async def _extract_from_image(image_data_url: str) -> str:
         logger.warning(f"Image vision extraction failed: {e}")
         return ""
 
-async def scan(content: str, mode: str = "brief", image: str | None = None) -> FullAnalysis:
+async def scan(content: str, mode: str = "brief", image: str | None = None, light: bool = False) -> FullAnalysis:
     """Main entry point: scan content through all engines.
 
     1. Detect input type (URL vs text)
@@ -499,7 +499,12 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
     prism_task = route_and_analyze(extracted_text, mode, heuristics, detected_language=detected_lang)
     trace_query = re.split(r'[.!?\n]', extracted_text)[0].strip()[:150]
     trace_task = run_lens(trace_query if len(trace_query) > 20 else extracted_text[:200])
-    signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
+    if light:
+        async def _light_signal():
+            return run_spectrum(extracted_text, source_url, skip_toxicity=True)
+        signal_task = _light_signal()
+    else:
+        signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
 
     synopsis_task = _generate_synopsis(extracted_text, mode)
     _t_core = time.time()
@@ -593,7 +598,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
 
     # Step 10: Political context (Compass)
     _t_compass = time.time()
-    if settings.enable_compass:
+    if settings.enable_compass and not light:
         try:
             from app.meridian import analyze_political_context
             compass_data = await analyze_political_context(extracted_text)
@@ -632,7 +637,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None) -> F
 
     # Step 11: Extract individual claims (only if techniques found, to save API cost)
     _t_claims = time.time()
-    if settings.enable_claims and len(prism_result.techniques) > 0:
+    if settings.enable_claims and not light and len(prism_result.techniques) > 0:
         try:
             claims = await extract_claims(extracted_text, mode)
             analysis.extracted_claims = claims

@@ -51,13 +51,16 @@ def analyze_toxicity(text: str) -> dict:
         }
 
 
-def run_spectrum(text: str, source_url: str = "") -> dict:
+def run_spectrum(text: str, source_url: str = "", skip_toxicity: bool = False) -> dict:
     """Run the full Signal pipeline.
 
     Returns: toxicity, source bias, sentiment, emotion.
     """
-    # Toxicity (Detoxify)
-    tox = analyze_toxicity(text)
+    # Toxicity (Detoxify) — skipped in light mode to avoid 418MB model per article
+    if skip_toxicity:
+        tox = {"toxicity": 0.0}
+    else:
+        tox = analyze_toxicity(text)
 
     # Source credibility (MBFC)
     source_bias = None
