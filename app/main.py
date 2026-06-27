@@ -798,10 +798,8 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
     except Exception:
         rc = None
 
-    if not _s.serpapi_key:
-        raise HTTPException(status_code=503, detail="search not configured")
     try:
-        results = await _serpapi_broad(query, _s.serpapi_key, num=n_articles * 2)
+        results = await _news_search(query, num=n_articles * 2)
     except Exception as e:
         logger.error(f"[keyword] search failed: {e}")
         return {"topic": query, "keywords": kws, "mode": mode, "articles": [],
