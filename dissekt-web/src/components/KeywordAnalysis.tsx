@@ -87,14 +87,25 @@ export default function KeywordAnalysis() {
   const uniqueSources = report ? new Set((report.articles || []).map((a: any) => a.source).filter(Boolean)).size : 0;
   const unfetched = s ? Math.max((s.attempted || 0) - (s.count || 0), 0) : 0;
 
+  const commitKeyword = () => { if (keyword.trim()) { addKeywords(keyword); setKeyword(''); } };
+
   return (
     <div style={{ padding: '4px 0' }}>
       {/* INPUT */}
       <div style={{ display: 'flex', gap: 8, marginBottom: chips.length ? 14 : 0 }}>
-        <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && keyword.trim()) { addKeywords(keyword); setKeyword(''); } }}
-          placeholder="Type a keyword and press Enter, or use Suggest…"
-          style={{ flex: 1, padding: '11px 14px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fff' }} />
+        <div style={{ flex: 1, position: 'relative', display: 'flex' }}>
+          <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') commitKeyword(); }}
+            placeholder="Type a keyword and press Enter, or use Suggest…"
+            style={{ flex: 1, padding: '11px 36px 11px 14px', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fff', width: '100%' }} />
+          {keyword.trim() && (
+            <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: '#bbb', pointerEvents: 'none' }}>↵</span>
+          )}
+        </div>
+        <button onClick={commitKeyword} disabled={!keyword.trim()}
+          style={{ padding: '11px 16px', background: keyword.trim() ? '#0f766e' : '#f0f0ee', color: keyword.trim() ? '#fff' : '#999', border: '1px solid ' + (keyword.trim() ? '#0f766e' : '#e5e5e5'), borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: keyword.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>
+          ↵ Add
+        </button>
         <button onClick={suggest} disabled={loadingSug || keyword.trim().length < 2}
           style={{ padding: '11px 18px', background: '#f0f0ee', color: '#555', border: '1px solid #e5e5e5', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: keyword.trim().length >= 2 ? 'pointer' : 'default', whiteSpace: 'nowrap' }}>
           {loadingSug ? '…' : '✦ Suggest'}
