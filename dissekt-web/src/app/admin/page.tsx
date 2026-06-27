@@ -5,6 +5,8 @@ import SiteHeader from '@/components/SiteHeader';
 import FeedsTab from '@/components/FeedsTab';
 import ModelsTab from '@/components/ModelsTab';
 import SiteFooter from '@/components/SiteFooter';
+import { supabase } from '@/lib/supabase';
+import { refreshAuth, getUserEmail, isAdmin } from '@/lib/tier';
 
 type Tab = 'users' | 'overview' | 'invitations' | 'feedback' | 'contacts' | 'corrections' | 'decisions' | 'settings' | 'sources' | 'feeds' | 'models';
 
@@ -83,41 +85,54 @@ function SourcesTab() {
 }
 
 export default function AdminPage() {
-  const [password, setPassword] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
   const [adminKey, setAdminKey] = useState('');
   const [tab, setTab] = useState<Tab>('overview');
+  const [authState, setAuthState] = useState<'loading' | 'anon' | 'forbidden' | 'ok'>('loading');
 
-  const login = async () => {
-    const res = await fetch('/api/admin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'login', password }),
-    });
-    const data = await res.json();
-    if (data.success) { setAuthenticated(true); setAdminKey(password); if (typeof window !== 'undefined') localStorage.setItem('dissekt_admin', 'true'); }
-    else alert('Invalid password');
-  };
+  useEffect(() => {
+    (async () => {
+      await refreshAuth();
+      if (!getUserEmail()) { setAuthState('anon'); return; }
+      if (!isAdmin()) { setAuthState('forbidden'); return; }
+      // confirmed admin: fetch the admin key for backend data calls
+      try {
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token || '';
+        const res = await fetch('/api/admin/key', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: token }),
+        });
+        const d = await res.json();
+        if (res.ok && d.adminKey) { setAdminKey(d.adminKey); setAuthState('ok'); }
+        else setAuthState('forbidden');
+      } catch { setAuthState('forbidden'); }
+    })();
+  }, []);
 
-  if (!authenticated) {
-    return (
-      <main style={{ flex: 1, background: '#fafaf8' }}>
-        <SiteHeader />
-        <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px' }}>
-          <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 28 }}>
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <div style={{ width: 48, height: 48, background: '#f0fdfa', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 22 }}>🔐</div>
-              <div style={{ fontSize: 18, fontWeight: 600 }}>Admin access</div>
-              <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>Enter admin password</div>
-            </div>
-            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
-              style={{ width: '100%', padding: '10px 14px', border: '0.5px solid #e5eaea', borderRadius: 8, fontSize: 14, outline: 'none', background: '#fafaf8', marginBottom: 12, boxSizing: 'border-box' as any }} />
-            <button onClick={login} style={{ width: '100%', padding: '10px 0', background: '#0d9488', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Sign in</button>
-          </div>
+  if (authState === 'loading') {
+    return (<main style={{ flex: 1, background: '#fafaf8' }}><SiteHeader />
+      <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px', textAlign: 'center', color: '#888' }}>Checking access…</div>
+      <SiteFooter /></main>);
+  }
+  if (authState === 'anon') {
+    return (<main style={{ flex: 1, background: '#fafaf8' }}><SiteHeader />
+      <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px' }}>
+        <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 28, textAlign: 'center' }}>
+          <div style={{ fontSize: 18, fontWeight: 600 }}>Log in to continue</div>
+          <div style={{ fontSize: 13, color: '#888', marginTop: 4, marginBottom: 16 }}>Admin access requires a signed-in admin account.</div>
+          <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', background: '#0d9488', color: '#fff', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>Go to login</a>
         </div>
-        <SiteFooter />
-      </main>
-    );
+      </div><SiteFooter /></main>);
+  }
+  if (authState === 'forbidden') {
+    return (<main style={{ flex: 1, background: '#fafaf8' }}><SiteHeader />
+      <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 24px' }}>
+        <div style={{ background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10, padding: 28, textAlign: 'center' }}>
+          <div style={{ fontSize: 18, fontWeight: 600 }}>No admin access</div>
+          <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>Your account doesn't have admin permissions.</div>
+          <a href="/" style={{ display: 'inline-block', marginTop: 16, padding: '8px 18px', background: '#f0f0ee', color: '#555', borderRadius: 8, fontSize: 13, textDecoration: 'none' }}>Back to app</a>
+        </div>
+      </div><SiteFooter /></main>);
   }
 
   const tabLabels: Record<Tab, string> = {
@@ -141,7 +156,7 @@ export default function AdminPage() {
               <span style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>Admin</span>
               <span style={{ fontSize: 9, padding: '2px 8px', background: '#f0fdfa', color: '#0d9488', borderRadius: 4, fontWeight: 600 }}>LIVE</span>
             </div>
-          <button onClick={() => { setAuthenticated(false); setAdminKey(''); if (typeof window !== 'undefined') localStorage.removeItem('dissekt_admin'); }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
+          <button onClick={async () => { await supabase.auth.signOut(); window.location.href = '/'; }} style={{ padding: '6px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 6, fontSize: 12, cursor: 'pointer', color: '#dc2626' }}>Sign out</button>
         </div>
         {/* Top-level group tabs */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>

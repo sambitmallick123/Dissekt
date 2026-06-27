@@ -13,12 +13,14 @@ export const LIMITS = {
 // Updated by refreshAuth() which should be called on app load + auth changes.
 let _isMember = false;
 let _userEmail = '';
+let _role = 'normal';
 
 export async function refreshAuth(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
   const { data } = await supabase.auth.getSession();
   _isMember = !!data.session;
   _userEmail = data.session?.user?.email || '';
+  _role = (data.session?.user?.app_metadata?.role as string) || 'normal';
   return _isMember;
 }
 
@@ -32,6 +34,14 @@ export function getTier(): Tier {
 
 export function getUserEmail(): string {
   return _userEmail;
+}
+
+export function getRole(): string {
+  return _role;
+}
+
+export function isAdmin(): boolean {
+  return _role === 'admin';
 }
 
 // Get today's date key in GMT (resets at 0000 GMT)
