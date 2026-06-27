@@ -245,6 +245,41 @@ async def my_limits(email: str):
         return {"brief": DEFAULTS["free"]["brief"], "detailed": DEFAULTS["free"]["detailed"], "tier": "free"}
 
 
+@app.post("/api/admin/users/set-role")
+async def admin_set_role(body: dict):
+    """Set a user's role (admin/normal). Guards against removing the last admin."""
+    _check_admin(body.get("adminKey", ""))
+    uid = body.get("user_id")
+    role = body.get("role")
+    if role not in ("admin", "normal"):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="role must be 'admin' or 'normal'")
+    if not uid:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="user_id required")
+    try:
+        sb = _admin_sb()
+        # last-admin guard: block demoting the only admin
+        if role == "normal":
+            resp = sb.auth.admin.list_users()
+            users = resp if isinstance(resp, list) else getattr(resp, "users", [])
+            admins = [u for u in users if (getattr(u, "app_metadata", {}) or {}).get("role") == "admin"]
+            if len(admins) <= 1 and any(getattr(a, "id", "") == uid for a in admins):
+                from fastapi import HTTPException
+                raise HTTPException(status_code=400, detail="Cannot demote the only admin — assign another admin first.")
+        u = sb.auth.admin.get_user_by_id(uid)
+        uo = getattr(u, "user", u)
+        meta = dict(getattr(uo, "app_metadata", {}) or {})
+        meta["role"] = role
+        sb.auth.admin.update_user_by_id(uid, {"app_metadata": meta})
+        return {"success": True, "action": "role_set", "user_id": uid, "role": role}
+    except Exception as e:
+        from fastapi import HTTPException
+        if isinstance(e, HTTPException):
+            raise
+        raise HTTPException(status_code=500, detail=f"Set role failed: {e}")
+
+
 @app.get("/health")
 async def health():
     """Health check endpoint."""
@@ -1892,11 +1927,13 @@ async def admin_list_users(adminKey: str, page: int = 1, per_page: int = 100):
         out = []
         for u in users:
             meta = getattr(u, "user_metadata", {}) or {}
+            ameta = getattr(u, "app_metadata", {}) or {}
             out.append({
                 "id": getattr(u, "id", ""),
                 "email": getattr(u, "email", ""),
                 "name": meta.get("name", ""),
                 "tier": meta.get("tier", "free"),
+                "role": ameta.get("role", "normal"),
                 "created_at": str(getattr(u, "created_at", "")),
                 "last_sign_in_at": str(getattr(u, "last_sign_in_at", "") or ""),
                 "banned_until": str(getattr(u, "banned_until", "") or ""),
@@ -1917,6 +1954,18 @@ async def admin_delete_user(body: dict):
         raise HTTPException(status_code=400, detail="user_id required")
     try:
         sb = _admin_sb()
+        # last-admin guard: never delete the only admin (would lock out the panel)
+        try:
+            _resp = sb.auth.admin.list_users()
+            _users = _resp if isinstance(_resp, list) else getattr(_resp, "users", [])
+            _admins = [u for u in _users if (getattr(u, "app_metadata", {}) or {}).get("role") == "admin"]
+            if len(_admins) <= 1 and any(getattr(a, "id", "") == uid for a in _admins):
+                from fastapi import HTTPException
+                raise HTTPException(status_code=400, detail="Cannot delete the only admin — assign another admin first.")
+        except HTTPException:
+            raise
+        except Exception:
+            pass
         # Resolve email from Auth so we can purge their data (GDPR erasure).
         email = None
         try:
