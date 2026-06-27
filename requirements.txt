@@ -47,4 +47,4 @@ feedparser==6.0.12
 python-telegram-bot==22.7
 yt-dlp
 bcrypt
-googlenewsdecoder==<version>
+googlenewsdecoder==0.1.7
