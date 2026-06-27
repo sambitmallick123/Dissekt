@@ -656,24 +656,43 @@ async def _gnews_search(query: str, num: int = 10) -> list:
     return out
 
 
+def _decode_one_gnews(link: str) -> str:
+    """Resolve a single news.google.com RSS link to the real publisher URL."""
+    if "news.google.com" not in link:
+        return link
+    try:
+        from googlenewsdecoder import gnewsdecoder
+        out = gnewsdecoder(link)
+        if isinstance(out, dict) and out.get("status") and out.get("decoded_url"):
+            return out["decoded_url"]
+    except Exception as e:
+        logger.warning(f"[keyword] gnews decode failed: {type(e).__name__}: {e}")
+    return link
+
+
 async def _google_news_rss(query: str, num: int = 10) -> list:
-    """Google News RSS (free, unlimited, no key). URLs are redirects that scan() follows."""
-    import httpx, feedparser, urllib.parse as _up
+    """Google News RSS (free, unlimited, no key). Decodes redirect URLs to real publisher URLs."""
+    import httpx, feedparser, urllib.parse as _up, asyncio as _aio
     q = _up.quote(query[:200])
     url = f"https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
     async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
         resp = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
         resp.raise_for_status()
         feed = feedparser.parse(resp.text)
+    entries = [e for e in feed.entries[:num] if getattr(e, "link", "")]
+    # Decode all redirect URLs in parallel (each decode is a sync network call)
+    decoded = await _aio.gather(
+        *[_aio.to_thread(_decode_one_gnews, getattr(e, "link", "")) for e in entries]
+    )
     out = []
-    for entry in feed.entries[:num]:
-        link = getattr(entry, "link", "")
-        if link:
-            src = ""
-            if hasattr(entry, "source") and hasattr(entry.source, "title"):
-                src = entry.source.title
-            out.append({"url": link, "title": getattr(entry, "title", ""),
-                        "date": getattr(entry, "published", ""), "source": src})
+    for entry, real in zip(entries, decoded):
+        if "news.google.com" in real:
+            continue  # decode failed for this one; skip (can't dedup/extract a google redirect)
+        src = ""
+        if hasattr(entry, "source") and hasattr(entry.source, "title"):
+            src = entry.source.title
+        out.append({"url": real, "title": getattr(entry, "title", ""),
+                    "date": getattr(entry, "published", ""), "source": src})
     return out
 
 
