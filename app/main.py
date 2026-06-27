@@ -2119,8 +2119,10 @@ async def admin_reset_password(body: dict):
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="email required")
     try:
-        # generate a recovery link / send reset email
-        _admin_sb().auth.admin.generate_link({"type": "recovery", "email": email})
+        # send the recovery email via Supabase (same flow as user-facing forgot-password)
+        _admin_sb().auth.reset_password_for_email(
+            email, {"redirect_to": "https://dissekt.info/auth/reset-password"}
+        )
         return {"success": True, "action": "reset_sent", "email": email}
     except Exception as e:
         from fastapi import HTTPException
