@@ -57,7 +57,7 @@ export default function UsersTab({ adminKey }: { adminKey: string }) {
     const isBanned = !!u.banned_until && u.banned_until !== 'None' && u.banned_until !== '';
     setBusy(u.id);
     const d = await post('/api/admin/users/ban', { user_id: u.id, ban: !isBanned });
-    flash(d.success ? `${isBanned ? 'Unbanned' : 'Banned'} ${u.email}` : `Failed: ${d.detail || 'error'}`);
+    flash(d.success ? `${isBanned ? 'Unblocked' : 'Blocked'} ${u.email}` : `Failed: ${d.detail || 'error'}`);
     await load(); setBusy('');
   };
 
@@ -109,7 +109,7 @@ export default function UsersTab({ adminKey }: { adminKey: string }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>
-                      {u.name || '(no name)'} {isBanned && <span style={{ fontSize: 9, color: '#dc2626', background: '#fef2f2', padding: '1px 6px', borderRadius: 4, marginLeft: 6 }}>BANNED</span>} {u.role === 'admin' && <span style={{ fontSize: 9, color: '#0d9488', background: '#f0fdfa', border: '0.5px solid #cce9e3', padding: '1px 7px', borderRadius: 4, marginLeft: 6, fontWeight: 600 }}>ADMIN</span>}
+                      {u.name || '(no name)'} {isBanned && <span style={{ fontSize: 9, color: '#dc2626', background: '#fef2f2', padding: '1px 6px', borderRadius: 4, marginLeft: 6 }}>BLOCKED</span>} {u.role === 'admin' && <span style={{ fontSize: 9, color: '#0d9488', background: '#f0fdfa', border: '0.5px solid #cce9e3', padding: '1px 7px', borderRadius: 4, marginLeft: 6, fontWeight: 600 }}>ADMIN</span>}
                     </div>
                     <div style={{ fontSize: 12, color: '#888' }}>{u.email}</div>
                     <div style={{ fontSize: 10, color: '#aaa', marginTop: 2 }}>
@@ -122,7 +122,7 @@ export default function UsersTab({ adminKey }: { adminKey: string }) {
                     <button onClick={() => { setLimitsFor(limitsFor === u.id ? null : u.id); }} disabled={busy === u.id} style={btn('#666')}>Limits</button>
                     <button onClick={() => doReset(u)} disabled={busy === u.id} style={btn('#666')}>Reset PW</button>
                     <button onClick={() => doSetRole(u)} disabled={busy === u.id} style={btn(u.role === 'admin' ? '#7c3aed' : '#0d9488')}>{u.role === 'admin' ? 'Make normal' : 'Make admin'}</button>
-                    <button onClick={() => doBan(u)} disabled={busy === u.id} style={btn(isBanned ? '#16a34a' : '#d97706')}>{isBanned ? 'Unban' : 'Ban'}</button>
+                    <button onClick={() => doBan(u)} disabled={busy === u.id} style={btn(isBanned ? '#16a34a' : '#d97706')}>{isBanned ? 'Unblock' : 'Block'}</button>
                     <button onClick={() => doDelete(u)} disabled={busy === u.id} style={btn('#dc2626')}>Delete</button>
                   </div>
                 </div>
