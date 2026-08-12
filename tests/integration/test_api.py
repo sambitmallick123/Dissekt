@@ -92,7 +92,7 @@ class TestScanURL:
 
 class TestSignal:
     def test_mbfc_loaded(self):
-        from app.signal import MBFC_DATABASE
+        from app.spectrum import MBFC_DATABASE
         assert len(MBFC_DATABASE) >= 200
         assert MBFC_DATABASE["foxnews.com"]["bias"] == "right"
         assert MBFC_DATABASE["bbc.com"]["factuality"] == "high"
