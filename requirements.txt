@@ -19,7 +19,6 @@ aiohttp==3.11.11
 anthropic==0.43.0
 beautifulsoup4==4.12.3
 datasketch==1.6.5
-detoxify==0.5.2
 fastapi==0.115.6
 google-api-python-client==2.159.0
 hashlib-additional==1.0.1
@@ -38,9 +37,7 @@ redis==5.2.1
 setuptools<78
 supabase==2.11.0
 textstat==0.7.4
-torch==2.5.1
 trafilatura==2.0.0
-transformers==4.47.1
 uvicorn[standard]==0.34.0
 vaderSentiment==3.3.2
 feedparser==6.0.12

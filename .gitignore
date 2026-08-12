@@ -37,3 +37,7 @@ models/
 *.log
 logs/
 .vercel
+.pytest_cache/
+*.bak
+tsconfig.tsbuildinfo
+.next/
