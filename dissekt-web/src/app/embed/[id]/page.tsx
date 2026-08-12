@@ -19,7 +19,6 @@ export default function EmbedPage({ params }: { params: Promise<{ id: string }> 
   const a = data.analysis;
   const techs = a.prism?.techniques || [];
   const fcs = a.trace?.fact_checks || [];
-  const tox = a.signal?.toxicity_score || 0;
   const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
   const raw = 0; // Legacy — using scoring object
   const score = a.scoring?.clarity_score || a.clarity_score || 0.5;
@@ -35,7 +34,7 @@ export default function EmbedPage({ params }: { params: Promise<{ id: string }> 
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: scoreColor }}>{label}</div>
-          <div style={{ fontSize: 10, color: '#888' }}>{techs.length} techniques · {fcs.length} cross-refs · {(tox * 100).toFixed(1)}% toxicity</div>
+          <div style={{ fontSize: 10, color: '#888' }}>{techs.length} techniques · {fcs.length} cross-refs</div>
         </div>
       </div>
 

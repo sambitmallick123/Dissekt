@@ -52,7 +52,6 @@ export default function ClarityScore({ data }: { data: any }) {
 
   const techs = data.prism?.techniques || [];
   const fcs = data.trace?.fact_checks || data.lens?.fact_checks || [];
-  const tox = data.signal?.toxicity_score || 0;
 
   const dims = [
     { key: 'construction', icon: '🏗️', label: 'Construction', value: con.score ?? 0.5, desc: 'How is it built?' },
@@ -130,10 +129,6 @@ export default function ClarityScore({ data }: { data: any }) {
           <div style={{ padding: '4px 8px', background: '#f8fafa', borderRadius: 4 }}>
             <div style={{ fontSize: 7, fontWeight: 600, textTransform: 'uppercase', color: '#888' }}>Cross-refs</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#404040' }}>{fcs.length}</div>
-          </div>
-          <div style={{ padding: '4px 8px', background: '#f8fafa', borderRadius: 4 }}>
-            <div style={{ fontSize: 7, fontWeight: 600, textTransform: 'uppercase', color: '#888' }}>Toxicity</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: tox > 0.3 ? '#dc2626' : '#16a34a' }}>{(tox * 100).toFixed(0)}%</div>
           </div>
           <div style={{ padding: '4px 8px', background: '#f8fafa', borderRadius: 4 }}>
             <div style={{ fontSize: 7, fontWeight: 600, textTransform: 'uppercase', color: '#888' }}>Confidence</div>

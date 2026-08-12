@@ -73,11 +73,9 @@ export default function BulkAnalysis() {
       const techs = r.prism?.techniques || [];
       const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
       const fcs = r.trace?.fact_checks?.length || 0;
-      const tox = r.signal?.toxicity_score || 0; const bulkScore = r.scoring?.clarity_score || r.clarity_score || 50;
-      let score = (techs.length > 0 ? Math.round(maxConf * 40) : 0) + Math.min(fcs * 4, 30) + Math.round(tox * 20) + (fcs >= 3 ? 10 : 0);
-      score = Math.min(score, 100);
+      const score = Math.round((r.scoring?.clarity_score ?? 0.5) * 100);
       const names = techs.map((t: any) => t.name?.replace(/_/g, ' ')).join('; ');
-      return `"${i.input.replace(/"/g, '""')}",${score},${techs.length},"${names}",${fcs},${(tox*100).toFixed(1)}%,${r.signal?.sentiment || ''},${r.detected_language || 'en'}`;
+      return `"${i.input.replace(/"/g, '""')}",${score},${techs.length},"${names}",${fcs},${r.signal?.sentiment || ''},${r.detected_language || 'en'}`;
     });
     const blob = new Blob([header + rows.join('\n')], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -89,12 +87,10 @@ export default function BulkAnalysis() {
     const techs = r.prism?.techniques || [];
     const maxConf = techs.reduce((max: number, t: any) => Math.max(max, t.confidence || 0), 0);
     const fcs = r.trace?.fact_checks?.length || 0;
-    const tox = r.signal?.toxicity_score || 0; const bulkScore = r.scoring?.clarity_score || r.clarity_score || 50;
-    let s = (techs.length > 0 ? Math.round(maxConf * 40) : 0) + Math.min(fcs * 4, 30) + Math.round(tox * 20) + (fcs >= 3 ? 10 : 0);
-    return Math.min(s, 100);
+    return Math.round((r.scoring?.clarity_score ?? 0.5) * 100);
   };
 
-  const scoreColor = (s: number) => s >= 70 ? '#dc2626' : s >= 40 ? '#d97706' : '#16a34a';
+  const scoreColor = (s: number) => s >= 65 ? '#16a34a' : s >= 35 ? '#d97706' : '#dc2626';
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 14, padding: 18, marginTop: 16 }}>

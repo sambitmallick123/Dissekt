@@ -32,9 +32,6 @@ const factInfo = (f: string|null) => {
 export default function SpectrumCard({ signal }: { signal: any }) {
   const bias = biasInfo(signal.source_bias);
   const fact = factInfo(signal.source_factuality);
-  const tox = signal.toxicity_score || 0;
-  const toxLabel = tox > 0.5 ? 'High' : tox > 0.2 ? 'Moderate' : 'Low';
-  const toxColor = tox > 0.5 ? '#dc2626' : tox > 0.2 ? '#d97706' : '#16a34a';
 
   return (
     <div style={card}>
@@ -62,31 +59,8 @@ export default function SpectrumCard({ signal }: { signal: any }) {
             <span style={{ fontSize: 14, fontWeight: 600, color: '#404040', textTransform: 'capitalize' }}>{signal.sentiment}</span>
             <span style={{ fontSize: 11, color: '#aaa', marginLeft: 4 }}>({signal.sentiment_score?.toFixed(2)})</span>
           </div>
-          <div style={metricBox}>
-            <div style={metricLabel}>Toxicity</div>
-            <span style={{ fontSize: 14, fontWeight: 600, color: toxColor }}>{toxLabel}</span>
-            <span style={{ fontSize: 11, color: '#aaa', marginLeft: 4 }}>({(tox*100).toFixed(1)}%)</span>
-          </div>
         </div>
 
-        {signal.toxicity_labels && Object.keys(signal.toxicity_labels).length > 0 && tox > 0.05 && (
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid #e5e5e5' }}>
-            <div style={metricLabel}>Toxicity breakdown</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', marginTop: 8 }}>
-              {Object.entries(signal.toxicity_labels).map(([k, v]: any) => (
-                <div key={k} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: '#888', textTransform: 'capitalize' }}>{k.replace(/_/g, ' ')}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 50, height: 3, background: '#f0f0ee', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 2, width: `${Math.max(v*100, 2)}%`, background: v > 0.5 ? '#dc2626' : v > 0.2 ? '#d97706' : '#d4d4d4' }}/>
-                    </div>
-                    <span style={{ fontWeight: 500, color: '#555', width: 36, textAlign: 'right' }}>{(v*100).toFixed(1)}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
