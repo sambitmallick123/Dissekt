@@ -374,7 +374,6 @@ async def _persist_scan(email: str, mode: str, result) -> None:
         if isinstance(scoring, dict):
             clarity = scoring.get("clarity_score", scoring.get("clarity", scoring.get("score")))
 
-        toxicity = g(result, "signal", "toxicity_score", default=0.0)
         language = g(result, "detected_language", default="en")
 
         # NER: extract entities + main topic from the analyzed text
@@ -389,7 +388,6 @@ async def _persist_scan(email: str, mode: str, result) -> None:
             "language": language,
             "clarity": clarity,
             "techniques": techniques,
-            "toxicity": toxicity,
             "entities": entities,
         }).execute()
         logger.info(f"[persist] ✓ saved scan for {email}")
@@ -849,11 +847,10 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
             clarity = scoring.get("clarity_score")
             techs = [(t.get("name") if isinstance(t, dict) else t)
                      for t in ((rd.get("prism") or {}).get("techniques") or [])]
-            tox = ((rd.get("signal") or {}).get("toxicity_score")) or 0.0
             return {"url": item["url"], "title": item.get("title", ""),
                     "source": item.get("source", "") or _up.urlparse(item["url"]).netloc.replace("www.", ""),
                     "analysis_id": rd.get("id", ""), "clarity": clarity,
-                    "toxicity": round(tox, 3), "techniques": techs, "ok": True}
+                    "techniques": techs, "ok": True}
         except Exception as e:
             logger.warning(f"[keyword] article failed {item.get('url')}: {e}")
             return {"url": item["url"], "title": item.get("title", ""), "ok": False, "error": str(e)[:120]}
@@ -864,18 +861,16 @@ async def keyword_analyze(request: KeywordAnalyzeRequest,
     # Aggregate
     from collections import Counter
     clar_vals = [a["clarity"] for a in good if a.get("clarity") is not None]
-    tox_vals = [a["toxicity"] for a in good if a.get("toxicity") is not None]
     tech_counter = Counter()
     for a in good:
         for t in a.get("techniques", []):
             if t:
                 tech_counter[t] += 1
     avg_clar = round(sum(clar_vals)/len(clar_vals), 3) if clar_vals else None
-    avg_tox = round(sum(tox_vals)/len(tox_vals), 3) if tox_vals else None
     dom_tech = [{"name": n, "count": ct} for n, ct in tech_counter.most_common(6)]
 
     _summary = {"count": len(good), "attempted": len(chosen),
-                "avg_clarity": avg_clar, "avg_toxicity": avg_tox,
+                "avg_clarity": avg_clar,
                 "dominant_techniques": dom_tech}
     _summary["synopsis"] = await _keyword_synopsis(query, good, _summary)
 
@@ -1289,8 +1284,8 @@ Write a 2-3 sentence comparison of how these two pieces of content differ in the
                 "only_a_techniques": list(only_a),
                 "only_b_techniques": list(only_b),
                 "score_diff": abs(
-                    (dict_a.get("signal", {}).get("toxicity_score", 0) * 100) -
-                    (dict_b.get("signal", {}).get("toxicity_score", 0) * 100)
+                    ((dict_a.get("scoring") or {}).get("clarity_score") or 0) * 100 -
+                    ((dict_b.get("scoring") or {}).get("clarity_score") or 0) * 100
                 ),
             }
         }

@@ -9,7 +9,6 @@ def format_result(data: dict) -> str:
     """Format Dissekt analysis for Telegram (HTML). No hyperlinks except report + dissekt.info."""
     techs = data.get("prism", {}).get("techniques", [])
     fcs = data.get("trace", {}).get("fact_checks", [])
-    tox = data.get("signal", {}).get("toxicity_score", 0)
     brief = data.get("prism", {}).get("brief", "")
     claims = data.get("extracted_claims", [])
     report_id = data.get("id", "")
@@ -20,7 +19,7 @@ def format_result(data: dict) -> str:
         score = scoring.get("clarity_score", 0.5)
     else:
         max_conf = max((t.get("confidence", 0) for t in techs), default=0)
-        raw = min(100, (round(max_conf * 40) if techs else 0) + min(len(fcs) * 4, 30) + round(tox * 20) + (10 if len(fcs) >= 3 else 0))
+        raw = min(100, (round(max_conf * 40) if techs else 0) + min(len(fcs) * 4, 30) + (10 if len(fcs) >= 3 else 0))
         score = 100 - raw
 
     emoji = "🔴" if score <= 0.35 else "🟡" if score <= 0.65 else "🟢"
@@ -59,7 +58,7 @@ def format_result(data: dict) -> str:
             lines.append(f"  • {c.get('claim', '')[:100]}")
 
     lines.append("")
-    lines.append(f"📊 Toxicity: {tox*100:.1f}% | Sentiment: {data.get('signal', {}).get('sentiment', 'neutral')}")
+    lines.append(f"📊 Sentiment: {data.get('signal', {}).get('sentiment', 'neutral')}")
     lines.append("")
 
     if report_id:
