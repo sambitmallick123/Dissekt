@@ -499,12 +499,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None, ligh
     prism_task = route_and_analyze(extracted_text, mode, heuristics, detected_language=detected_lang)
     trace_query = re.split(r'[.!?\n]', extracted_text)[0].strip()[:150]
     trace_task = run_lens(trace_query if len(trace_query) > 20 else extracted_text[:200])
-    if light:
-        async def _light_signal():
-            return run_spectrum(extracted_text, source_url, skip_toxicity=True)
-        signal_task = _light_signal()
-    else:
-        signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
+    signal_task = asyncio.to_thread(run_spectrum, extracted_text, source_url)
 
     synopsis_task = _generate_synopsis(extracted_text, mode)
     _t_core = time.time()

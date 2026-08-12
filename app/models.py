@@ -96,8 +96,6 @@ class TraceResult(BaseModel):
 
 class SignalResult(BaseModel):
     """Output from the bias/toxicity/emotion radar."""
-    toxicity_score: float = Field(default=0.0, ge=0.0, le=1.0)
-    toxicity_labels: dict[str, float] = Field(default_factory=dict)
     source_bias: Optional[str] = Field(default=None, description="e.g. 'left-center', 'right'")
     source_factuality: Optional[str] = Field(default=None, description="e.g. 'high', 'mixed'")
     primary_emotion: str = Field(default="neutral")
