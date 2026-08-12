@@ -10,7 +10,6 @@ interface Props {
 export default function ScanInput({ onScan, loading, initialContent }: Props) {
   const [content, setContent] = useState(initialContent || '');
   useEffect(() => { if (initialContent) setContent(initialContent); }, [initialContent]);
-  const [mode, setMode] = useState<'brief' | 'detailed'>('brief');
   const [image, setImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState('');
   const [dragOver, setDragOver] = useState(false);
@@ -43,7 +42,7 @@ export default function ScanInput({ onScan, loading, initialContent }: Props) {
     }
   }, [processFile]);
 
-  const handleSubmit = () => { if (canSubmit) onScan(content.trim(), mode, image || undefined); };
+  const handleSubmit = () => { if (canSubmit) onScan(content.trim(), 'detailed', image || undefined); };
   const removeImage = () => { setImage(null); setImageName(''); };
 
   return (
@@ -72,11 +71,6 @@ export default function ScanInput({ onScan, loading, initialContent }: Props) {
         </div>
 
         <div className="scan-controls" style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <div style={{ display: 'flex', background: '#f0f0ee', borderRadius: 8, padding: 3 }}>
-            {(['brief', 'detailed'] as const).map(m => (
-              <button key={m} onClick={() => setMode(m)} style={{ padding: '6px 10px', borderRadius: 6, fontSize: 12, fontWeight: 500, border: 'none', cursor: 'pointer', background: mode === m ? '#fff' : 'transparent', color: mode === m ? '#1a1a1a' : '#888', boxShadow: mode === m ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{m}</button>
-            ))}
-          </div>
           <button onClick={handleSubmit} disabled={!canSubmit} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 16px', background: canSubmit ? '#0d9488' : '#d4d4d4', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: canSubmit ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap' }}>
             {loading ? (<><svg style={{ animation: 'spin 0.8s linear infinite' }} width="14" height="14" viewBox="0 0 24 24"><circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/><path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Scanning</>) : (<><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Scan</>)}
           </button>

@@ -21,7 +21,7 @@ function ScanAppInner() {
   const [error, setError] = useState('');
   const [inputContent, setInputContent] = useState('');
   const [scanTab, setScanTab] = useState<'single' | 'keyword'>('single');
-  const [remaining, setRemaining] = useState<{ brief: number; detailed: number; tier: 'free' | 'member' }>({ brief: 3, detailed: 1, tier: 'free' });
+  const [remaining, setRemaining] = useState<{ brief: number; detailed: number; tier: 'free' | 'member' }>({ brief: 3, detailed: 3, tier: 'free' });
   const [resetIn, setResetIn] = useState('');
   const [shareToast, setShareToast] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -58,28 +58,23 @@ function ScanAppInner() {
       setInputContent(incoming);
       // Auto-run a brief scan if we have a usable value
       if (incoming.length >= 10) {
-        handleScan(incoming, 'brief');
+        handleScan(incoming, 'detailed');
       }
     }
   }, [mounted, searchParams, urlHandled]);
 
 
   const handleScan = async (content: string, modeArg: string, image?: string) => {
-    const mode = (modeArg === 'detailed' ? 'detailed' : 'brief') as 'brief' | 'detailed';
+    const mode: 'brief' | 'detailed' = 'detailed';
     if (!image && (!content || content.length < 5)) { setError('Please enter at least 5 characters, or attach an image'); return; }
 
-    // Gate detailed mode — members always have access; free users gated by feature list
-    if (mode === 'detailed' && !isMember() && !enabledFeatures.includes('detailed_mode')) {
-      checkFeature('Detailed mode', enabledFeatures);
-      return;
-    }
 
     if (!canScan(mode)) {
       const tier = getTier();
       if (tier === 'free') {
-        setError(`Free tier limit reached for ${mode} scans (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT.`);
+        setError(`Free tier limit reached (${LIMITS.free[mode]}/day). Resets in ${getResetTime()} at 00:00 GMT.`);
       } else {
-        setError(`Daily limit reached for ${mode} scans. Resets in ${getResetTime()} at 00:00 GMT.`);
+        setError(`Daily limit reached. Resets in ${getResetTime()} at 00:00 GMT.`);
       }
       return;
     }
@@ -173,7 +168,7 @@ function ScanAppInner() {
               <span style={{ fontWeight: 600, color: remaining.tier === 'member' ? '#0d9488' : '#888' }}>
                 {remaining.tier === 'member' ? '👤 Member' : '🆓 Free'}
               </span>
-              {' · '}{remaining.brief} brief, {remaining.detailed} detailed left
+              {' · '}{remaining.detailed} scans left
               <div style={{ fontSize: 10, color: '#aaa' }}>Resets in {resetIn} (00:00 GMT)</div>
             </div>
           </div>
@@ -194,7 +189,7 @@ function ScanAppInner() {
 
         {scanTab === 'single' && !result && !loading && (
           <>
-            <Scope onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'brief'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+            <Scope onAnalyze={(text: string) => { setInputContent(text); handleScan(text, 'detailed'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
           </>
         )}
       </div>

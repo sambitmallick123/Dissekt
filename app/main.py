@@ -225,7 +225,7 @@ async def rate_limit(request: Request, call_next):
 @app.get("/api/me/limits")
 async def my_limits(email: str):
     """Effective daily limits: admin override (user_metadata) else tier default."""
-    DEFAULTS = {"member": {"brief": 25, "detailed": 10}, "free": {"brief": 3, "detailed": 1}}
+    DEFAULTS = {"member": {"brief": 15, "detailed": 15}, "free": {"brief": 3, "detailed": 3}}
     try:
         sb = _admin_sb()
         resp = sb.auth.admin.list_users(page=1, per_page=200)
