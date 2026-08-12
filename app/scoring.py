@@ -22,8 +22,6 @@ References (operationalized in the scoring):
     https://aclanthology.org/D18-1389/
   Wachsmuth et al., EACL 2017 — argumentation quality (Construction)
     https://aclanthology.org/E17-1017/
-  Pavlopoulos et al., ACL 2020 — context-aware toxicity (Intent/tone)
-    https://aclanthology.org/2020.acl-main.396/
   Hutto & Gilbert, ICWSM 2014 — VADER sentiment (Intent/tone, Spectrum)
     https://doi.org/10.1609/icwsm.v8i1.14550
   UNDP, Human Development Report 2010 (Technical Notes) — geometric mean for composite indices

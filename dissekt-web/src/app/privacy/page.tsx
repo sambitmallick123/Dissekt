@@ -19,7 +19,6 @@ export default function PrivacyPage() {
           <p><strong>Content you submit for analysis:</strong> When you paste text, a URL, or upload an image, that content is sent to our analysis servers for processing. We do not store the full content permanently. A short preview (first 200 characters) may be stored alongside the analysis result for shareable reports.</p>
           <p><strong>Analysis results:</strong> The output of each analysis (techniques detected, cross-references found, scores) is stored in our database to enable shareable report links.</p>
           <p><strong>Feedback and corrections:</strong> If you submit feedback or use the 👍/👎 correction buttons, your input is stored to improve future analysis accuracy.</p>
-          <p><strong>Ledger:</strong> If you mark content as Trust/Unsure/Reject, this is stored to enable the journal feature.</p>
           <p><strong>Account data:</strong> If you create an account, we collect and store your email address, display name, and a securely hashed password (managed by our authentication provider, Supabase). You can use most of Dissekt without an account; an account is required only for member features such as expanded daily limits, your Dashboard, saved history, and API access.</p>
           <p><strong>Member scan history (metadata only):</strong> If you are signed in, we store <em>metadata</em> about each analysis you run — the manipulation techniques identified, clarity and toxicity scores, the detected language, a reference ID linking to the full report, and a timestamp. We do <strong>not</strong> store the raw text you analyze as part of this history. This metadata powers your saved scan history and Dashboard. It is linked to your account.</p>
           <p><strong>Usage data:</strong> We track the number of scans per day per user for rate limiting.</p>
@@ -39,7 +38,7 @@ export default function PrivacyPage() {
           <p>• <strong>SerpAPI</strong> — for the Keyword Topic feature, to find recent articles on a topic. Only your search keywords are sent (not personal data).</p>
           <p>• <strong>Supabase</strong> — for storing reports, feedback, and corrections. Data is hosted in EU (Frankfurt).</p>
           <p>• <strong>Qdrant Cloud</strong> — for finding related past analyses. Text embeddings (not raw text) are stored for similarity search.</p>
-          <p>Toxicity analysis (Detoxify), sentiment analysis (VADER), and source credibility scoring (MBFC) run entirely on our servers. No content is sent to external services for these features.</p>
+          <p>Sentiment analysis (VADER) and source credibility scoring run entirely on our servers. No content is sent to external services for these features.</p>
 
           <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8, marginTop: 20 }}>5. Data retention</h2>
           <p>• Analysis reports are stored indefinitely to support shareable links.</p>

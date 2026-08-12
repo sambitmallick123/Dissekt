@@ -38,9 +38,7 @@ export default function HelpPage() {
   const [open, setOpen] = useState<string | null>(null);
   const faqs = [
     ['Does Dissekt tell me if something is true or false?', 'No. Dissekt analyzes how content is constructed — the techniques, framing, sourcing, and tone — and cross-references existing fact-checks. It gives you the tools to think critically, not a verdict. The Clarity Score reflects transparency of construction, not truth.'],
-    ['What is a "Brief" vs "Detailed" scan?', 'Brief is a fast analysis using a lightweight model — good for quick checks. Detailed runs a deeper model with fuller reasoning and more thorough cross-referencing. Detailed scans count separately against your daily limit.'],
     ['Why did my scan find no fact-checks?', 'Cross-referencing depends on whether fact-checkers have already covered the claim. Newer or niche topics often have none yet. Absence of fact-checks is not evidence either way.'],
-    ['Why is toxicity usually 0%?', 'Professional news writing rarely triggers toxicity detection, which looks for insults, threats, and obscenity. A low toxicity score is normal for news and does not mean the content is unbiased.'],
     ['Is my data private?', 'Content you submit is processed but not stored in full. If you have an account, lightweight metadata about your scans (techniques, scores, a reference ID — not the raw text) is stored so your history and reports work. You can request deletion anytime. See the Privacy Policy for details.'],
     ['Can I use Dissekt without an account?', 'Yes. Free use requires no account (3 brief + 1 detailed scan per day). A free account raises limits and unlocks your Dashboard and API access.'],
   ];
@@ -77,11 +75,9 @@ export default function HelpPage() {
           <Steps items={[
             'Go to Analyze → Single scan.',
             'Paste text or a URL, or attach an image.',
-            'Choose Brief (fast) or Detailed (deeper).',
             'Read the Clarity Score, detected techniques, cross-references, and source credibility.',
           ]} />
           <P>For a URL, Dissekt fetches and extracts the article automatically. Some sites block automated access (paywalls) — if extraction fails, paste the text directly.</P>
-          <Tip>Use Brief for a quick gut-check, Detailed when a piece matters and you want the fuller reasoning and cross-referencing.</Tip>
 
           <H id="keyword">Keyword topic</H>
           <P>Instead of one article, analyze how a <em>whole topic</em> is being covered right now. Dissekt fetches recent articles on your keywords, analyzes each, and aggregates a coverage report.</P>
@@ -89,7 +85,6 @@ export default function HelpPage() {
             'Go to Analyze → Keyword topic.',
             'Type a topic (e.g. "5G health risks") and press Suggest.',
             'Dissekt proposes related keywords — tap to add the ones that sharpen your search.',
-            'Pick Brief (more articles) or Detailed (deeper, fewer), then Analyze topic.',
             'Read the aggregate report: average clarity, dominant techniques, and a per-source breakdown sorted least-to-most clear.',
           ]} />
           <P>Searches are limited to recent coverage (about the past month) and span general web sources — news, analysis, and blogs. Sources that block automated access are noted and excluded.</P>
@@ -104,7 +99,6 @@ export default function HelpPage() {
           <H id="access">Access &amp; limits</H>
           <P>Daily scan limits reset at 00:00 GMT.</P>
           <P><strong>Free (no account):</strong> 3 brief + 1 detailed scan per day.<br /><strong>Free member account:</strong> 25 brief + 10 detailed per day, plus your Dashboard and API access.</P>
-          <P>Brief and detailed scans are counted separately. Keyword topic analyses count as one scan of the chosen depth.</P>
           <Tip>An account is free and unlocks your Dashboard, saved scan history, and API access.</Tip>
 
           <H id="tips">Tips for good results</H>
@@ -127,7 +121,6 @@ export default function HelpPage() {
           <Tip>A report shows only the tags that actually fired, so a clean piece may show none — that&apos;s normal, not a failure. These patterns are detected in <strong>English only</strong>, so non-English articles may show fewer signals.</Tip>
           <P><strong>Framing &amp; credibility language</strong></P>
           <P>• <strong>Doubt-casting language</strong> — words that quietly question credibility (&ldquo;so-called&rdquo;, &ldquo;alleged&rdquo;, &ldquo;purported&rdquo;).<br />• <strong>Asserted certainty</strong> — verbs presenting contested points as settled (&ldquo;revealed&rdquo;, &ldquo;exposed&rdquo;, &ldquo;confirmed&rdquo;).<br />• <strong>Heavily hedged</strong> — frequent softeners that distance claims (&ldquo;may&rdquo;, &ldquo;possibly&rdquo;, &ldquo;arguably&rdquo;).<br />• <strong>One-sided framing</strong> — subjective intensifiers that assume agreement (&ldquo;clearly&rdquo;, &ldquo;obviously&rdquo;, &ldquo;of course&rdquo;).<br />• <strong>Sweeping generalization</strong> — broad claims about an entire group.<br />• <strong>Dehumanizing metaphor</strong> — threat/disaster language applied to people (&ldquo;flood&rdquo;, &ldquo;swarm&rdquo;, &ldquo;infestation&rdquo;).</P>
-          <P><strong>Toxicity sub-types</strong> (shown when detected): Severe toxicity, Obscene language, Threat, Insult, Identity attack, Sexually explicit.</P>
           <P>Tap any tag in a report to see the specific words that triggered it.</P>
 
           <H id="references">References</H>
@@ -137,10 +130,8 @@ export default function HelpPage() {
               ['Da San Martino et al., EMNLP-IJCNLP 2019', 'Propaganda technique taxonomy', 'https://aclanthology.org/D19-1565/'],
               ['Baly et al., EMNLP 2018', 'News-source factuality & bias (MBFC basis)', 'https://aclanthology.org/D18-1389/'],
               ['Wachsmuth et al., EACL 2017', 'Computational argumentation quality', 'https://aclanthology.org/E17-1017/'],
-              ['Pavlopoulos et al., ACL 2020', 'Context-aware toxicity', 'https://aclanthology.org/2020.acl-main.396/'],
               ['Hutto & Gilbert, ICWSM 2014', 'VADER sentiment analysis', 'https://doi.org/10.1609/icwsm.v8i1.14550'],
               ['Recasens et al., ACL 2013', 'Framing & epistemological bias', 'https://aclanthology.org/P13-1162/'],
-              ['Borkan et al., WWW 2019', 'Toxicity sub-labels (Jigsaw/Detoxify)', 'https://arxiv.org/abs/1903.04561'],
               ['UNDP, Human Development Report 2010', 'Geometric mean for composite indices', 'https://hdr.undp.org/'],
             ].map(([p, t, u]) => (
               <a key={p} href={u} target="_blank" rel="noopener" style={{ fontSize: 13, color: '#404040', textDecoration: 'none', display: 'flex', gap: 8, padding: '7px 0', borderBottom: '0.5px solid #f0efec' }}>

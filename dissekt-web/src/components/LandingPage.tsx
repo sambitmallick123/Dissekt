@@ -119,24 +119,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 12 ENGINES */}
-      <section style={{ padding: '48px 24px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>6 analysis engines</h2>
-            <p style={{ fontSize: 14, color: '#888' }}>Every scan runs through 6 specialized engines in parallel.</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
-            {[{ icon: '🔦', name: 'Beacon', desc: 'Orchestrator — parallel pipeline' }, { icon: '🔺', name: 'Prism', desc: '20 manipulation techniques' }, { icon: '🔎', name: 'Lens', desc: 'Fact-checker cross-references' }, { icon: '🌈', name: 'Spectrum', desc: 'Toxicity + credibility + sentiment' }, { icon: '💠', name: 'Claims', desc: 'Claim extraction + typing' }, { icon: '🧭', name: 'Meridian', desc: '68 politicians, 4 countries' }].map(e => (
-              <div key={e.name} style={{ padding: '12px 14px', background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}><span style={{ fontSize: 16 }}>{e.icon}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a' }}>{e.name}</span></div>
-                <div style={{ fontSize: 11, color: '#888' }}>{e.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* PLATFORMS */}
       <section style={{ padding: '48px 24px', background: '#fff', borderTop: '0.5px solid #e5eaea', borderBottom: '0.5px solid #e5eaea' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
@@ -150,32 +132,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* FEATURES */}
-      <section style={{ padding: '48px 24px' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 700, color: '#1a1a1a', margin: '0 0 8px' }}>Tools for seeing clearly</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
-            {[{ icon: '📊', name: 'Dashboard', desc: 'Your scan history, reading profile, and API keys in one place' }, { icon: '📒', name: 'Ledger', desc: 'Decision journal — log Trust / Unsure / Reject on what you read' }, { icon: '🪞', name: 'Reflect', desc: 'Your reading profile — how you tend to judge what you read' }, { icon: '💠', name: 'Facet', desc: 'Plain-language summary atop every report — what it is, what it says, the key finding' }, { icon: '🔑', name: 'API access', desc: 'Scan programmatically with your own API key' }].map(f => (
-              <div key={f.name} style={{ padding: 14, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}><span style={{ fontSize: 14 }}>{f.icon}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#0d9488' }}>{f.name}</span></div>
-                <div style={{ fontSize: 11, color: '#888', lineHeight: 1.7 }}>{f.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* NUMBERS */}
-      <section style={{ padding: '48px 24px', background: '#0d9488' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, textAlign: 'center' }}>
-          {[{ n: '6', l: 'Engines' }, { n: '20', l: 'Techniques' }, { n: '100+', l: 'Fact-check network' }, { n: '231', l: 'Media rated' }, { n: '68', l: 'Politicians' }].map(s => (
-            <div key={s.l} style={{ padding: 12 }}><div style={{ fontSize: 28, fontWeight: 700, color: '#fff' }}>{s.n}</div><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{s.l}</div></div>
-          ))}
         </div>
       </section>
 
@@ -214,13 +170,13 @@ export default function LandingPage() {
             <div style={{ padding: 20, background: '#fff', border: '0.5px solid #e5eaea', borderRadius: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 600 }}>🆓 Free</div>
               <div style={{ fontSize: 11, color: '#888', marginBottom: 10 }}>Start instantly</div>
-              <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>3 brief / day<br />1 detailed / day<br />Help + Feedback</div>
+              <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>3 scans / day<br />Help + Feedback</div>
               <a href="/analyze" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#f0f0ee', color: '#555', borderRadius: 6, fontSize: 13, textDecoration: 'none' }}>Start scanning</a>
             </div>
             <div style={{ padding: 20, background: '#fff', border: '2px solid #0d9488', borderRadius: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 600 }}>🔐 Account</div>
               <div style={{ fontSize: 11, color: '#0d9488', marginBottom: 10 }}>Free — sign up with email</div>
-              <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>25 brief / day<br />10 detailed / day<br />All features + API + Dashboard</div>
+              <div style={{ fontSize: 12, color: '#555', lineHeight: 2 }}>15 scans / day<br />Dashboard + scan history</div>
               <a href="/signup" style={{ display: 'block', textAlign: 'center', marginTop: 12, padding: '8px 0', background: '#0d9488', color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Sign up</a>
               <a href="/login" style={{ display: 'block', textAlign: 'center', marginTop: 6, fontSize: 12, color: '#0d9488', textDecoration: 'none' }}>or sign in</a>
             </div>

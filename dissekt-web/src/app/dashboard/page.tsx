@@ -4,8 +4,6 @@ import { supabase } from '@/lib/supabase';
 import { refreshAuth, isMember } from '@/lib/tier';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
-import Reflect from '@/components/Reflect';
-import LedgerView from '@/components/Ledger';
 import ScanHistory from '@/components/ScanHistory';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -197,8 +195,6 @@ export default function DashboardPage() {
 
         {tab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-            <Reflect />
-            <LedgerView />
             <ScanHistory onReanalyze={(input: string) => { window.location.href = '/analyze?content=' + encodeURIComponent(input); }} />
           </div>
         )}

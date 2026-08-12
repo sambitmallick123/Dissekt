@@ -45,7 +45,7 @@ export default function DocsPage() {
               {[
                 { icon: '👁', name: 'Prism', desc: '20 manipulation techniques with confidence scores' },
                 { icon: '🌐', name: 'Trace', desc: 'Cross-references from 100+ fact-checking orgs' },
-                { icon: '📊', name: 'Signal', desc: 'Toxicity, sentiment, source bias from 231 sources' },
+                { icon: '📊', name: 'Signal', desc: 'Sentiment and source credibility' },
                 { icon: '🔒', name: 'Anchor', desc: 'SHA-256 hash + blockchain timestamp' },
                 { icon: '🏛', name: 'Compass', desc: 'Political accountability (India, more coming)' },
                 { icon: '📡', name: 'Pulse', desc: 'Coordination detection signals' },
