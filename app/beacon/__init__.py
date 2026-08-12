@@ -525,7 +525,7 @@ async def scan(content: str, mode: str = "brief", image: str | None = None, ligh
 
     if isinstance(signal_raw, Exception):
         logger.error(f"Signal failed: {signal_raw}")
-        signal_raw = {"toxicity_score": 0.0, "toxicity_labels": {}, "source_bias": None, "source_factuality": None, "sentiment": "neutral", "sentiment_score": 0.0, "primary_emotion": "neutral", "emotion_scores": {}}
+        signal_raw = {"source_bias": None, "source_factuality": None, "sentiment": "neutral", "sentiment_score": 0.0, "primary_emotion": "neutral", "emotion_scores": {}}
     signal_result = SignalResult(**signal_raw)
 
     # Step 9: Blockchain hash + OTS anchoring
@@ -666,20 +666,18 @@ async def scan(content: str, mode: str = "brief", image: str | None = None, ligh
                     'url': getattr(fc, 'url', ''),
                     'publisher': getattr(fc, 'publisher', {}),
                 })
-        tox_raw = 0.0
         sent_raw = 0.0
         src_fact = None
         src_bias = None
         if hasattr(analysis, 'signal') and analysis.signal:
             sig = analysis.signal if isinstance(analysis.signal, dict) else analysis.signal.__dict__ if hasattr(analysis.signal, '__dict__') else {}
-            tox_raw = sig.get('toxicity_score', 0.0)
             sent_raw = sig.get('sentiment_score', 0.0)
             src_fact = sig.get('source_factuality')
             src_bias = sig.get('source_bias')
         
         score_result = compute_full_score(
             techniques=techs_raw, fact_checks=fcs_raw,
-            toxicity_score=tox_raw, sentiment_compound=sent_raw,
+            sentiment_compound=sent_raw,
             source_factuality=src_fact, source_bias=src_bias,
             text=content[:5000], source_name="",
         )

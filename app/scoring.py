@@ -280,23 +280,19 @@ def extract_quoted_speech(text: str) -> tuple:
     return editorial.strip(), " ".join(quotes)
 
 
-def compute_tone(text: str, raw_toxicity: float, sentiment_compound: float, source_name: str = "") -> dict:
+def compute_tone(text: str, sentiment_compound: float, source_name: str = "") -> dict:
     editorial, quoted = extract_quoted_speech(text)
     genre = detect_genre(text, source_name)
-    baseline = GENRE_BASELINES.get(genre, 0.06)
-    adjusted_tox = max(raw_toxicity - baseline, 0) / max(1.0 - baseline, 0.01)
     quote_ratio = len(quoted) / max(len(text), 1)
-    editorial_tox = adjusted_tox * (1.0 - quote_ratio * 0.6)
     words = text.lower().split()
     agg = sum(1 for w in words if w.strip(".,!?;:") in AGGRESSION_WORDS)
     bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)] if len(words) > 1 else []
     agg += sum(1 for b in bigrams if b in AGGRESSION_WORDS)
     hostility = _clamp(agg / max(len(words), 1) * 20, 0, 1.0)
-    tox_pen = editorial_tox * 0.30
     host_pen = hostility * 0.40
     sent_pen = abs(sentiment_compound) * 0.30
-    score = _clamp(1.0 - tox_pen - host_pen - sent_pen, 0.05)
-    return {"score": _round(score), "raw_toxicity": _round(raw_toxicity), "adjusted_toxicity": _round(editorial_tox), "hostility": _round(hostility), "sentiment_extremity": _round(abs(sentiment_compound)), "genre": genre, "quote_ratio": _round(quote_ratio), "penalties": {"toxicity": _round(tox_pen), "hostility": _round(host_pen), "sentiment": _round(sent_pen)}}
+    score = _clamp(1.0 - host_pen - sent_pen, 0.05)
+    return {"score": _round(score), "hostility": _round(hostility), "sentiment_extremity": _round(abs(sentiment_compound)), "genre": genre, "quote_ratio": _round(quote_ratio), "penalties": {"hostility": _round(host_pen), "sentiment": _round(sent_pen)}}
 
 
 def compute_manipulation(text: str) -> dict:
@@ -356,7 +352,7 @@ def compute_intent(tone: dict, manipulation: dict, narrative: dict) -> dict:
 # HEADLINE: CLARITY SCORE
 # ═══════════════════════════════════════════
 
-def compute_full_score(techniques: list, fact_checks: list, toxicity_score: float,
+def compute_full_score(techniques: list, fact_checks: list,
                        sentiment_compound: float, source_factuality: str = None,
                        source_bias: str = None, text: str = "", source_name: str = "",
                        claims: list = None) -> dict:
@@ -374,7 +370,7 @@ def compute_full_score(techniques: list, fact_checks: list, toxicity_score: floa
     verification = compute_verification(evidence, source, diversity, temporal)
 
     # Dimension 3: Intent
-    tone = compute_tone(text, toxicity_score, sentiment_compound, source_name)
+    tone = compute_tone(text, sentiment_compound, source_name)
     manipulation = compute_manipulation(text)
     narrative = compute_narrative_direction(text, sentiment_compound)
     intent = compute_intent(tone, manipulation, narrative)
