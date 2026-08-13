@@ -1,0 +1,12 @@
+id    genre          detected        clarity  constr  intent
+g001  academic       news_article      0.582   0.625   0.888
+g002  academic       news_article      0.689   0.674   0.875
+g003  activism       news_article      0.604   0.592   0.819
+g004  activism       news_article      0.514   0.543   0.551
+g005  activism       news_article      0.554   0.543   0.884
+g006  opinion        news_article      0.707   0.703   0.769
+g007  press_release  press_release     0.627   0.651   0.831
+g008  reporting      news_article      0.685   0.733   0.844
+g009  reporting      news_article      0.707   0.765   0.832
+g010  satire         news_article      0.581   0.625   0.884
+g011  satire         news_article      0.760   0.727   0.966
