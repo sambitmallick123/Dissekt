@@ -440,6 +440,6 @@ AI Engineer · LLM / NLP · Production AI Systems
 
 ## License
 
-The repository is publicly accessible, but an explicit open-source license should be added before describing the project as open source.
+DISSEKT is licensed under the [Apache License 2.0](./LICENSE).
 
-If the intention is to make DISSEKT open source, add a standard license such as **Apache-2.0** or **MIT** in a root-level `LICENSE` file and update this section accordingly.
+Copyright © 2026 Sambit Mallick
